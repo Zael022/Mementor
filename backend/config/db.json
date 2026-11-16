@@ -1,0 +1,18 @@
+{
+  "development": {
+    "dialect": "mysql",
+    "hostEnv": "DB_HOST",
+    "portEnv": "DB_PORT",
+    "databaseEnv": "DB_NAME",
+    "usernameEnv": "DB_USER",
+    "passwordEnv": "DB_PASSWORD"
+  },
+  "test": {
+    "dialect": "mysql",
+    "hostEnv": "TEST_DB_HOST",
+    "portEnv": "TEST_DB_PORT",
+    "databaseEnv": "TEST_DB_NAME",
+    "usernameEnv": "TEST_DB_USER",
+    "passwordEnv": "TEST_DB_PASSWORD"
+  }
+}

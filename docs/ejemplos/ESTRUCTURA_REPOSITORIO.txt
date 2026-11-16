@@ -1,0 +1,32 @@
+mentor-ai/
+├── frontend/
+│   ├── index.html                   <- Vite busca aquí el HTML raíz
+│   ├── package.json
+│   ├── src/
+│   │   ├── Componentes/            <- Componentes de React reutilizables
+│   │   ├── Pages/                  <- Páginas de cada rol
+│   │   ├── Rutas/Rutas.jsx         <- React Router
+│   │   ├── App.jsx                 <- raíz lógica de la aplicación
+│   │   ├── main.jsx                <- punto de entrada a React
+│   │   ├── services/api.js         <- cliente HTTP
+│   │   └── styles.css
+│   └── public/
+├── backend/
+│   ├── config/db.json              <- mapa de entorno, SIN secretos
+│   ├── database/migrations/        <- Sequelize
+│   ├── src/
+│   │   ├── app.js
+│   │   ├── server.js
+│   │   ├── config/database.js
+│   │   ├── models/
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   ├── routes/
+│   │   ├── middlewares/
+│   │   └── validators/
+│   └── .env.example
+├── docs/
+└── README.md
+
+index.html -> main.jsx -> App.jsx -> Rutas/Rutas.jsx -> Pages/* -> Componentes/*
+MySQL + Sequelize guardan todos los datos. No seeds, datos demo, JSON Server ni resultados inventados.

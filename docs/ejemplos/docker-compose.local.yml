@@ -1,0 +1,21 @@
+# SOLO DESARROLLO LOCAL; no reutilizar contraseñas ni configuración en producción.
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:3307:3306'
+    environment:
+      MYSQL_DATABASE: mentor_ai
+      MYSQL_USER: mentor_app
+      MYSQL_PASSWORD: ${LOCAL_DB_PASSWORD:?Define LOCAL_DB_PASSWORD en entorno local}
+      MYSQL_ROOT_PASSWORD: ${LOCAL_DB_ROOT_PASSWORD:?Define LOCAL_DB_ROOT_PASSWORD en entorno local}
+    volumes:
+      - mentor_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h localhost --silent']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+volumes:
+  mentor_mysql_data:

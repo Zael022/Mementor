@@ -1,0 +1,116 @@
+import { z } from 'zod';
+
+// Define las reglas de los datos que recibe la API.
+const text = (max, min = 1) => z.string().trim().min(min, 'Este campo es obligatorio.').max(max, `Máximo ${max} caracteres.`);
+const id = z.number().int().positive();
+const email = z.string().trim().toLowerCase().email('Correo no válido.').max(190);
+
+export const loginSchema = z.object({ email, password: z.string().min(1).max(200) });
+export const activateSchema = z.object({ token: z.string().trim().length(64), password: z.string().min(1).max(200) });
+
+export const institutionSchema = z.object({ name: text(150, 2), slug: text(100).optional() });
+export const inviteUserSchema = z.object({
+  email,
+  displayName: text(120, 2),
+  role: z.enum(['institution_admin', 'teacher', 'student']),
+});
+export const inviteAdminSchema = z.object({ email, displayName: text(120, 2) });
+export const updateUserSchema = z.object({
+  displayName: text(120, 2).optional(),
+  status: z.enum(['active', 'disabled']).optional(),
+}).refine((data) => Object.keys(data).length > 0, 'No hay cambios.');
+
+export const courseSchema = z.object({
+  code: text(40).regex(/^[A-Za-z0-9._-]+$/, 'Usa solo letras, números, punto, guion o guion bajo.'),
+  title: text(180, 2),
+  description: z.string().trim().max(5000).optional(),
+});
+export const updateCourseSchema = z.object({
+  title: text(180, 2).optional(),
+  description: z.string().trim().max(5000).optional(),
+  status: z.enum(['draft', 'published', 'archived']).optional(),
+}).refine((data) => Object.keys(data).length > 0, 'No hay cambios.');
+export const userRefSchema = z.object({ userId: id });
+export const enrollSchema = z.object({ studentId: id });
+
+export const moduleSchema = z.object({ title: text(180, 2) });
+export const topicSchema = z.object({ title: text(180, 2), learningObjective: z.string().trim().max(500).optional() });
+export const prerequisitesSchema = z.object({ prerequisiteTopicIds: z.array(id).max(20) });
+const videoUrl = z.string().trim().max(500).nullable().optional();
+export const lessonSchema = z.object({ title: text(180, 2), bodyMd: text(60000), videoUrl });
+export const updateLessonSchema = z.object({
+  title: text(180, 2).optional(),
+  bodyMd: text(60000).optional(),
+  videoUrl,
+  status: z.enum(['draft', 'published']).optional(),
+}).refine((data) => Object.keys(data).length > 0, 'No hay cambios.');
+
+export const assessmentSchema = z.object({
+  title: text(180, 2),
+  topicId: id,
+  passingScore: z.number().int().min(1).max(100).default(60),
+  maxAttempts: z.number().int().min(1).max(20).default(3),
+});
+export const questionSchema = z.object({
+  stem: text(4000, 3),
+  explanation: z.string().trim().max(4000).optional(),
+  points: z.number().int().min(1).max(100).default(1),
+  topicId: id.optional(),
+  options: z.array(z.object({ body: text(500), isCorrect: z.boolean() })).min(2, 'Agrega al menos dos opciones.').max(6),
+}).refine((data) => data.options.filter((option) => option.isCorrect).length === 1, 'Debe haber exactamente una opción correcta.');
+export const submitSchema = z.object({
+  answers: z.array(z.object({ questionId: id, selectedOptionId: id })).max(200),
+});
+
+export const threadSchema = z.object({ title: z.string().trim().max(180).optional() });
+export const tutorMessageSchema = z.object({ question: text(2000, 3), intent: z.enum(['hint', 'rephrase']).optional() });
+
+// --- Aula: clases en vivo, anuncios, materiales, comentarios y tareas ---
+const httpsUrl = z.string().trim().max(500).url('Enlace no válido.').refine((value) => value.startsWith('https://'), 'El enlace debe comenzar con https://');
+const optionalId = id.nullable().optional();
+const noChanges = (data) => Object.keys(data).length > 0;
+
+const sessionFields = {
+  title: text(180, 2),
+  description: z.string().trim().max(2000).optional(),
+  startsAt: z.coerce.date(),
+  durationMinutes: z.number().int().min(10).max(480).default(60),
+  meetingUrl: httpsUrl,
+  topicId: optionalId,
+};
+export const sessionSchema = z.object(sessionFields);
+export const updateSessionSchema = z.object({
+  ...sessionFields,
+  durationMinutes: z.number().int().min(10).max(480),
+  status: z.enum(['scheduled', 'cancelled']),
+  recordingUrl: httpsUrl.nullable(),
+}).partial().refine(noChanges, 'No hay cambios.');
+
+export const announcementSchema = z.object({ title: text(180, 2), body: text(5000) });
+export const materialLinkSchema = z.object({ title: text(180, 2), url: httpsUrl, lessonId: optionalId });
+export const commentSchema = z.object({ body: text(4000), parentId: optionalId });
+
+const assignmentFields = {
+  title: text(180, 2),
+  instructions: text(20000),
+  dueAt: z.coerce.date().nullable().optional(),
+  maxPoints: z.number().int().min(1).max(1000).default(100),
+  topicId: optionalId,
+};
+export const assignmentSchema = z.object(assignmentFields);
+export const updateAssignmentSchema = z.object({
+  ...assignmentFields,
+  maxPoints: z.number().int().min(1).max(1000),
+  status: z.enum(['draft', 'published']),
+}).partial().refine(noChanges, 'No hay cambios.');
+export const submissionSchema = z.object({ body: text(20000), linkUrl: httpsUrl.nullable().optional() });
+export const gradeSchema = z.object({ gradePoints: z.number().int().min(0).max(1000), feedback: z.string().trim().max(5000).optional() });
+
+// --- Fuentes del tutor, Drive y topes ---
+const limit = z.number().int().min(0).max(1000000).nullable().optional();
+export const institutionLimitsSchema = z.object({ maxDocuments: limit, aiDailyQuestionLimit: limit })
+  .refine((data) => Object.keys(data).length > 0, 'No hay cambios.');
+// Los identificadores de Drive solo tienen letras, números, guion y guion bajo.
+const driveId = z.string().trim().min(10).max(128).regex(/^[A-Za-z0-9_-]+$/, 'El identificador de carpeta no es válido.');
+export const driveFolderSchema = z.object({ folderId: driveId, label: text(180, 2) });
+export const driveLinkSchema = z.object({ driveFolderId: id });

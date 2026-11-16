@@ -1,0 +1,212 @@
+# Estado de desarrollo — mantener actualizado
+
+**Última actualización** — 2026-11-16. Las 15 mejoras de la revisión, pruebas en navegador e integración continua.
+
+## Sesión 2026-11-16 · Las 15 mejoras de la revisión
+
+| # | Mejora | Dónde | Cómo se comprobó |
+| --- | --- | --- | --- |
+| 1 | `<` y `>` del texto de fuentes, preguntas e historial se neutralizan (`asData`); la pregunta va en `<pregunta>` | `tutorService.js` | Prueba con documento hostil que intenta cerrar su fuente y fingir la pregunta |
+| 2 | `TRUST_PROXY` configurable (rechaza `true`) | `config/proxy.js`, `app.js` | Prueba unitaria y prueba con dos IP distintas detrás del proxy |
+| 3 | Primeros bytes del archivo (PDF, ZIP de Office, PNG, JPEG, texto UTF-8 sin NUL) | `utils/fileSignature.js`, `courseBoardService.js` | Prueba con cuatro archivos renombrados (422, no quedan en disco) y prueba en navegador |
+| 4 | El historial que recibe el modelo va sin marcas `[S#]` | `tutorService.js` | Prueba de historial |
+| 5 | «Entrar» se activa con un temporizador al instante exacto de apertura, inicio y fin | `hooks/useEstadoClase.js`, `utils/clases.js` | Pruebas con reloj simulado y prueba en navegador (ventana que se abre a los 6 s) |
+| 6 | Números escritos con letras como palabras vacías (también tras quitar el plural) | `utils/textChunks.js` | Prueba de términos |
+| 7 | Comentario SSE `: ping` cada `SSE_PING_MS`; los errores rápidos siguen como JSON | `knowledgeController.js` | Prueba de streaming con pings y prueba del cliente que los ignora |
+| 8 | Caché por id de versión; se piden metadatos y el texto solo de lo que falta | `retrievalService.js`, `knowledgeService.js` | Prueba: tres preguntas leen el texto de MySQL una sola vez |
+| 9 | Una lectura del corpus por curso y ronda para confirmar importaciones y limpiezas | `vertexRagClient.js`, `knowledgeService.js` | Prueba: tres importaciones confirmadas con una sola lectura |
+| 10 | Turno de tareas en MySQL (`job_leases`) y límites compartidos (`RATE_LIMIT_STORE=mysql`); liberación del turno al apagar | `coordination.js`, `rateLimitStore.js`, `backgroundJobs.js`, `server.js` | Pruebas de turno entre dos instancias y de límite compartido entre dos apps |
+| 11 | Retención: texto de versiones sin citas (30 días), consumo resumido por mes (90), chats sin actividad (365) | `retentionService.js`, migración `20261116000500` | Prueba que respeta la versión citada y la vigente |
+| 12 | El borrador deja de ser región viva; un aviso único anuncia «Respuesta lista con N fuentes» | `TutorCurso.jsx`, `useChatTutor.js` | Prueba del hook y prueba en navegador. **Pendiente: NVDA y VoiceOver reales** |
+| 13 | Pruebas Playwright en `frontend/e2e` (escritorio y móvil) y GitHub Actions con MySQL 8.4 | `frontend/e2e`, `.github/workflows/ci.yml` | 11 de 11 en local |
+| 14 | `/health` informa tutor, modo de búsqueda y Google Cloud sin datos sensibles | `healthController.js` | Prueba de flujo |
+| 15 | Pruebas de `CargaArchivo` (rechazos, una petición, reintento) y `CursoFuentes` | `frontend/tests` | 5 pruebas nuevas |
+
+### Resultados (Node 22, MySQL 8.0.46)
+- Backend: `npm run lint` sin errores; `npm test` **80 de 80**.
+- Frontend: `npm run lint` sin errores; `npm test` **27 de 27**; `npm run build` compila.
+- Navegador: `npm run test:e2e` **11 de 11** (escritorio 1280 px y Pixel 7).
+- Migraciones: base nueva sin filas de contenido; las migraciones nuevas se revierten y se vuelven a aplicar.
+- MySQL 8.4 queda cubierto por GitHub Actions al subir el repositorio.
+
+## Sesión 2026-11-16 · Optimización de rendimiento
+
+### Cambios realizados
+
+- `utils/textChunks.js` conserva rangos exactos del original y solapamiento entre fragmentos. Corrige la pérdida del final del pasaje cuando hay varias líneas en blanco, reconoce siglas cortas y exige que el pasaje remoto completo exista en el texto guardado. La normalización mantiene las posiciones de Unicode.
+- `retrievalService.js` reutiliza fragmentos y conjuntos de términos en una caché acotada a 128 textos y 4.000.000 de caracteres. La autorización se consulta en MySQL en cada pregunta. En modo Vertex se leen primero metadatos y después el texto de las versiones recuperadas.
+- `homeService.js` calcula avance mediante agregados, filtra la asistencia por estudiante y usa columnas explícitas y resultados planos. `courseBoardService.js` aplica el mismo criterio a anuncios y materiales. `analyticsService.js` agrupa respuestas y dominio antes de unirlos a los temas.
+- La migración `20261116000400-optimize-read-indexes.js` añade índices en `class_sessions(course_id, status, starts_at)`, `assessment_attempts(assessment_id, status, student_id)`, `attempt_answers(question_id, is_correct)` y `ai_threads(user_id, course_id, id)`. Permite reanudar una aplicación parcial y revertirla conservando los índices que necesitan las claves foráneas. Se mantienen los índices previos de progreso y consumo.
+- `app.js` negocia compresión HTTP con `compression`. El filtro omite `text/event-stream` para que los eventos lleguen de inmediato.
+- `useChatTutor.js` mantiene el borrador fuera del historial, agrupa deltas cada 32 ms y cancela las cargas al salir. `TutorCurso.jsx` y `MensajeTutor.jsx` evitan renderizar mensajes anteriores durante el streaming. El lector SSE libera sus recursos ante cancelaciones y errores, y admite UTF-8 y CRLF entre paquetes.
+- `useAhora.js` detiene los relojes al ocultar la pestaña. La ventana de acceso a las clases se revisa cada 15 segundos y al volver a la pestaña. La cuenta regresiva conserva su actualización por segundo. `ShapeGrid.jsx` atiende cambios de movimiento reducido durante la sesión.
+- `Rutas.jsx` difiere 26 de las 27 páginas. El formulario de ingreso está en la entrada principal. `vite.config.js` separa React, Motion y React Spring en archivos con hash de contenido.
+
+### Mediciones
+
+| Comprobación | Versión recibida | Versión optimizada |
+| --- | --- | --- |
+| Búsqueda local con 100 documentos, mediana de 15 ejecuciones tras preparar la caché | 62,85 ms | 1,74 ms |
+| JavaScript inicial completo, con dependencias estáticas | 283,15 kB | 282,50 kB |
+| JavaScript inicial completo con gzip | 90,59 kB | 90,71 kB |
+
+Los documentos de la medición son sintéticos, de unos 17.000 caracteres cada uno. El tiempo medido corresponde a la selección en memoria de fragmentos. El tiempo completo de una pregunta incluye además MySQL, red y generación. La mejora de empaquetado permite reutilizar las dependencias entre versiones. El tamaño gzip inicial aumenta 125 bytes.
+
+### Validación de esta sesión
+
+- Node.js 24.22.1 y MySQL 8.0.46 en una instancia aislada de pruebas.
+- `npm run lint` pasa en `backend/` y `frontend/`.
+- `npm test` en `backend/` pasa con **68 pruebas**. Incluyen los casos anteriores, rangos exactos, siglas, coincidencias parciales rechazadas, citas completas, avance por estudiante, compresión JSON y SSE sin compresión.
+- `npm test` en `frontend/` pasa con **17 pruebas**. Incluyen citas, dominio, historial estable durante los deltas, cancelación, nueva conversación, UTF-8, cierre del lector SSE y reloj al volver a la pestaña.
+- `npm run build` en `frontend/` pasa.
+- Tras cambiar el texto de la página de ingreso y recompilar, los archivos de React, Motion y React Spring conservaron sus hashes. El cambio temporal se revirtió antes de empaquetar.
+- Las migraciones se aplican sobre una base nueva y dejan **35 tablas de aplicación y cero filas de contenido**. La nueva migración se revierte y reaplica. Ejecutar su `up` dos veces mantiene un solo índice de cada nombre.
+- Recorrido con Chromium Headless en 1280 × 900 y 390 × 844. Se comprobaron acceso, carga diferida de animaciones, pregunta sobre IA, tres citas desplegables con teclado, apertura del pasaje completo, detener la generación, nueva conversación, cambio de curso, aviso sin evidencia y ruta de activación. Se registraron dos cancelaciones en el generador de prueba y cero errores JavaScript. La vista móvil se mantiene dentro del ancho disponible.
+- El recorrido usa el backend y MySQL reales con un generador de pruebas. Las pruebas de Vertex y Drive usan dobles. La llamada a Google Cloud, Drive y al proveedor con credenciales reales, junto con MySQL 8.4, sigue pendiente.
+
+## Versión recibida · Tutor con fuentes, RAG Engine, Drive, streaming y consumo
+
+### Entrega 1 · Tutor y aula
+- `utils/textChunks.js`: fragmenta sin perder texto (párrafos largos por oraciones, con posiciones exactas) y exige un mínimo de coincidencias. Sin evidencia hay aviso `NO_EVIDENCE`, cero citas y ninguna llamada al modelo.
+- «Dame una pista» y «Explica diferente» envían `intent`: la búsqueda usa la pregunta anterior del mismo hilo.
+- La respuesta del proveedor se valida con Zod (`AI_INVALID_FORMAT`, 502). Las citas se contrastan con los fragmentos entregados; sin ninguna válida, aviso `NO_VALID_CITATIONS` en vez de la respuesta.
+- `TutorCurso.jsx` + `hooks/useChatTutor.js`: el chat se monta con `key={courseId}`, «Nueva conversación» queda en estado explícito (`null`) y cada turno se cancela o descarta si cambia el hilo o el curso.
+- `ClasesEnVivo.jsx` y `EstudianteInicio.jsx` calculan la ventana de 15 minutos con un reloj local (`utils/clases.js`, `hooks/useAhora.js`). El servidor sigue validando.
+- `assessmentService.submitAttempt` bloquea la evaluación y rechaza un intento pendiente si ya está cerrada (`ASSESSMENT_CLOSED`); cerrar espera a la entrega en curso.
+
+### Entrega 2 · RAG Engine de extremo a extremo
+- Migración `20261116000200`: `course_rag_corpora` (un corpus por curso), `knowledge_sources`, `source_versions` (texto extraído, URI de Cloud Storage, archivo del corpus, operación), `ai_message_sources` y topes por institución.
+- `knowledgeService.js`: lecciones publicadas, materiales PDF/DOCX/TXT (incluidos los existentes con «Indexar ahora») y Drive. Cada versión: objeto privado `mentor-ai/i{inst}/c{curso}/s{fuente}/v{versión}.txt` → `ragFiles.import` → se confirma el archivo en el corpus (`fileStatus`) antes de marcarla lista. Una sola versión activa; la anterior pasa a limpieza.
+- `retrievalService.js`: autoriza en MySQL, llama a `retrieveContexts` solo con los `ragFileIds` activos, descarta resultados de origen desconocido o retirado y verifica el pasaje dentro de la versión publicada. Sin fuentes autorizadas no se consulta Google. `RAG_UNAVAILABLE` (falla) es distinto de `NO_EVIDENCE` (sin coincidencias).
+- Cita protegida `GET /tutor/messages/:id/citations/:n` y página `CitaTutor.jsx`: pasaje, título, página o sección, versión y aviso si hay una más nueva. La URI interna nunca sale del servidor.
+- Retiro inmediato (docente, borrador, borrado). El historial marca «fuente retirada» y el modelo no recibe esos turnos. Al borrar una lección se reconcilian el archivo local, el objeto privado y el archivo del corpus, con reintentos y solo sobre recursos administrados.
+- Pantalla docente `CursoFuentes.jsx`: estado, motivo, reintento, retiro, versiones y uso en respuestas.
+
+### Entrega 3 · Drive, chat y consumo
+- Migración `20261116000300`: carpetas habilitadas por la institución, vínculo por curso con sincronización reanudable y `ai_usage_events`.
+- `driveSyncService.js`: recorre todas las páginas, exporta Google Docs a texto, descarga PDF/DOCX/TXT, no reindexa lo que no cambió, reanuda desde la página guardada sin declarar borrados, retira lo que salió de la carpeta y desactiva todo si se pierde el acceso (404). Solo lectura.
+- `aiProvider.streamWithProvider` con el SDK oficial de Anthropic; SSE en `POST /tutor/threads/:id/messages/stream`; cancelación al salir o con «Detener». Un flujo interrumpido no se guarda. OpenAI conserva su ruta JSON.
+- `usageService.js`: reserva atómica con bloqueo de fila (institución y luego usuario). Límite por persona (`RATE_LIMITED`) y por institución (`INSTITUTION_QUOTA`), ambos 429. Tope de documentos (`DOCUMENT_LIMIT`). Registro de modelo, latencia y tokens sin contenido. Pantalla `AdminConsumo.jsx` (sin costos: no hay tarifas verificadas).
+- Tareas periódicas (`backgroundJobs.js`): revisión de importaciones, limpieza remota, reconciliación de archivos y sincronización de Drive opcional.
+
+### Mejoras de interfaz
+| Biblioteca | Archivo | Resultado observado en el navegador |
+| --- | --- | --- |
+| Motion (`motion/react`, `LazyMotion` + `m`) | `Componentes/MensajeTutor.jsx` | Primera cita visible; «Ver 2 fuentes más» con `aria-expanded` y `aria-controls`; se abre con Enter. Las citas aparecen al llegar la respuesta validada; el texto en curso usa el mismo formato que el final |
+| React Bits · Shape Grid (JS + CSS desde el repositorio oficial) | `Componentes/Portada.jsx`, `Componentes/ShapeGrid.jsx` | Se carga aparte; el formulario acepta escritura de inmediato; capa `aria-hidden` sin eventos de puntero; 0 cuadros de animación después de la entrada y con la pestaña oculta; estática con movimiento reducido |
+| Aceternity UI · File Upload (adaptado) + `react-dropzone` | `Componentes/CargaArchivo.jsx`, `Componentes/Materiales.jsx` | Arrastrar o elegir; nombre y tamaño; «Cambiar archivo»; rechazo de más de 10 MB; doble clic produce 1 petición; error del servidor visible y «Reintentar subida»; estado de indexación cuando la API lo informa |
+| React Spring (`useSpring`, `animated.div`) | `Componentes/MedidorDominio.jsx` | Texto 67 % desde el inicio y barra que llega a 67 %; inmediata con movimiento reducido; se quitaron el contador y la transición CSS de la barra |
+
+JavaScript inicial: **353,08 kB (105,37 kB gzip) antes → 283,15 kB (90,59 kB gzip) después**, gracias a la carga de páginas por ruta y a `LazyMotion`.
+
+### Pruebas ejecutadas (2026-11-16, Node 22.23, MySQL 8.0.46)
+Todas con **dobles** (Google Cloud en memoria y generador de prueba); ninguna con servicios reales.
+- `backend: npm test` → **59 de 59**: las 28 anteriores, 7 del tutor y el cierre (`tutor.test.js`), 11 de RAG (`rag.test.js`: dos cursos y dos instituciones con plazos distintos y sinónimos, citas protegidas, versión usada visible para el docente, sin respaldo sin generador, falla de Google distinta, reimportación idempotente, retiro con limpieza fallida y reintento, PDF con y sin texto, DOCX, borrado de lección, permisos de carga), 6 de Drive (`drive.test.js`) y 7 de streaming y consumo (`stream.test.js`: SSE, cancelación, cuota concurrente 3 de 6, tope institucional 429, registro sin contenido).
+- `backend: npm run lint`, `frontend: npm run lint` → sin errores.
+- `frontend: npm test` → 10 de 10 (Vitest + jsdom: medidor 0,72 → 72 %, 0 → 0 %, null → n/a, movimiento reducido, límites; citas con 3, 1 y 0 fuentes, texto en curso y fuente retirada).
+- `frontend: npm run build` → compila.
+- Migraciones: base nueva → 35 tablas y **0 filas**; revertir las tres migraciones nuevas y volver a aplicarlas funciona.
+- Navegador (Chrome headless, escritorio 1280 px y móvil 390 px, teclado y movimiento reducido), modo local, con un doble local del API de Anthropic con streaming: recorridos de las entregas 1, 2 y 3 y de las cuatro mejoras sin errores de consola (solo los 401 esperados antes de iniciar sesión).
+
+### Comprobaciones pendientes con servicios reales
+- **MySQL 8.4:** no se pudo descargar en el entorno (Docker Hub y repo.mysql.com bloqueados). Comprobación: `npm run db:migrate` y `npm test` contra 8.4.
+- **Google Cloud (modo vertex):** con un proyecto de prueba en `europe-west4`: crear un corpus, importar un TXT, comprobar `fileStatus.state = ACTIVE`, recuperar con `retrieveContexts` filtrando por `ragFileIds`, confirmar que `sourceUri` coincide con `gs://…` y calibrar `RAG_VECTOR_DISTANCE_THRESHOLD`. Verificar que `roles/aiplatform.user` alcanza para `ragCorpora.*` y `ragFiles.*`.
+- **Drive real:** compartir una carpeta con la cuenta de servicio, exportar un Google Doc y comprobar ADC con alcance `drive.readonly` (suplantación de cuenta de servicio).
+- **Proveedor real:** streaming con una clave de Anthropic y el modelo vigente; uso real de tokens.
+- **Interfaz con datos reales en modo vertex** (solo se probó en modo local).
+- `npm audit` (backend, producción): 2 avisos moderados heredados de `sequelize` (`uuid`). Frontend: 0.
+- No existe `CONTEXTO_CHAT_MENTOR_AI.md` en el ZIP recibido; el historial se contrastó con este archivo y con el código.
+- React Bits Background Studio y el registro de Aceternity no fueron accesibles desde el entorno: los parámetros de Shape Grid se ajustaron a mano y File Upload se adaptó a partir de su estructura publicada.
+
+## Checklist
+- [x] Estructura React `Componentes / Pages / Rutas / App.jsx / main.jsx / index.html`
+- [x] Backend Node/Express en capas
+- [x] Conexión Sequelize a MySQL y migraciones de esquema
+- [x] MySQL sin datos precargados ni usuarios demo
+- [x] Provisionamiento seguro de primer administrador (`npm run admin:create`)
+- [x] Auth + roles + aislamiento institucional
+- [x] Cursos, módulos, temas, lecciones, matrículas y evaluaciones
+- [x] Tutor IA real con errores explícitos sin configuración (ver "Sin verificar")
+- [x] Progreso y recomendaciones con evidencia
+- [x] Tests, lint, build, documentación
+- [x] Aula: clases en vivo con asistencia, video en lecciones, materiales, anuncios, preguntas por lección, tareas con nota, inicio del estudiante
+- [x] Tutor con fuentes: RAG Engine (Google Cloud) o búsqueda local, citas protegidas, Drive, streaming, cuota y consumo
+- [ ] Planificador de estudio (`study_plans`)
+- [ ] Borradores de preguntas generados por IA con aprobación docente
+- [ ] Restablecimiento de contraseña, MFA, notificaciones por correo, entrega de tareas con archivo
+
+## Decisiones (2026-11-10)
+- **Correo único en toda la plataforma** (no por institución) para iniciar sesión sin elegir institución.
+- **Cuentas por invitación:** quien administra crea la cuenta y recibe un enlace de un solo uso (72 h); la persona define su contraseña. No hay envío de correo todavía.
+- **Sesión** con cookie httpOnly + token CSRF en cabecera `x-csrf-token`; se guarda solo el hash del token. Bloqueo de 15 min tras 5 intentos fallidos.
+- **Contraseñas** con scrypt (módulo `crypto` de Node), sin dependencias extra.
+- **Validación** con zod en `src/validators/schemas.js`.
+- `topics` y `lessons` guardan `course_id` para validar el acceso por curso en cada consulta.
+- **Evaluaciones:** las preguntas solo se editan en borrador; al publicar quedan bloqueadas. La clave se muestra al estudiante cuando agota sus intentos o la evaluación se cierra.
+- **Dominio:** fórmula `baseline-1` de `docs/08` en `src/utils/mastery.js`; se recalcula dentro de la misma transacción del envío.
+- **Tutor:** recuperación por coincidencia de palabras sobre lecciones publicadas (sin embeddings); el modelo debe responder JSON y las citas se validan contra las fuentes enviadas. Límite diario por usuario (`AI_DAILY_LIMIT_PER_USER`).
+- El administrador de plataforma no accede a contenido académico.
+
+## Aula de clases (2026-11-13)
+Migración `20261113000100-create-classroom.js`: columna `lessons.video_url` y tablas `class_sessions`, `session_attendance`, `announcements`, `materials`, `lesson_comments`, `assignments`, `assignment_submissions`.
+
+Endpoints nuevos (`src/routes/classroomRoutes.js`):
+- Clases: `GET/POST /courses/:id/sessions`, `PATCH/DELETE /sessions/:id`, `POST /sessions/:id/join`, `GET /sessions/:id/attendance`.
+- Anuncios: `GET/POST /courses/:id/announcements`, `DELETE /announcements/:id`.
+- Materiales: `GET/POST /courses/:id/materials`, `POST /courses/:id/materials/upload`, `GET /materials/:id/download`, `DELETE /materials/:id`.
+- Preguntas: `GET/POST /lessons/:id/comments`, `DELETE /comments/:id`.
+- Tareas: `GET/POST /courses/:id/assignments`, `GET/PATCH/DELETE /assignments/:id`, `POST /assignments/:id/submission`, `PATCH /submissions/:id/grade`.
+- Inicio del estudiante: `GET /me/home`.
+
+Decisiones:
+- La videollamada ocurre en Meet/Zoom/Teams; MENTOR guarda el enlace, lo entrega al pulsar "Entrar" (desde 15 min antes) y ahí registra la asistencia. El listado para estudiantes no incluye el enlace.
+- Video de lección solo de YouTube o Vimeo; el backend calcula la dirección para incrustar (`src/utils/links.js`).
+- Archivos en `backend/storage/uploads` (fuera de Git), nombre aleatorio, máximo 10 MB, tipos: pdf, docx, pptx, xlsx, png, jpg, txt. La descarga pasa por un endpoint que valida el acceso al curso.
+- Todos los enlaces guardados deben ser `https://`.
+- Una entrega se puede corregir hasta que el docente la califica.
+- Al borrar una lección se borran los registros de sus materiales, pero el archivo queda en disco (pendiente de limpieza).
+
+## Rediseño (2026-11-13)
+- Sistema de color con un papel por color: azul para estructura, naranja solo para la acción principal, lima para avance y completado, tinta oscura para texto y bloques destacados.
+- Tipografías instaladas con el proyecto (ya no dependen de internet): Bricolage Grotesque en títulos y Figtree en texto (`@fontsource-variable/*`, importadas en `src/main.jsx`).
+- Inicio del estudiante: la próxima clase es el bloque principal, con cuenta regresiva y botón para entrar.
+- Curso del estudiante: las lecciones se muestran como una ruta numerada que se llena con el avance (`Componentes/RutaLecciones.jsx`).
+- Páginas del docente: los formularios de creación se abren bajo un botón (`Componentes/Desplegable.jsx`) y se muestran solos cuando la lista está vacía; primero se ve el contenido.
+- Menos tarjetas idénticas y menos animaciones automáticas; se conservan las que responden a una acción.
+
+## Estilo y animaciones (2026-11-10)
+- Rediseño visual: navegación superior, azul intenso con botones naranja tipo píldora, tarjetas redondeadas y banners; tipografía Poppins desde Google Fonts (con fuente del sistema como respaldo).
+- Animaciones sin librerías: `src/hooks/useMovimiento.js` y `src/Componentes/Animaciones.jsx` (aparición al hacer scroll, contadores, anillo de puntaje, tarjetas que se inclinan con el cursor) y `Portada.jsx` (fichas flotantes que siguen al cursor).
+- Todas se desactivan con `prefers-reduced-motion`.
+- Se usó como referencia de estilo un sitio externo; no se copiaron su marca, imágenes ni textos.
+
+## Archivos principales
+- Migraciones: `backend/database/migrations/2026111000010x..0400`.
+- Modelos: `backend/src/models/*` (asociaciones en `index.js`).
+- Servicios: `auth`, `user`, `institution`, `access`, `course`, `content`, `assessment`, `mastery`, `analytics`, `tutor`, `aiProvider`, `audit`.
+- Rutas: `authRoutes`, `adminRoutes`, `courseRoutes`, `learningRoutes`.
+- Frontend: 23 páginas en `src/Pages`, componentes en `src/Componentes`, sesión en `src/context`, hooks en `src/hooks`.
+
+## Pruebas ejecutadas (2026-11-13)
+- `backend: npm test` → 28 de 28 (las 20 anteriores + 8 del aula: video, clases y asistencia, anuncios, subida y descarga de archivos, comentarios, tareas y notas, inicio del estudiante, aislamiento).
+- Lint de backend y frontend sin errores; el frontend compila.
+- Recorrido del aula en navegador con docente y estudiante sin errores de consola.
+- Sin verificar: reproducción real del video (el entorno de prueba no tiene internet) y apertura de una reunión real de Meet/Zoom.
+
+## Pruebas ejecutadas (2026-11-10, MySQL 8.0.46, Node 22)
+- `backend: npm run db:migrate` sobre base vacía → 21 tablas, 0 filas de contenido.
+- `backend: npm test` → 20 de 20 pruebas pasan (5 unitarias de dominio, 15 de integración: sesión, CSRF, invitaciones, permisos, aislamiento entre instituciones, clave oculta, corrección, idempotencia, intentos, analítica, tutor sin configurar, citas, auditoría, bloqueo).
+- `backend: npm run lint` y `frontend: npm run lint` → sin errores.
+- `frontend: npm run build` → compila.
+- Recorrido completo en navegador (plataforma → institución → docente → estudiante → analítica) sin errores de consola.
+
+## Sin verificar
+- **Llamada real al proveedor de IA:** no se probó con una clave real. Se probó el error `AI_NOT_CONFIGURED`, la selección de fuentes y la validación de citas con la llamada externa sustituida dentro de la prueba.
+- Ocultamiento de la contraseña al escribirla en `admin:create` en una terminal de Windows.
+- MySQL 8.4 (se probó en 8.0).
+- `npm audit` reporta 2 avisos moderados heredados de `sequelize` (dependencia `uuid`).
+
+## Próximo paso
+1. Ejecutar las comprobaciones pendientes con servicios reales (arriba).
+2. Planificador de estudio (Fase 3) y borradores de preguntas con IA revisados por el docente (Fase 4).
+3. Política de retención y borrado de conversaciones; OCR para PDF escaneados; restablecimiento de contraseña y envío de invitaciones por correo.

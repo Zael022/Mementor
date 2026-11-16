@@ -1,0 +1,48 @@
+import { open } from 'node:fs/promises';
+
+// Firmas de los formatos permitidos: el contenido debe coincidir con la extensión declarada.
+const SIGNATURES = {
+  '.pdf': [Buffer.from('%PDF-')],
+  '.docx': [Buffer.from([0x50, 0x4b, 0x03, 0x04])],
+  '.pptx': [Buffer.from([0x50, 0x4b, 0x03, 0x04])],
+  '.xlsx': [Buffer.from([0x50, 0x4b, 0x03, 0x04])],
+  '.png': [Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])],
+  '.jpg': [Buffer.from([0xff, 0xd8, 0xff])],
+  '.jpeg': [Buffer.from([0xff, 0xd8, 0xff])],
+};
+const TEXT_SAMPLE_BYTES = 64 * 1024;
+
+// Lee el comienzo del archivo sin cargarlo completo en memoria.
+async function readStart(filePath, length) {
+  const handle = await open(filePath, 'r');
+  try {
+    const buffer = Buffer.alloc(length);
+    const { bytesRead } = await handle.read(buffer, 0, length, 0);
+    return buffer.subarray(0, bytesRead);
+  } finally {
+    await handle.close();
+  }
+}
+
+// Un TXT válido es UTF-8 sin bytes nulos (los binarios casi siempre los tienen).
+function looksLikeText(sample) {
+  if (sample.includes(0)) return false;
+  // Si la muestra corta un carácter de varios bytes al final, se ignoran esos últimos bytes.
+  for (let trim = 0; trim < 4 && trim <= sample.length; trim += 1) {
+    try {
+      new TextDecoder('utf-8', { fatal: true }).decode(sample.subarray(0, sample.length - trim));
+      return true;
+    } catch { /* prueba recortando un byte más */ }
+  }
+  return false;
+}
+
+// Indica si el contenido real del archivo corresponde a su extensión.
+export async function matchesSignature(filePath, extension) {
+  const ext = String(extension || '').toLowerCase();
+  if (ext === '.txt') return looksLikeText(await readStart(filePath, TEXT_SAMPLE_BYTES));
+  const expected = SIGNATURES[ext];
+  if (!expected) return false;
+  const start = await readStart(filePath, 16);
+  return expected.some((signature) => start.subarray(0, signature.length).equals(signature));
+}

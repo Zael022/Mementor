@@ -1,0 +1,16 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.DS_Store
+dist/
+coverage/
+backend/storage/
+# Credenciales de Google Cloud: nunca en el repositorio (usa ADC).
+credenciales/
+*service-account*.json
+application_default_credentials.json
+# Resultados de las pruebas en navegador
+frontend/test-results/
+frontend/playwright-report/
+backend/storage/uploads-e2e/

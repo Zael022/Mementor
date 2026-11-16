@@ -1,0 +1,33 @@
+{
+  "policyId": "mentor-ai-default-v1",
+  "language": "es",
+  "tutor": {
+    "allowedSources": "published_lessons_within_authorized_course_only",
+    "requireSourceCitations": true,
+    "allowUncitedGeneralInformation": false,
+    "academicIntegrityMode": "hints_for_active_assessments",
+    "maxOutputTokens": 800,
+    "rateLimitPerUserPerDay": 40,
+    "requestTimeoutSeconds": 20
+  },
+  "generatedQuestions": {
+    "publishedAutomatically": false,
+    "requiresTeacherApproval": true,
+    "validateSchema": true,
+    "sourceLessonRequired": true
+  },
+  "mastery": {
+    "algorithmVersion": "baseline-1",
+    "prior": 0.5,
+    "priorWeight": 2,
+    "recentAnswersMax": 20,
+    "minimumEvidenceForNonPreliminaryLabel": 3,
+    "thresholds": {"reinforceBelow": 0.6, "advanceAtOrAbove": 0.85}
+  },
+  "privacy": {
+    "dontTrainOnStudentDataWithoutLawfulBasis": true,
+    "dontLogSecrets": true,
+    "humanReviewOfHighImpactDecisions": true,
+    "tenantIsolationRequired": true
+  }
+}
