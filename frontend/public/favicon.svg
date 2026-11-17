@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Marca de MENTOR AI: el mismo cuadro azul con borde lima que aparece junto al nombre. -->
+  <defs>
+    <clipPath id="forma">
+      <path d="M22 2 H42 A20 20 0 0 1 62 22 V42 A20 20 0 0 1 42 62 H8 A6 6 0 0 1 2 56 V22 A20 20 0 0 1 22 2 Z"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#forma)">
+    <rect width="64" height="64" fill="#c8f169"/>
+    <path transform="translate(-20 -20)" d="M22 2 H42 A20 20 0 0 1 62 22 V42 A20 20 0 0 1 42 62 H8 A6 6 0 0 1 2 56 V22 A20 20 0 0 1 22 2 Z" fill="#3451e1"/>
+  </g>
+</svg>

@@ -1,6 +1,8 @@
-import { Suspense } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Cargando } from './Estados.jsx';
+import LimiteErrores from './LimiteErrores.jsx';
+import { tituloDe } from '../utils/titulos.js';
 import { useSesion } from '../context/SesionContext.jsx';
 
 // Opciones del menú según el rol.
@@ -29,6 +31,19 @@ export default function Layout() {
   const { usuario, cerrarSesion } = useSesion();
   const navegar = useNavigate();
   const { pathname } = useLocation();
+  const principal = useRef(null);
+  const primeraVisita = useRef(true);
+
+  // Al cambiar de página actualiza el título y lleva el foco al contenido, para que los lectores de pantalla anuncien el cambio.
+  useEffect(() => {
+    document.title = tituloDe(pathname);
+    if (primeraVisita.current) {
+      primeraVisita.current = false;
+      return;
+    }
+    principal.current?.focus({ preventScroll: true });
+    window.scrollTo({ top: 0 });
+  }, [pathname]);
 
   async function salir() {
     await cerrarSesion();
@@ -37,6 +52,7 @@ export default function Layout() {
 
   return (
     <div className="app">
+      <a className="saltar" href="#contenido">Saltar al contenido</a>
       <header className="cabecera">
         <Link to="/" className="marca">MENTOR <span>AI</span></Link>
         <nav aria-label="Navegación principal">
@@ -54,7 +70,9 @@ export default function Layout() {
         </div>
       </header>
       {/* La clave reinicia la animación de entrada al cambiar de página. */}
-      <main className="contenido" key={pathname}><Suspense fallback={<Cargando />}><Outlet /></Suspense></main>
+      <main id="contenido" className="contenido" key={pathname} ref={principal} tabIndex={-1}>
+        <LimiteErrores><Suspense fallback={<Cargando />}><Outlet /></Suspense></LimiteErrores>
+      </main>
     </div>
   );
 }

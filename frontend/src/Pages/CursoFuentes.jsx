@@ -122,7 +122,7 @@ export default function CursoFuentes() {
 
       {fuentes.cargando && !datos && <Cargando />}
       {datos && activas.length === 0 && (
-        <EstadoVacio titulo="Aún no hay fuentes" detalle="Publica una lección, sube un PDF, DOCX o TXT en «Anuncios y materiales» o vincula una carpeta de Drive." />
+        <EstadoVacio ilustracion="libro" titulo="Aún no hay fuentes" detalle="Publica una lección, sube un PDF, DOCX o TXT en «Anuncios y materiales» o vincula una carpeta de Drive." />
       )}
       {activas.length > 0 && (
         <section className="tarjeta">

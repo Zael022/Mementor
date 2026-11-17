@@ -62,7 +62,7 @@ export default function CursoTareas() {
 
       <MensajeError error={tareas.error} />
       {tareas.cargando && !tareas.datos && <Cargando />}
-      {tareas.datos?.length === 0 && <EstadoVacio titulo="No hay tareas todavía" detalle="Crea la primera tarea con el formulario de arriba." />}
+      {tareas.datos?.length === 0 && <EstadoVacio ilustracion="tarea" titulo="No hay tareas todavía" detalle="Crea la primera tarea con el formulario de arriba." />}
       {tareas.datos?.map((tarea) => (
         <article className="tarjeta" key={tarea.id}>
           <div className="tarjeta-cabecera">

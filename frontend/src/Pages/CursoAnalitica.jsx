@@ -28,7 +28,7 @@ export default function CursoAnalitica() {
       </div>
 
       {intentos === 0 && (
-        <EstadoVacio titulo="Aún no hay intentos enviados" detalle="Las estadísticas aparecerán cuando los estudiantes resuelvan evaluaciones publicadas." />
+        <EstadoVacio ilustracion="grafica" titulo="Aún no hay intentos enviados" detalle="Las estadísticas aparecerán cuando los estudiantes resuelvan evaluaciones publicadas." />
       )}
 
       <Revelar etiqueta="section" className="tarjeta">

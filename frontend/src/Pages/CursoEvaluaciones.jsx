@@ -63,7 +63,7 @@ export default function CursoEvaluaciones() {
 
       <MensajeError error={evaluaciones.error} />
       {evaluaciones.cargando && <Cargando />}
-      {evaluaciones.datos?.length === 0 && <EstadoVacio titulo="No hay evaluaciones todavía" detalle="Crea un cuestionario y agrégale preguntas antes de publicarlo." />}
+      {evaluaciones.datos?.length === 0 && <EstadoVacio ilustracion="tarea" titulo="No hay evaluaciones todavía" detalle="Crea un cuestionario y agrégale preguntas antes de publicarlo." />}
       {evaluaciones.datos?.map((evaluacion) => (
         <article className="tarjeta" key={evaluacion.id}>
           <div className="tarjeta-cabecera">

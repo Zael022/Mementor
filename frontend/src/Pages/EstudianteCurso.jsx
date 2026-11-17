@@ -81,7 +81,7 @@ export default function EstudianteCurso() {
       {seccion === 'contenido' && (
         <>
           <Recomendaciones lista={recomendaciones.datos} />
-          {datos.modules.length === 0 && <EstadoVacio titulo="Este curso aún no tiene contenido" detalle="Tu docente todavía no ha agregado módulos." />}
+          {datos.modules.length === 0 && <EstadoVacio ilustracion="libro" titulo="Este curso aún no tiene contenido" detalle="Tu docente todavía no ha agregado módulos." />}
           <RutaLecciones modulos={datos.modules} />
         </>
       )}
@@ -89,7 +89,7 @@ export default function EstudianteCurso() {
       {seccion === 'clases' && (
         <>
           <MensajeError error={sesiones.error} />
-          {sesiones.datos?.length === 0 && <EstadoVacio titulo="No hay clases en vivo programadas" detalle="Cuando tu docente programe una clase aparecerá aquí con su cuenta regresiva." />}
+          {sesiones.datos?.length === 0 && <EstadoVacio ilustracion="calendario" titulo="No hay clases en vivo programadas" detalle="Cuando tu docente programe una clase aparecerá aquí con su cuenta regresiva." />}
           {vigentes.map((sesion) => <TarjetaSesion key={sesion.id} sesion={sesion} alEntrar={sesiones.recargar} />)}
           {pasadas.length > 0 && <h2>Clases anteriores</h2>}
           {pasadas.map((sesion) => <TarjetaSesion key={sesion.id} sesion={sesion} />)}
@@ -99,7 +99,7 @@ export default function EstudianteCurso() {
       {seccion === 'tareas' && (
         <>
           <MensajeError error={tareas.error} />
-          {tareas.datos?.length === 0 && <EstadoVacio titulo="No hay tareas asignadas" detalle="Las tareas publicadas por tu docente aparecerán aquí." />}
+          {tareas.datos?.length === 0 && <EstadoVacio ilustracion="tarea" titulo="No hay tareas asignadas" detalle="Las tareas publicadas por tu docente aparecerán aquí." />}
           {tareas.datos?.map((tarea) => (
             <article className="tarjeta" key={tarea.id}>
               <div className="tarjeta-cabecera">
@@ -121,7 +121,7 @@ export default function EstudianteCurso() {
       {seccion === 'evaluaciones' && (
         <>
           <MensajeError error={evaluaciones.error} />
-          {evaluaciones.datos?.length === 0 && <EstadoVacio titulo="No hay evaluaciones disponibles" detalle="Aparecerán aquí cuando tu docente las publique." />}
+          {evaluaciones.datos?.length === 0 && <EstadoVacio ilustracion="tarea" titulo="No hay evaluaciones disponibles" detalle="Aparecerán aquí cuando tu docente las publique." />}
           {evaluaciones.datos?.map((evaluacion) => (
             <article className="tarjeta" key={evaluacion.id}>
               <div className="tarjeta-cabecera">

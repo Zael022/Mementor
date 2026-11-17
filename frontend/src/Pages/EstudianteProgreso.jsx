@@ -22,7 +22,7 @@ export default function EstudianteProgreso() {
     return (
       <>
         <h1>Mi progreso</h1>
-        <EstadoVacio titulo="Aún no hay progreso que mostrar" detalle="Tu progreso aparecerá cuando estés matriculado en un curso y resuelvas evaluaciones." />
+        <EstadoVacio ilustracion="grafica" titulo="Aún no hay progreso que mostrar" detalle="Tu progreso aparecerá cuando estés matriculado en un curso y resuelvas evaluaciones." />
       </>
     );
   }

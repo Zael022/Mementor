@@ -1,6 +1,22 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-16. Las 15 mejoras de la revisión, pruebas en navegador e integración continua.
+**Última actualización** — 2026-11-17. Identidad visual, ilustraciones, página 404, límite de errores, títulos y foco por página; acciones de CI en v5.
+
+## Sesión 2026-11-17 · Pulido de interfaz y accesibilidad
+
+| Cambio | Dónde | Cómo se comprobó |
+| --- | --- | --- |
+| Ícono propio (`favicon.svg`), descripción, `theme-color` y aviso `noscript` | `frontend/public`, `frontend/index.html` | Compilación |
+| Ilustraciones SVG propias por tema (libro, calendario, tarea, gráfica, chat, búsqueda), con flotación suave que respeta «menos movimiento» | `Componentes/Ilustracion.jsx`, `EstadoVacio.jsx`, `Portada.jsx` | Capturas en navegador |
+| Página «no encontrada» dentro del diseño (antes redirigía en silencio al inicio) | `Pages/NoEncontrada.jsx`, `Rutas.jsx` | Vitest y Playwright |
+| Límite de errores: si una página falla o no se descarga tras publicar otra versión, aparece un aviso con «Recargar» en vez de una pantalla en blanco | `Componentes/LimiteErrores.jsx`, `App.jsx`, `Layout.jsx` | Vitest (error común y descarga fallida) |
+| Título de pestaña por sección y foco al contenido al cambiar de página; enlace «Saltar al contenido» | `utils/titulos.js`, `Layout.jsx`, `Portada.jsx` | Vitest y Playwright |
+| `actions/checkout`, `setup-node` y `upload-artifact` en v5 (Node 24) | `.github/workflows/ci.yml` | Corrida de GitHub Actions |
+
+### Resultados
+- Frontend: `npm run lint` sin errores; `npm test` **31 de 31**; `npm run build` compila.
+- Navegador: `npm run test:e2e` **12 de 12** (escritorio y móvil).
+- Backend sin cambios en esta sesión (80 de 80 en la corrida anterior de CI).
 
 ## Sesión 2026-11-16 · Las 15 mejoras de la revisión
 
@@ -27,7 +43,7 @@
 - Frontend: `npm run lint` sin errores; `npm test` **27 de 27**; `npm run build` compila.
 - Navegador: `npm run test:e2e` **11 de 11** (escritorio 1280 px y Pixel 7).
 - Migraciones: base nueva sin filas de contenido; las migraciones nuevas se revierten y se vuelven a aplicar.
-- MySQL 8.4 queda cubierto por GitHub Actions al subir el repositorio.
+- MySQL 8.4: confirmado por GitHub Actions (servidor 8.4.13): backend **80 de 80**.
 
 ## Sesión 2026-11-16 · Optimización de rendimiento
 

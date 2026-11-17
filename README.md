@@ -133,7 +133,7 @@ cd backend
 npm run lint
 npm test
 
-# Frontend: lint, 27 pruebas de componentes y hooks (Vitest + jsdom) y compilación
+# Frontend: lint, 31 pruebas de componentes y hooks (Vitest + jsdom) y compilación
 cd ..\frontend
 npm run lint
 npm test
@@ -141,7 +141,7 @@ npm run build
 ```
 
 ### Pruebas en navegador (Playwright)
-Recorren la aplicación real (backend, MySQL y frontend) en escritorio y móvil: acceso, tutor con streaming y citas, aviso sin respaldo, «Detener», carga de archivos y el botón «Entrar» de las clases. Usan una base **dedicada** que se borra y recrea en cada corrida (su nombre debe terminar en `_e2e`) y un doble local del modelo, así que no necesitan claves.
+Recorren la aplicación real (backend, MySQL y frontend) en escritorio y móvil: acceso, tutor con streaming y citas, aviso sin respaldo, «Detener», carga de archivos, el botón «Entrar» de las clases y la página «no encontrada». Usan una base **dedicada** que se borra y recrea en cada corrida (su nombre debe terminar en `_e2e`) y un doble local del modelo, así que no necesitan claves.
 
 ```powershell
 # Una sola vez: base vacía y navegador de Playwright

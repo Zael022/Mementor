@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Layout from '../Componentes/Layout.jsx';
 import { Cargando } from '../Componentes/Estados.jsx';
 import RutaProtegida from './RutaProtegida.jsx';
@@ -30,6 +30,7 @@ const CitaTutor = lazy(() => import('../Pages/CitaTutor.jsx'));
 const CursoFuentes = lazy(() => import('../Pages/CursoFuentes.jsx'));
 const AdminDrive = lazy(() => import('../Pages/AdminDrive.jsx'));
 const AdminConsumo = lazy(() => import('../Pages/AdminConsumo.jsx'));
+const NoEncontrada = lazy(() => import('../Pages/NoEncontrada.jsx'));
 
 // Las páginas se cargan bajo demanda: el acceso queda disponible sin esperar el resto de la aplicación.
 
@@ -95,10 +96,11 @@ export default function Rutas() {
             <Route path="/estudiante/citas/:messageId/:posicion" element={<CitaTutor />} />
             <Route path="/estudiante/progreso" element={<EstudianteProgreso />} />
           </Route>
+
+          {/* Cualquier otra dirección muestra la página de «no encontrada» dentro del diseño. */}
+          <Route path="*" element={<NoEncontrada />} />
         </Route>
       </Route>
-
-      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

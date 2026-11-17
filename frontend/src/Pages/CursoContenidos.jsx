@@ -64,7 +64,7 @@ export default function CursoContenidos() {
         {usuario.role === 'institution_admin' && <DocentesCurso curso={datos} alCambiar={curso.recargar} />}
       </section>
 
-      {datos.modules.length === 0 && <EstadoVacio titulo="Este curso aún no tiene módulos" detalle="Agrega el primer módulo para empezar a organizar los temas." />}
+      {datos.modules.length === 0 && <EstadoVacio ilustracion="libro" titulo="Este curso aún no tiene módulos" detalle="Agrega el primer módulo para empezar a organizar los temas." />}
 
       {datos.modules.map((modulo) => (
         <section className="tarjeta" key={modulo.id}>

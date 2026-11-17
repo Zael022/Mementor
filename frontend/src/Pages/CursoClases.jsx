@@ -90,7 +90,7 @@ export default function CursoClases() {
 
       <MensajeError error={sesiones.error} />
       {sesiones.cargando && !sesiones.datos && <Cargando />}
-      {sesiones.datos?.length === 0 && <EstadoVacio titulo="No hay clases programadas" detalle="Programa la primera clase con el formulario de arriba." />}
+      {sesiones.datos?.length === 0 && <EstadoVacio ilustracion="calendario" titulo="No hay clases programadas" detalle="Programa la primera clase con el formulario de arriba." />}
       {sesiones.datos?.map((sesion) => (
         <article className="tarjeta sesion" key={sesion.id}>
           <div className="tarjeta-cabecera">

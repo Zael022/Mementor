@@ -41,7 +41,7 @@ export default function CursosGestion() {
       </Desplegable>
       <MensajeError error={cursos.error} />
       {cursos.cargando && <Cargando />}
-      {cursos.datos?.length === 0 && <EstadoVacio titulo="No hay cursos todavía" detalle="Crea el primer curso con el formulario de arriba." />}
+      {cursos.datos?.length === 0 && <EstadoVacio ilustracion="libro" titulo="No hay cursos todavía" detalle="Crea el primer curso con el formulario de arriba." />}
       <div className="rejilla">
         {cursos.datos?.map((curso) => (
           <TarjetaInteractiva key={curso.id} to={`${base}/cursos/${curso.id}/contenidos`}>

@@ -1,5 +1,6 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Revelar } from './Animaciones.jsx';
+import Ilustracion from './Ilustracion.jsx';
 
 // La cuadrícula decorativa se descarga aparte: el formulario funciona mientras llega.
 const ShapeGrid = lazy(() => import('./ShapeGrid.jsx'));
@@ -25,14 +26,16 @@ const CUADRICULA = {
 };
 
 const RASGOS = [
-  { titulo: 'Cursos y lecciones', texto: 'Cada docente organiza su curso en módulos, temas y lecciones.' },
-  { titulo: 'Evaluaciones', texto: 'Cuestionarios con corrección inmediata y revisión de cada respuesta.' },
-  { titulo: 'Dominio por tema', texto: 'Una estimación calculada con tus respuestas, con su evidencia a la vista.' },
-  { titulo: 'Tutor IA con fuentes', texto: 'Responde con el material publicado del curso y cita de dónde lo tomó.' },
+  { titulo: 'Cursos y lecciones', dibujo: 'libro', texto: 'Cada docente organiza su curso en módulos, temas y lecciones.' },
+  { titulo: 'Evaluaciones', dibujo: 'tarea', texto: 'Cuestionarios con corrección inmediata y revisión de cada respuesta.' },
+  { titulo: 'Dominio por tema', dibujo: 'grafica', texto: 'Una estimación calculada con tus respuestas, con su evidencia a la vista.' },
+  { titulo: 'Tutor IA con fuentes', dibujo: 'chat', texto: 'Responde con el material publicado del curso y cita de dónde lo tomó.' },
 ];
 
 // Portada pública para ingresar y activar la cuenta, con una cuadrícula discreta detrás del título.
 export default function Portada({ titulo, children }) {
+  useEffect(() => { document.title = `${titulo} · MENTOR AI`; }, [titulo]);
+
   return (
     <div className="portada">
       <header className="cabecera"><p className="marca">MENTOR <span>AI</span></p></header>
@@ -63,6 +66,7 @@ export default function Portada({ titulo, children }) {
           {RASGOS.map((rasgo, indice) => (
             <Revelar key={rasgo.titulo} retraso={indice * 0.1}>
               <article className="tarjeta rasgo">
+                <Ilustracion tipo={rasgo.dibujo} />
                 <h3>{rasgo.titulo}</h3>
                 <p className="tenue">{rasgo.texto}</p>
               </article>

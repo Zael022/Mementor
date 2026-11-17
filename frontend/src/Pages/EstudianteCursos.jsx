@@ -13,7 +13,7 @@ export default function EstudianteCursos() {
       <MensajeError error={cursos.error} />
       {cursos.cargando && <Cargando />}
       {cursos.datos?.length === 0 && (
-        <EstadoVacio titulo="No hay cursos todavía" detalle="Cuando tu docente o la administración te matricule en un curso publicado, aparecerá aquí." />
+        <EstadoVacio ilustracion="libro" titulo="No hay cursos todavía" detalle="Cuando tu docente o la administración te matricule en un curso publicado, aparecerá aquí." />
       )}
       <div className="rejilla">
         {cursos.datos?.map((curso) => (
