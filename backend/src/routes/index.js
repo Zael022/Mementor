@@ -7,6 +7,8 @@ import learningRoutes from './learningRoutes.js';
 import classroomRoutes from './classroomRoutes.js';
 import knowledgeRoutes from './knowledgeRoutes.js';
 import driveRoutes from './driveRoutes.js';
+import gamificationRoutes from './gamificationRoutes.js';
+import workspaceRoutes from './workspaceRoutes.js';
 
 // Reúne todas las rutas de la API.
 const router = Router();
@@ -18,4 +20,6 @@ router.use(learningRoutes);
 router.use(classroomRoutes);
 router.use(knowledgeRoutes);
 router.use(driveRoutes);
+router.use(gamificationRoutes);
+router.use(workspaceRoutes);
 export default router;

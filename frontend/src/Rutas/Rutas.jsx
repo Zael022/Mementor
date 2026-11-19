@@ -31,6 +31,13 @@ const CursoFuentes = lazy(() => import('../Pages/CursoFuentes.jsx'));
 const AdminDrive = lazy(() => import('../Pages/AdminDrive.jsx'));
 const AdminConsumo = lazy(() => import('../Pages/AdminConsumo.jsx'));
 const NoEncontrada = lazy(() => import('../Pages/NoEncontrada.jsx'));
+const Calendario = lazy(() => import('../Pages/Calendario.jsx'));
+const Pendientes = lazy(() => import('../Pages/Pendientes.jsx'));
+const Configuracion = lazy(() => import('../Pages/Configuracion.jsx'));
+const CursoQuizzes = lazy(() => import('../Pages/CursoQuizzes.jsx'));
+const CursoCalificaciones = lazy(() => import('../Pages/CursoCalificaciones.jsx'));
+const JugarQuiz = lazy(() => import('../Pages/JugarQuiz.jsx'));
+const PracticaDiaria = lazy(() => import('../Pages/PracticaDiaria.jsx'));
 
 // Las páginas se cargan bajo demanda: el acceso queda disponible sin esperar el resto de la aplicación.
 
@@ -48,6 +55,8 @@ function rutasDeGestion(base) {
       <Route path={`${base}/lecciones/:id`} element={<Leccion />} />
       <Route path={`${base}/cursos/:id/matriculas`} element={<CursoMatriculas />} />
       <Route path={`${base}/cursos/:id/analitica`} element={<CursoAnalitica />} />
+      <Route path={`${base}/cursos/:id/quizzes`} element={<CursoQuizzes />} />
+      <Route path={`${base}/cursos/:id/calificaciones`} element={<CursoCalificaciones />} />
     </>
   );
 }
@@ -62,6 +71,13 @@ export default function Rutas() {
       <Route element={<RutaProtegida />}>
         <Route element={<Layout />}>
           <Route path="/" element={<Inicio />} />
+          <Route path="/configuracion" element={<Configuracion />} />
+
+          {/* Vistas de trabajo diario para quien tiene clases. */}
+          <Route element={<RutaProtegida roles={['institution_admin', 'teacher', 'student']} />}>
+            <Route path="/calendario" element={<Calendario />} />
+            <Route path="/pendientes" element={<Pendientes />} />
+          </Route>
 
           <Route element={<RutaProtegida roles={['platform_admin']} />}>
             <Route path="/plataforma/instituciones" element={<PlataformaInstituciones />} />
@@ -88,6 +104,8 @@ export default function Rutas() {
             <Route path="/estudiante/inicio" element={<EstudianteInicio />} />
             <Route path="/estudiante/cursos" element={<EstudianteCursos />} />
             <Route path="/estudiante/cursos/:id" element={<EstudianteCurso />} />
+            <Route path="/estudiante/cursos/:id/quizzes/:quizId" element={<JugarQuiz />} />
+            <Route path="/estudiante/cursos/:id/racha" element={<PracticaDiaria />} />
             <Route path="/estudiante/lecciones/:id" element={<Leccion />} />
             <Route path="/estudiante/tareas/:id" element={<EstudianteTarea />} />
             <Route path="/estudiante/evaluaciones/:id" element={<EstudianteEvaluacion />} />

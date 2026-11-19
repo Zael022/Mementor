@@ -37,7 +37,7 @@ export function AnilloPuntaje({ porcentaje, aprobado }) {
 }
 
 // Tarjeta enlazada que se inclina y se ilumina siguiendo el cursor.
-export function TarjetaInteractiva({ to, children }) {
+export function TarjetaInteractiva({ to, children, color }) {
   function mover(evento) {
     if (prefiereMenosMovimiento()) return;
     const caja = evento.currentTarget.getBoundingClientRect();
@@ -55,7 +55,8 @@ export function TarjetaInteractiva({ to, children }) {
   }
 
   return (
-    <Link className="tarjeta tarjeta-enlace" to={to} onMouseMove={mover} onMouseLeave={salir}>
+    <Link className={`tarjeta tarjeta-enlace ${color ? 'tarjeta-clase' : ''}`} to={to} onMouseMove={mover} onMouseLeave={salir}
+      style={color ? { '--color-clase': color } : undefined}>
       {children}
     </Link>
   );

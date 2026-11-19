@@ -16,6 +16,9 @@
 | Consumo técnico | MySQL `ai_usage_events` y registro del servidor | MENTOR | Administración de la institución | Detalle por `AI_USAGE_DETAIL_DAYS` (90); después, solo el resumen mensual (`ai_usage_monthly`) | Operador |
 | Contadores de límites por IP | MySQL `rate_limit_hits` (solo con `RATE_LIMIT_STORE=mysql`) | MENTOR | Nadie desde la interfaz | Se borran una hora después de vencer la ventana | Operador |
 | Turno de tareas | MySQL `job_leases` | MENTOR | Nadie desde la interfaz | Una fila por tarea, sin datos personales | Operador |
+| Quizzes rápidos y partidas | MySQL `quick_quizzes`, `quick_quiz_*`, `quiz_plays`, `quiz_play_answers` | Docente (quizzes) y estudiante (partidas) | Docente: todo. Estudiante: sus partidas y la tabla de posiciones del quiz (nombre visible y puntaje de compañeros) | Mientras exista el curso | Docente del curso |
+| Práctica diaria, racha y bono | MySQL `daily_practices`, `daily_practice_answers`, `course_streaks`, `grade_bonus_events` | Estudiante | El propio estudiante y los docentes del curso | Mientras exista el curso | Docente del curso |
+| Trabajo en clase y pesos de la nota | MySQL `class_work_items`, `class_work_grades`, `course_grade_policies` | Docente | Docente: todo. Estudiante: solo sus propias notas | Mientras exista el curso | Docente del curso |
 | Auditoría | MySQL `audit_logs` | MENTOR | Administración | Sin contenido de documentos | Administración de la institución |
 
 ## Qué recibe el proveedor de generación

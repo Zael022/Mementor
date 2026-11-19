@@ -8,6 +8,7 @@ import { Cargando, Insignia, MensajeError } from '../Componentes/Estados.jsx';
 import { useDatos } from '../hooks/useDatos.js';
 import { useEnvio } from '../hooks/useEnvio.js';
 import { api } from '../services/api.js';
+import { colorDeCurso } from '../utils/cursos.js';
 
 // Lista los cursos que la persona gestiona y permite crear uno nuevo.
 export default function CursosGestion() {
@@ -27,7 +28,7 @@ export default function CursosGestion() {
 
   return (
     <>
-      <h1>Cursos</h1>
+      <h1>Clases</h1>
       <Desplegable etiqueta="Nuevo curso" sugerirAbierto={cursos.datos?.length === 0}>
         <form className="tarjeta" onSubmit={crear}>
           <div className="fila-formulario">
@@ -44,7 +45,7 @@ export default function CursosGestion() {
       {cursos.datos?.length === 0 && <EstadoVacio ilustracion="libro" titulo="No hay cursos todavía" detalle="Crea el primer curso con el formulario de arriba." />}
       <div className="rejilla">
         {cursos.datos?.map((curso) => (
-          <TarjetaInteractiva key={curso.id} to={`${base}/cursos/${curso.id}/contenidos`}>
+          <TarjetaInteractiva key={curso.id} to={`${base}/cursos/${curso.id}/anuncios`} color={colorDeCurso(curso.id)}>
             <span className="codigo">{curso.code}</span>
             <h3>{curso.title}</h3>
             {curso.description && <p className="tenue">{curso.description}</p>}

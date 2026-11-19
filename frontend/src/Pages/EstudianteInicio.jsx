@@ -7,6 +7,7 @@ import { Cargando, Insignia, MensajeError } from '../Componentes/Estados.jsx';
 import { useSesion } from '../context/SesionContext.jsx';
 import { useEstadoClase } from '../hooks/useEstadoClase.js';
 import { useDatos } from '../hooks/useDatos.js';
+import { colorDeCurso } from '../utils/cursos.js';
 import { fechaHora } from '../utils/fechas.js';
 
 // La próxima clase ocupa el lugar principal de la página.
@@ -75,7 +76,7 @@ export default function EstudianteInicio() {
 
           <div className="dos-columnas inicio-columnas">
             <section className="tarjeta">
-              <h2>Tareas pendientes</h2>
+              <div className="titulo-con-dato"><h2>Vence pronto</h2><Link className="pequeno" to="/pendientes">Ver pendientes</Link></div>
               {tareas.length === 0 && <p className="tenue">No tienes tareas pendientes.</p>}
               <ul className="lista-simple">
                 {tareas.map((tarea) => (
@@ -92,12 +93,12 @@ export default function EstudianteInicio() {
             </section>
           </div>
 
-          <h2>Mis cursos</h2>
+          <h2>Clases</h2>
           <div className="rejilla">
             {cursos.map((curso) => {
               const avance = curso.totalLessons ? Math.round((curso.completedLessons / curso.totalLessons) * 100) : 0;
               return (
-                <TarjetaInteractiva key={curso.id} to={`/estudiante/cursos/${curso.id}`}>
+                <TarjetaInteractiva key={curso.id} to={`/estudiante/cursos/${curso.id}`} color={colorDeCurso(curso.id)}>
                   <span className="codigo">{curso.code}</span>
                   <h3>{curso.title}</h3>
                   <div className="pie">

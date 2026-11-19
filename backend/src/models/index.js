@@ -12,6 +12,10 @@ import {
 import {
   CourseRagCorpus, KnowledgeSource, SourceVersion, AiMessageSource, InstitutionDriveFolder, CourseDriveLink, AiUsageEvent,
 } from './Knowledge.js';
+import {
+  CourseGradePolicy, ClassWorkItem, ClassWorkGrade, QuickQuiz, QuickQuizQuestion, QuickQuizOption, QuizPlay, QuizPlayAnswer,
+  DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent,
+} from './Gamification.js';
 
 // Define las relaciones entre los modelos.
 Institution.hasMany(User, { foreignKey: 'institutionId', as: 'users' });
@@ -83,6 +87,19 @@ CourseDriveLink.belongsTo(InstitutionDriveFolder, { foreignKey: 'driveFolderId',
 CourseDriveLink.belongsTo(Course, { foreignKey: 'courseId', as: 'course' });
 Material.hasOne(KnowledgeSource, { foreignKey: 'materialId', as: 'knowledgeSource' });
 
+// Quizzes rápidos, racha y bono de nota.
+Course.hasOne(CourseGradePolicy, { foreignKey: 'courseId', as: 'gradePolicy' });
+ClassWorkItem.hasMany(ClassWorkGrade, { foreignKey: 'itemId', as: 'grades' });
+QuickQuiz.belongsTo(Course, { foreignKey: 'courseId', as: 'course' });
+QuickQuiz.hasMany(QuickQuizQuestion, { foreignKey: 'quizId', as: 'questions' });
+QuickQuizQuestion.belongsTo(QuickQuiz, { foreignKey: 'quizId', as: 'quiz' });
+QuickQuizQuestion.hasMany(QuickQuizOption, { foreignKey: 'questionId', as: 'options' });
+QuickQuiz.hasMany(QuizPlay, { foreignKey: 'quizId', as: 'plays' });
+QuizPlay.belongsTo(QuickQuiz, { foreignKey: 'quizId', as: 'quiz' });
+QuizPlay.belongsTo(User, { foreignKey: 'studentId', as: 'student' });
+QuizPlay.hasMany(QuizPlayAnswer, { foreignKey: 'playId', as: 'answers' });
+DailyPractice.hasMany(DailyPracticeAnswer, { foreignKey: 'practiceId', as: 'answers' });
+
 export {
   CourseRagCorpus, KnowledgeSource, SourceVersion, AiMessageSource, InstitutionDriveFolder, CourseDriveLink, AiUsageEvent,
   ClassSession, SessionAttendance, Announcement, Material, LessonComment, Assignment, AssignmentSubmission,
@@ -90,4 +107,6 @@ export {
   Module, Topic, TopicPrerequisite, Lesson, LessonProgress,
   Assessment, Question, QuestionOption, AssessmentAttempt, AttemptAnswer,
   TopicMastery, LearningRecommendation, AiThread, AiMessage, AuditLog,
+  CourseGradePolicy, ClassWorkItem, ClassWorkGrade, QuickQuiz, QuickQuizQuestion, QuickQuizOption, QuizPlay, QuizPlayAnswer,
+  DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent,
 };

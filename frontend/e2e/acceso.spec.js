@@ -26,8 +26,8 @@ test.describe('Navegación dentro de la plataforma', () => {
     await page.goto('/estudiante/no-existe');
     await expect(page.getByRole('heading', { name: 'No encontramos esta página' })).toBeVisible();
     await expect(page.getByRole('navigation', { name: 'Navegación principal' })).toBeVisible();
-    await page.getByRole('link', { name: 'Mis cursos' }).click();
-    await expect(page).toHaveTitle('Cursos · MENTOR AI');
+    await page.getByRole('link', { name: 'Calendario' }).click();
+    await expect(page).toHaveTitle('Calendario · MENTOR AI');
     await expect(page.locator('#contenido')).toBeFocused();
   });
 });

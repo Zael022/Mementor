@@ -1,6 +1,6 @@
 # Registro de riesgos
 
-Última revisión: 2026-11-16 (después de aplicar las 15 mejoras de la revisión). Nivel: A alto, M medio, B bajo.
+Última revisión: 2026-11-19 (quizzes rápidos, racha y nota del curso). Nivel: A alto, M medio, B bajo.
 
 | # | Riesgo | Nivel | Mitigación aplicada | Pendiente | Responsable |
 | --- | --- | --- | --- | --- | --- |
@@ -21,3 +21,6 @@
 | R15 | Varias instancias duplicando tareas o límites | B | Turno de tareas en MySQL; `RATE_LIMIT_STORE=mysql` comparte los límites | — | Operador |
 | R16 | IP guardadas en `rate_limit_hits` | B | Solo con el almacén compartido; se borran una hora después de vencer | — | Operador |
 | R17 | Lectores de pantalla en el chat en vivo | M | El borrador ya no es región viva; un aviso único dice «Respuesta lista» | Probar con NVDA y VoiceOver | Desarrollo |
+| R18 | Trampa en el quiz (ver la clave o responder fuera de tiempo) | M | La clave solo sale después de responder; el tiempo lo mide el servidor (margen de 1,5 s); una respuesta repetida da 409; límite de 90 solicitudes por minuto | Revisar si conviene barajar las opciones | Desarrollo |
+| R19 | Bono duplicado o inflado | M | Índice único por evento; transacciones con bloqueo de la partida y de la práctica; tope del docente; la nota nunca pasa de 10 | — | Docente |
+| R20 | Exposición de compañeros en la tabla de posiciones | B | Solo el nombre visible y el puntaje, dentro del mismo curso; los correos solo los ve el docente en Personas | Permitir un apodo u ocultarse si la institución lo pide | Administración |

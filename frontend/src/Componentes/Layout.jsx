@@ -1,23 +1,10 @@
-import { Suspense, useEffect, useRef } from 'react';
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import BarraLateral from './BarraLateral.jsx';
 import { Cargando } from './Estados.jsx';
 import LimiteErrores from './LimiteErrores.jsx';
-import { tituloDe } from '../utils/titulos.js';
 import { useSesion } from '../context/SesionContext.jsx';
-
-// Opciones del menú según el rol.
-const MENU = {
-  platform_admin: [{ to: '/plataforma/instituciones', texto: 'Instituciones' }, { to: '/admin/auditoria', texto: 'Auditoría' }],
-  institution_admin: [
-    { to: '/admin/usuarios', texto: 'Usuarios' },
-    { to: '/admin/cursos', texto: 'Cursos' },
-    { to: '/admin/drive', texto: 'Drive' },
-    { to: '/admin/consumo', texto: 'Consumo IA' },
-    { to: '/admin/auditoria', texto: 'Auditoría' },
-  ],
-  teacher: [{ to: '/docente/cursos', texto: 'Mis cursos' }],
-  student: [{ to: '/estudiante/inicio', texto: 'Inicio' }, { to: '/estudiante/cursos', texto: 'Mis cursos' }, { to: '/estudiante/progreso', texto: 'Mi progreso' }],
-};
+import { tituloDe } from '../utils/titulos.js';
 
 const ROLES = {
   platform_admin: 'Administración de plataforma',
@@ -26,17 +13,19 @@ const ROLES = {
   student: 'Estudiante',
 };
 
-// Muestra la navegación general.
+// Estructura tipo aula: barra superior, barra lateral con las clases y el contenido de cada página.
 export default function Layout() {
   const { usuario, cerrarSesion } = useSesion();
   const navegar = useNavigate();
   const { pathname } = useLocation();
   const principal = useRef(null);
   const primeraVisita = useRef(true);
+  const [menuAbierto, setMenuAbierto] = useState(false);
 
-  // Al cambiar de página actualiza el título y lleva el foco al contenido, para que los lectores de pantalla anuncien el cambio.
+  // Al cambiar de página actualiza el título, cierra el menú móvil y lleva el foco al contenido.
   useEffect(() => {
     document.title = tituloDe(pathname);
+    setMenuAbierto(false);
     if (primeraVisita.current) {
       primeraVisita.current = false;
       return;
@@ -51,17 +40,16 @@ export default function Layout() {
   }
 
   return (
-    <div className="app">
+    <div className={`app aula ${menuAbierto ? 'menu-abierto' : ''}`}>
       <a className="saltar" href="#contenido">Saltar al contenido</a>
       <header className="cabecera">
+        <button type="button" className="boton-menu" aria-label={menuAbierto ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={menuAbierto}
+          aria-controls="barra-lateral" onClick={() => setMenuAbierto((abierto) => !abierto)}>
+          <span aria-hidden="true" />
+        </button>
         <Link to="/" className="marca">MENTOR <span>AI</span></Link>
-        <nav aria-label="Navegación principal">
-          {MENU[usuario.role].map((opcion) => (
-            <NavLink key={opcion.to} to={opcion.to}>{opcion.texto}</NavLink>
-          ))}
-        </nav>
         <div className="perfil">
-          <span className="perfil-inicial" aria-hidden="true">{usuario.displayName.charAt(0).toUpperCase()}</span>
+          <Link to="/configuracion" className="perfil-inicial" aria-label="Configuración de tu perfil">{usuario.displayName.charAt(0).toUpperCase()}</Link>
           <div className="perfil-nombre">
             <strong>{usuario.displayName}</strong>
             <span>{ROLES[usuario.role]}{usuario.institutionName ? `, ${usuario.institutionName}` : ''}</span>
@@ -69,10 +57,14 @@ export default function Layout() {
           <button type="button" className="boton secundario" onClick={salir}>Cerrar sesión</button>
         </div>
       </header>
-      {/* La clave reinicia la animación de entrada al cambiar de página. */}
-      <main id="contenido" className="contenido" key={pathname} ref={principal} tabIndex={-1}>
-        <LimiteErrores><Suspense fallback={<Cargando />}><Outlet /></Suspense></LimiteErrores>
-      </main>
+      <div className="aula-cuerpo">
+        <BarraLateral />
+        {/* Velo que cierra el menú al tocar fuera en pantallas angostas. */}
+        <div className="velo" aria-hidden="true" onClick={() => setMenuAbierto(false)} />
+        <main id="contenido" className="contenido" key={pathname} ref={principal} tabIndex={-1}>
+          <LimiteErrores><Suspense fallback={<Cargando />}><Outlet /></Suspense></LimiteErrores>
+        </main>
+      </div>
     </div>
   );
 }

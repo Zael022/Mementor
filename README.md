@@ -116,7 +116,7 @@ Una falla de Google Cloud se muestra como `RAG_UNAVAILABLE` («no significa que 
 2. **Administración de la institución:** en *Usuarios*, invita a un docente y a un estudiante. Opcional: en *Drive*, habilita una carpeta.
 3. **Docente:**
    - Crea un curso con módulo, tema y lección (márcala *Publicada*), publica el curso y matricula al estudiante.
-   - En *Anuncios y materiales*, arrastra un **PDF con texto, DOCX o TXT** (por ejemplo un reglamento), revisa nombre y tamaño y pulsa **Subir archivo**. Verás su estado de indexación.
+   - En *Novedades*, arrastra un **PDF con texto, DOCX o TXT** (por ejemplo un reglamento), revisa nombre y tamaño y pulsa **Subir archivo**. Verás su estado de indexación.
    - En *Fuentes del tutor*, comprueba que dice **Listo**. Sube un PDF escaneado para ver el motivo del error y el botón **Reintentar**.
 4. **Estudiante:**
    - Abre el curso y entra a **Tutor IA**. Pregunta con tus palabras por algo del reglamento: la respuesta se escribe en vivo y, al final, aparecen las fuentes validadas. Abre la cita: verás el pasaje, el título, la página o sección y la versión.
@@ -125,15 +125,29 @@ Una falla de Google Cloud se muestra como `RAG_UNAVAILABLE` («no significa que 
 5. **Docente:** en *Fuentes del tutor*, abre *Versiones* para ver qué versión se usó y en cuántas respuestas. Retira la fuente: el estudiante verá la cita como «fuente retirada».
 6. **Administración:** en *Consumo IA*, revisa respuestas, tokens y latencia por modelo (sin contenido de chats).
 
+### Aula, quizzes, racha y nota del curso
+La interfaz se organiza como un aula virtual: barra lateral con **Página principal**, **Calendario**, **Pendientes** (docente: **Por revisar**), la lista de clases y **Configuración**. Cada clase tiene pestañas.
+
+- **Estudiante:** Novedades (anuncios y recuadro «Próximas»), Trabajo en clase (lecciones, tareas, evaluaciones, materiales y clases en vivo con filtros), Quizzes y racha, Calificaciones y Personas.
+- **Docente:** las mismas secciones con permisos de gestión, más Quizzes (crear, publicar, archivar), Calificaciones (libro de notas, trabajo en clase y pesos), Fuentes del tutor y Analítica. Todo permiso se valida en el backend; ocultar un botón no es la protección.
+
+Reglas de la nota (escala 0 a 10):
+1. **Base:** evaluaciones, tareas y trabajo en clase con pesos que fija el docente (por defecto 40/30/30; deben sumar 100). Una parte sin nada calificado no cuenta y su peso se reparte. Una evaluación cerrada sin intento y una tarea vencida sin entrega cuentan 0.
+2. **Quiz rápido perfecto:** +0,1 la primera vez por quiz. El servidor mide el tiempo de cada respuesta (1000 puntos si es inmediata, 500 al final; fuera de tiempo, 0).
+3. **Racha:** cada día en que se responden las 5 preguntas de la práctica diaria (tomadas de los quizzes publicados) suma +0,09. Si un día queda sin práctica, la racha vuelve a empezar, pero lo ganado se conserva. El día se decide con `APP_TIMEZONE` (por defecto `America/Costa_Rica`).
+4. **Tope del bono:** lo fija el docente (por defecto 1,00). La nota final nunca pasa de 10.
+
+Recorrido: el docente crea un quiz en *Quizzes*, le agrega preguntas y lo publica; el estudiante lo juega desde *Quizzes y racha* y hace la práctica del día; el docente crea una actividad en *Calificaciones* → *Trabajo en clase*, la califica y ve la nota final de cada estudiante.
+
 ## 5. Pruebas
 
 ```powershell
-# Backend: 80 pruebas en mentor_ai_test (crean y borran sus datos). Google Cloud y el generador son dobles.
+# Backend: 89 pruebas en mentor_ai_test (crean y borran sus datos). Google Cloud y el generador son dobles.
 cd backend
 npm run lint
 npm test
 
-# Frontend: lint, 31 pruebas de componentes y hooks (Vitest + jsdom) y compilación
+# Frontend: lint, 34 pruebas de componentes y hooks (Vitest + jsdom) y compilación
 cd ..\frontend
 npm run lint
 npm test
@@ -141,7 +155,7 @@ npm run build
 ```
 
 ### Pruebas en navegador (Playwright)
-Recorren la aplicación real (backend, MySQL y frontend) en escritorio y móvil: acceso, tutor con streaming y citas, aviso sin respaldo, «Detener», carga de archivos, el botón «Entrar» de las clases y la página «no encontrada». Usan una base **dedicada** que se borra y recrea en cada corrida (su nombre debe terminar en `_e2e`) y un doble local del modelo, así que no necesitan claves.
+Recorren la aplicación real (backend, MySQL y frontend) en escritorio y móvil: acceso, tutor con streaming y citas, aviso sin respaldo, «Detener», carga de archivos, el botón «Entrar» de las clases, la página «no encontrada» y el quiz perfecto con racha y libro de calificaciones. Usan una base **dedicada** que se borra y recrea en cada corrida (su nombre debe terminar en `_e2e`) y un doble local del modelo, así que no necesitan claves.
 
 ```powershell
 # Una sola vez: base vacía y navegador de Playwright

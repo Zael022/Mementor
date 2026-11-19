@@ -19,6 +19,7 @@ Este archivo es coherente con `CLAUDE.md`; si hay contradicción, mandan `CLAUDE
 9. Todo texto de documentos o preguntas que va al modelo pasa por `asData` (sin `<` ni `>`); el historial va sin marcas `[S#]`.
 10. Archivos subidos: extensión, tipo y primeros bytes deben coincidir.
 11. Tareas periódicas solo con el turno de `job_leases`; con varias instancias, `RATE_LIMIT_STORE=mysql` y `TRUST_PROXY`.
+12. Quizzes y racha: el tiempo lo mide el servidor (`utils/clock.js`, que las pruebas reemplazan); la clave sale solo después de responder; todo bono pasa por `awardBonus` (índice único). La nota se calcula en `gradeService` (ADR 0004).
 
 ## Antes de entregar
 - `backend`: `npm run lint` y `npm test` (MySQL de pruebas).

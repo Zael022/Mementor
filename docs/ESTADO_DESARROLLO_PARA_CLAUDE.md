@@ -1,6 +1,28 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-17. Identidad visual, ilustraciones, página 404, límite de errores, títulos y foco por página; acciones de CI en v5.
+**Última actualización** — 2026-11-19. Interfaz tipo aula para estudiante y docente, quizzes rápidos con tiempo, práctica diaria con racha, trabajo en clase y nota final del curso.
+
+## Sesión 2026-11-19 · Aula, quizzes, racha y nota
+
+| Cambio | Dónde | Cómo se comprobó |
+| --- | --- | --- |
+| Migración `20261119000100`: pesos de nota, trabajo en clase, quizzes, partidas, práctica diaria, racha y eventos de bono | `database/migrations`, `models/Gamification.js` | Pruebas sobre base nueva |
+| Quiz con tiempo medido por el servidor, clave protegida, bono de 0,1 una vez por quiz y tabla de posiciones | `quickQuizService.js` | `gamification.test.js` (reloj simulado) y Playwright |
+| Práctica diaria de 5 preguntas, racha que avanza, se pone en riesgo y se reinicia; +0,09 por día | `streakService.js`, `utils/clock.js` | Prueba de cuatro días simulados y Playwright |
+| Nota de 0 a 10: evaluaciones, tareas y trabajo en clase con pesos; bono con tope; reparte el peso de lo no calificado | `gradeService.js`, `classWorkService.js` | Prueba con valores exactos (8,05) y Playwright (8,19) |
+| Personas sin correos para el alumno, calendario semanal, pendientes / por revisar y perfil | `workspaceService.js` | `gamification.test.js` |
+| Barra lateral con clases, pestañas tipo aula, calendario, pendientes y configuración | `Layout.jsx`, `BarraLateral.jsx`, `EstudianteCurso.jsx`, `EncabezadoCurso.jsx`, `Pages/*` | Capturas de escritorio y móvil |
+| Juego con figuras y colores, cuenta regresiva, puntos animados, confeti y llama de racha (todo se apaga con «menos movimiento») | `JugarQuiz.jsx`, `PracticaDiaria.jsx`, `OpcionesQuiz.jsx`, `TarjetaRacha.jsx`, `styles.css` | `Juego.test.jsx` y Playwright |
+| ADR 0004 y gobernanza (R18 a R20) | `docs/` | Revisión |
+
+### Resultados
+- Backend: `npm run lint` sin errores; `npm test` **89 de 89**.
+- Frontend: `npm run lint` sin errores; `npm test` **34 de 34**; `npm run build` compila.
+- Navegador: `npm run test:e2e` **16 de 16** (escritorio y móvil).
+
+### Pendiente
+- Que la institución confirme la escala (0 a 10) y los valores del bono, que se pueden cambiar por curso.
+- Clases archivadas en la barra lateral, notificaciones por correo y comentarios privados en tareas (vistos en la referencia de aula, no incluidos todavía).
 
 ## Sesión 2026-11-17 · Pulido de interfaz y accesibilidad
 

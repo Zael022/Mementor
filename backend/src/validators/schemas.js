@@ -114,3 +114,42 @@ export const institutionLimitsSchema = z.object({ maxDocuments: limit, aiDailyQu
 const driveId = z.string().trim().min(10).max(128).regex(/^[A-Za-z0-9_-]+$/, 'El identificador de carpeta no es válido.');
 export const driveFolderSchema = z.object({ folderId: driveId, label: text(180, 2) });
 export const driveLinkSchema = z.object({ driveFolderId: id });
+
+// Quizzes rápidos, práctica diaria y política de nota.
+export const quickQuizSchema = z.object({
+  title: text(180, 2),
+  secondsPerQuestion: z.number().int().min(5, 'Mínimo 5 segundos.').max(120, 'Máximo 120 segundos.').default(20),
+});
+export const updateQuickQuizSchema = z.object({
+  title: text(180, 2).optional(),
+  secondsPerQuestion: z.number().int().min(5).max(120).optional(),
+}).refine((data) => Object.keys(data).length > 0, 'No hay cambios.');
+export const quickQuestionSchema = z.object({
+  prompt: text(500, 3),
+  options: z.array(z.object({ body: text(200), isCorrect: z.boolean() })).min(2, 'Agrega al menos dos opciones.').max(4, 'Máximo cuatro opciones.'),
+});
+export const quickAnswerSchema = z.object({ questionId: id, optionId: id.nullable() });
+export const dailyAnswerSchema = z.object({ questionId: id, optionId: id });
+const bonusValue = z.number().min(0).max(10).multipleOf(0.01, 'Usa como máximo dos decimales.');
+export const gradePolicySchema = z.object({
+  assessmentsWeight: z.number().int().min(0).max(100),
+  assignmentsWeight: z.number().int().min(0).max(100),
+  classworkWeight: z.number().int().min(0).max(100),
+  quizBonus: bonusValue,
+  streakDayBonus: bonusValue,
+  bonusCap: bonusValue,
+});
+export const classWorkItemSchema = z.object({
+  title: text(180, 2),
+  maxPoints: z.number().int().min(1).max(1000).default(100),
+  workDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha no válida.').nullable().optional(),
+});
+export const classWorkGradesSchema = z.object({
+  grades: z.array(z.object({
+    studentId: id,
+    // null borra la calificación de ese estudiante.
+    points: z.number().min(0).max(1000).multipleOf(0.01).nullable(),
+    feedback: z.string().trim().max(1000).optional(),
+  })).min(1).max(500),
+});
+export const profileSchema = z.object({ displayName: text(120, 2) });

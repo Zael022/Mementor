@@ -3,31 +3,84 @@ import Anuncios from '../Componentes/Anuncios.jsx';
 import { TarjetaSesion } from '../Componentes/ClasesEnVivo.jsx';
 import EstadoVacio from '../Componentes/EstadoVacio.jsx';
 import { Cargando, MensajeError } from '../Componentes/Estados.jsx';
+import ListaPersonas from '../Componentes/ListaPersonas.jsx';
 import { ListaMateriales } from '../Componentes/Materiales.jsx';
-import RutaLecciones from '../Componentes/RutaLecciones.jsx';
+import NotaCurso from '../Componentes/NotaCurso.jsx';
 import Recomendaciones from '../Componentes/Recomendaciones.jsx';
+import RutaLecciones from '../Componentes/RutaLecciones.jsx';
+import TarjetaRacha from '../Componentes/TarjetaRacha.jsx';
 import { useDatos } from '../hooks/useDatos.js';
+import { colorDeCurso } from '../utils/cursos.js';
 import { fechaHora } from '../utils/fechas.js';
 
-const SECCIONES = [
-  { id: 'contenido', texto: 'Contenido' },
-  { id: 'clases', texto: 'Clases en vivo' },
+// Pestañas de la clase, como en un aula virtual.
+const PESTANAS = [
+  { id: 'novedades', texto: 'Novedades' },
+  { id: 'trabajo', texto: 'Trabajo en clase' },
+  { id: 'quizzes', texto: 'Quizzes y racha' },
+  { id: 'calificaciones', texto: 'Calificaciones' },
+  { id: 'personas', texto: 'Personas' },
+];
+
+// Filtros dentro de «Trabajo en clase».
+const FILTROS = [
+  { id: 'todo', texto: 'Todo' },
+  { id: 'lecciones', texto: 'Lecciones' },
   { id: 'tareas', texto: 'Tareas' },
   { id: 'evaluaciones', texto: 'Evaluaciones' },
   { id: 'materiales', texto: 'Materiales' },
+  { id: 'clases', texto: 'Clases en vivo' },
 ];
 
-// Aula del estudiante: contenido, clases, tareas, evaluaciones y materiales del curso.
+// Enlaces antiguos (?seccion=tareas) siguen funcionando dentro de «Trabajo en clase».
+const ANTIGUAS = { contenido: 'lecciones', tareas: 'tareas', evaluaciones: 'evaluaciones', materiales: 'materiales', clases: 'clases' };
+
+function estadoTarea(tarea) {
+  if (tarea.gradePoints !== null) return `Calificada: ${tarea.gradePoints} de ${tarea.maxPoints}`;
+  if (tarea.submitted) return 'Entregada';
+  if (tarea.dueAt && new Date(tarea.dueAt) < new Date()) return 'Faltante';
+  return 'Asignada';
+}
+
+// Próximas entregas de la clase (como el recuadro «Próximas» del aula).
+function Proximas({ tareas, cursoId }) {
+  const proximas = (tareas || [])
+    .filter((tarea) => !tarea.submitted && tarea.dueAt && new Date(tarea.dueAt) > new Date())
+    .sort((a, b) => new Date(a.dueAt) - new Date(b.dueAt))
+    .slice(0, 3);
+  return (
+    <aside className="tarjeta proximas" aria-label="Próximas entregas">
+      <h3>Próximas</h3>
+      {proximas.length === 0 && <p className="tenue pequeno">¡Excelente! No tienes ninguna tarea por entregar pronto.</p>}
+      <ul className="lista-simple">
+        {proximas.map((tarea) => (
+          <li key={tarea.id}>
+            <span className="pequeno">Vence {fechaHora(tarea.dueAt)}<br /><Link to={`/estudiante/tareas/${tarea.id}`}>{tarea.title}</Link></span>
+          </li>
+        ))}
+      </ul>
+      <Link className="pequeno" to={`/estudiante/cursos/${cursoId}?seccion=trabajo&ver=tareas`}>Ver todo</Link>
+    </aside>
+  );
+}
+
+// Aula del estudiante: novedades, trabajo en clase, quizzes con racha, calificaciones y personas.
 export default function EstudianteCurso() {
   const { id } = useParams();
   const [parametros, setParametros] = useSearchParams();
-  const seccion = parametros.get('seccion') || 'contenido';
+  const pedida = parametros.get('seccion') || 'novedades';
+  const seccion = ANTIGUAS[pedida] ? 'trabajo' : pedida;
+  const filtro = ANTIGUAS[pedida] || parametros.get('ver') || 'todo';
   const curso = useDatos(`/courses/${id}`);
   const sesiones = useDatos(`/courses/${id}/sessions`);
   const tareas = useDatos(`/courses/${id}/assignments`);
   const evaluaciones = useDatos(`/courses/${id}/assessments`);
   const anuncios = useDatos(`/courses/${id}/announcements`);
-  const recomendaciones = useDatos(`/me/recommendations?courseId=${id}`);
+  const recomendaciones = useDatos(seccion === 'trabajo' ? `/me/recommendations?courseId=${id}` : null);
+  const quizzes = useDatos(seccion === 'quizzes' ? `/courses/${id}/quick-quizzes` : null);
+  const practica = useDatos(seccion === 'quizzes' ? `/courses/${id}/daily-practice` : null);
+  const nota = useDatos(seccion === 'calificaciones' || seccion === 'quizzes' ? `/courses/${id}/my-grade` : null);
+  const trabajoClase = useDatos(seccion === 'calificaciones' ? `/courses/${id}/class-work` : null);
 
   if (curso.cargando && !curso.datos) return <Cargando />;
   if (curso.error) return <MensajeError error={curso.error} />;
@@ -37,14 +90,17 @@ export default function EstudianteCurso() {
   const vigentes = (sesiones.datos || []).filter((sesion) => sesion.state === 'upcoming' || sesion.state === 'live');
   const pasadas = (sesiones.datos || []).filter((sesion) => sesion.state === 'ended' || sesion.state === 'cancelled').reverse();
   const pendiente = lecciones.find((leccion) => !leccion.completed);
+  const ver = (opcion) => filtro === 'todo' || filtro === opcion;
+
+  function irA(nueva, extra = {}) {
+    setParametros({ seccion: nueva, ...extra }, { replace: true });
+  }
 
   return (
     <>
-      <section className="banner">
+      <section className="banner banner-clase" style={{ '--color-clase': colorDeCurso(datos.id) }}>
         <div>
-          <Link to="/estudiante/cursos" className="volver">← Volver a mis cursos</Link>
-          <br />
-          <span className="pildora">{datos.code}</span>
+          <span className="pildora clara">{datos.code}</span>
           <h1>{datos.title}</h1>
           {datos.description && <p>{datos.description}</p>}
           <div className="barra-avance" role="img" aria-label={`Avance: ${completadas} de ${lecciones.length} lecciones`}>
@@ -61,97 +117,167 @@ export default function EstudianteCurso() {
         </div>
       </section>
 
-      {vigentes[0] && <TarjetaSesion sesion={vigentes[0]} destacada alEntrar={sesiones.recargar} />}
-      {anuncios.datos?.length > 0 && (
-        <section className="tarjeta">
-          <h2>Anuncios</h2>
-          <Anuncios lista={anuncios.datos.slice(0, 3)} />
-        </section>
-      )}
-
-      <nav className="pestanas" aria-label="Secciones del curso">
-        {SECCIONES.map((opcion) => (
+      <nav className="pestanas" aria-label="Secciones de la clase">
+        {PESTANAS.map((opcion) => (
           <a key={opcion.id} href={`?seccion=${opcion.id}`} className={seccion === opcion.id ? 'active' : ''} aria-current={seccion === opcion.id ? 'page' : undefined}
-            onClick={(evento) => { evento.preventDefault(); setParametros({ seccion: opcion.id }, { replace: true }); }}>
+            onClick={(evento) => { evento.preventDefault(); irA(opcion.id); }}>
             {opcion.texto}
           </a>
         ))}
       </nav>
 
-      {seccion === 'contenido' && (
+      {seccion === 'novedades' && (
+        <div className="novedades">
+          <Proximas tareas={tareas.datos} cursoId={id} />
+          <div className="flujo">
+            {vigentes[0] && <TarjetaSesion sesion={vigentes[0]} destacada alEntrar={sesiones.recargar} />}
+            <MensajeError error={anuncios.error} />
+            {anuncios.datos?.length === 0 && <EstadoVacio ilustracion="chat" titulo="Aún no hay novedades" detalle="Los anuncios de tu docente aparecerán aquí." />}
+            {anuncios.datos?.length > 0 && <section className="tarjeta"><Anuncios lista={anuncios.datos} /></section>}
+          </div>
+        </div>
+      )}
+
+      {seccion === 'trabajo' && (
         <>
-          <Recomendaciones lista={recomendaciones.datos} />
-          {datos.modules.length === 0 && <EstadoVacio ilustracion="libro" titulo="Este curso aún no tiene contenido" detalle="Tu docente todavía no ha agregado módulos." />}
-          <RutaLecciones modulos={datos.modules} />
+          <div className="chips" role="group" aria-label="Filtrar trabajo en clase">
+            {FILTROS.map((opcion) => (
+              <button key={opcion.id} type="button" className={`chip ${filtro === opcion.id ? 'activo' : ''}`} aria-pressed={filtro === opcion.id}
+                onClick={() => irA('trabajo', { ver: opcion.id })}>{opcion.texto}</button>
+            ))}
+          </div>
+
+          {ver('lecciones') && (
+            <section className="bloque-trabajo">
+              <h2>Lecciones</h2>
+              <Recomendaciones lista={recomendaciones.datos} />
+              {datos.modules.length === 0 && <EstadoVacio ilustracion="libro" titulo="Este curso aún no tiene contenido" detalle="Tu docente todavía no ha agregado módulos." />}
+              <RutaLecciones modulos={datos.modules} />
+            </section>
+          )}
+
+          {ver('tareas') && (
+            <section className="bloque-trabajo">
+              <h2>Tareas</h2>
+              <MensajeError error={tareas.error} />
+              {tareas.datos?.length === 0 && <EstadoVacio ilustracion="tarea" titulo="No hay tareas asignadas" detalle="Las tareas publicadas por tu docente aparecerán aquí." />}
+              <ul className="lista-trabajo">
+                {tareas.datos?.map((tarea) => (
+                  <li key={tarea.id}>
+                    <Link to={`/estudiante/tareas/${tarea.id}`}>{tarea.title}</Link>
+                    <span className="tenue pequeno">{tarea.dueAt ? `Vence ${fechaHora(tarea.dueAt)}` : 'Sin fecha límite'}</span>
+                    <span className={`estado-trabajo ${estadoTarea(tarea).split(':')[0].toLowerCase()}`}>{estadoTarea(tarea)}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {ver('evaluaciones') && (
+            <section className="bloque-trabajo">
+              <h2>Evaluaciones</h2>
+              <MensajeError error={evaluaciones.error} />
+              {evaluaciones.datos?.length === 0 && <EstadoVacio ilustracion="tarea" titulo="No hay evaluaciones disponibles" detalle="Aparecerán aquí cuando tu docente las publique." />}
+              {evaluaciones.datos?.map((evaluacion) => (
+                <article className="tarjeta" key={evaluacion.id}>
+                  <div className="tarjeta-cabecera">
+                    <div>
+                      <h3>{evaluacion.title}</h3>
+                      <ul className="meta">
+                        <li>Tema: {evaluacion.topicTitle}</li>
+                        <li>{evaluacion.questionCount} pregunta(s)</li>
+                        <li>Intentos: {evaluacion.attemptsUsed} de {evaluacion.maxAttempts}</li>
+                        {evaluacion.bestScorePct !== null && <li>Mejor puntaje: {evaluacion.bestScorePct} %</li>}
+                      </ul>
+                    </div>
+                    <div className="acciones">
+                      {evaluacion.status === 'published' && evaluacion.attemptsUsed < evaluacion.maxAttempts && (
+                        <Link className="boton" to={`/estudiante/evaluaciones/${evaluacion.id}`}>Resolver</Link>
+                      )}
+                      {evaluacion.lastAttemptId && <Link className="boton secundario" to={`/estudiante/resultados/${evaluacion.lastAttemptId}`}>Último resultado</Link>}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </section>
+          )}
+
+          {ver('materiales') && (
+            <section className="bloque-trabajo">
+              <h2>Materiales</h2>
+              <section className="tarjeta"><ListaMateriales cursoId={id} mostrarLeccion vacio="Este curso aún no tiene materiales." /></section>
+            </section>
+          )}
+
+          {ver('clases') && (
+            <section className="bloque-trabajo">
+              <h2>Clases en vivo</h2>
+              <MensajeError error={sesiones.error} />
+              {sesiones.datos?.length === 0 && <EstadoVacio ilustracion="calendario" titulo="No hay clases en vivo programadas" detalle="Cuando tu docente programe una clase aparecerá aquí con su cuenta regresiva." />}
+              {vigentes.map((sesion) => <TarjetaSesion key={sesion.id} sesion={sesion} alEntrar={sesiones.recargar} />)}
+              {pasadas.length > 0 && <h3>Clases anteriores</h3>}
+              {pasadas.map((sesion) => <TarjetaSesion key={sesion.id} sesion={sesion} />)}
+            </section>
+          )}
         </>
       )}
 
-      {seccion === 'clases' && (
+      {seccion === 'quizzes' && (
         <>
-          <MensajeError error={sesiones.error} />
-          {sesiones.datos?.length === 0 && <EstadoVacio ilustracion="calendario" titulo="No hay clases en vivo programadas" detalle="Cuando tu docente programe una clase aparecerá aquí con su cuenta regresiva." />}
-          {vigentes.map((sesion) => <TarjetaSesion key={sesion.id} sesion={sesion} alEntrar={sesiones.recargar} />)}
-          {pasadas.length > 0 && <h2>Clases anteriores</h2>}
-          {pasadas.map((sesion) => <TarjetaSesion key={sesion.id} sesion={sesion} />)}
+          <MensajeError error={practica.error} />
+          {practica.datos && (
+            <TarjetaRacha racha={practica.datos.streak} valorDia={nota.datos?.policy.streakDayBonus}
+              enlace={practica.datos.available ? `/estudiante/cursos/${id}/racha` : null} />
+          )}
+          {practica.datos && !practica.datos.available && <p className="tenue">La práctica diaria se activa cuando tu docente publique el primer quiz.</p>}
+          <h2>Quizzes rápidos</h2>
+          <MensajeError error={quizzes.error} />
+          {quizzes.cargando && !quizzes.datos && <Cargando />}
+          {quizzes.datos?.length === 0 && <EstadoVacio ilustracion="tarea" titulo="No hay quizzes todavía" detalle="Cuando tu docente publique uno podrás jugarlo aquí." />}
+          <div className="rejilla">
+            {quizzes.datos?.map((quiz) => (
+              <article className="tarjeta tarjeta-quiz" key={quiz.id}>
+                <h3>{quiz.title}</h3>
+                <ul className="meta">
+                  <li>{quiz.questionCount} pregunta(s)</li>
+                  <li>{quiz.secondsPerQuestion} s c/u</li>
+                </ul>
+                <p className="tenue pequeno">
+                  {quiz.bestScore === null ? 'Aún no lo juegas.' : `Mejor puntaje: ${quiz.bestScore}`}
+                  {quiz.perfect && <span className="insignia ready"> Bono ganado</span>}
+                </p>
+                <Link className="boton" to={`/estudiante/cursos/${id}/quizzes/${quiz.id}`}>{quiz.bestScore === null ? 'Jugar' : 'Jugar de nuevo'}</Link>
+              </article>
+            ))}
+          </div>
         </>
       )}
 
-      {seccion === 'tareas' && (
+      {seccion === 'calificaciones' && (
         <>
-          <MensajeError error={tareas.error} />
-          {tareas.datos?.length === 0 && <EstadoVacio ilustracion="tarea" titulo="No hay tareas asignadas" detalle="Las tareas publicadas por tu docente aparecerán aquí." />}
-          {tareas.datos?.map((tarea) => (
-            <article className="tarjeta" key={tarea.id}>
-              <div className="tarjeta-cabecera">
-                <div>
-                  <h3>{tarea.title}</h3>
-                  <ul className="meta">
-                    <li>{tarea.dueAt ? `Entrega: ${fechaHora(tarea.dueAt)}` : 'Sin fecha límite'}</li>
-                    <li>{tarea.maxPoints} puntos</li>
-                    <li>{tarea.gradePoints !== null ? `Nota: ${tarea.gradePoints} de ${tarea.maxPoints}` : tarea.submitted ? 'Entregada, sin calificar' : 'Sin entregar'}</li>
-                  </ul>
-                </div>
-                <Link className={tarea.submitted ? 'boton secundario' : 'boton'} to={`/estudiante/tareas/${tarea.id}`}>{tarea.submitted ? 'Ver entrega' : 'Entregar'}</Link>
-              </div>
-            </article>
-          ))}
+          <MensajeError error={nota.error} />
+          {nota.cargando && !nota.datos && <Cargando />}
+          {nota.datos && <NotaCurso nota={nota.datos.grade} politica={nota.datos.policy} />}
+          <h2>Trabajo en clase</h2>
+          <MensajeError error={trabajoClase.error} />
+          {trabajoClase.datos?.length === 0 && <p className="tenue">Tu docente aún no ha registrado actividades de trabajo en clase.</p>}
+          <ul className="lista-trabajo">
+            {trabajoClase.datos?.map((actividad) => {
+              const mia = actividad.grades[0];
+              return (
+                <li key={actividad.id}>
+                  <span>{actividad.title}</span>
+                  <span className="tenue pequeno">{actividad.workDate || ''}</span>
+                  <span className={`estado-trabajo ${mia ? 'calificada' : 'asignada'}`}>{mia ? `${String(mia.points).replace('.', ',')} de ${actividad.maxPoints}` : 'Sin calificar'}</span>
+                  {mia?.feedback && <span className="tenue pequeno retro">{mia.feedback}</span>}
+                </li>
+              );
+            })}
+          </ul>
         </>
       )}
 
-      {seccion === 'evaluaciones' && (
-        <>
-          <MensajeError error={evaluaciones.error} />
-          {evaluaciones.datos?.length === 0 && <EstadoVacio ilustracion="tarea" titulo="No hay evaluaciones disponibles" detalle="Aparecerán aquí cuando tu docente las publique." />}
-          {evaluaciones.datos?.map((evaluacion) => (
-            <article className="tarjeta" key={evaluacion.id}>
-              <div className="tarjeta-cabecera">
-                <div>
-                  <h3>{evaluacion.title}</h3>
-                  <ul className="meta">
-                    <li>Tema: {evaluacion.topicTitle}</li>
-                    <li>{evaluacion.questionCount} pregunta(s)</li>
-                    <li>Intentos: {evaluacion.attemptsUsed} de {evaluacion.maxAttempts}</li>
-                    {evaluacion.bestScorePct !== null && <li>Mejor puntaje: {evaluacion.bestScorePct} %</li>}
-                  </ul>
-                </div>
-                <div className="acciones">
-                  {evaluacion.status === 'published' && evaluacion.attemptsUsed < evaluacion.maxAttempts && (
-                    <Link className="boton" to={`/estudiante/evaluaciones/${evaluacion.id}`}>Resolver</Link>
-                  )}
-                  {evaluacion.lastAttemptId && <Link className="boton secundario" to={`/estudiante/resultados/${evaluacion.lastAttemptId}`}>Último resultado</Link>}
-                </div>
-              </div>
-            </article>
-          ))}
-        </>
-      )}
-
-      {seccion === 'materiales' && (
-        <section className="tarjeta">
-          <h2>Materiales del curso</h2>
-          <ListaMateriales cursoId={id} mostrarLeccion vacio="Este curso aún no tiene materiales." />
-        </section>
-      )}
+      {seccion === 'personas' && <ListaPersonas cursoId={id} />}
     </>
   );
 }

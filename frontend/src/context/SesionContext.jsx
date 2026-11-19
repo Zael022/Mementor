@@ -34,7 +34,13 @@ export function SesionProvider({ children }) {
     }
   }, []);
 
-  const valor = useMemo(() => ({ usuario, cargando, iniciarSesion, cerrarSesion }), [usuario, cargando, iniciarSesion, cerrarSesion]);
+  // Aplica cambios del perfil propio sin volver a iniciar sesión.
+  const actualizarUsuario = useCallback((cambios) => setUsuario((previo) => (previo ? { ...previo, ...cambios } : previo)), []);
+
+  const valor = useMemo(
+    () => ({ usuario, cargando, iniciarSesion, cerrarSesion, actualizarUsuario }),
+    [usuario, cargando, iniciarSesion, cerrarSesion, actualizarUsuario],
+  );
   return <SesionContext.Provider value={valor}>{children}</SesionContext.Provider>;
 }
 
