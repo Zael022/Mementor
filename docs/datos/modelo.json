@@ -1,0 +1,7159 @@
+{
+ "dic": [
+  {
+   "module": "Seguridad e identidad",
+   "table": "roles",
+   "purpose": "Catálogo de roles del sistema (seguridad).",
+   "columns": [
+    {
+     "name": "code",
+     "type": "varchar(30)",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "",
+     "purpose": "Código único.",
+     "fk": null
+    },
+    {
+     "name": "name",
+     "type": "varchar(80)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre.",
+     "fk": null
+    },
+    {
+     "name": "description",
+     "type": "varchar(255)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Descripción.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Seguridad e identidad",
+   "table": "users",
+   "purpose": "Personas que usan la plataforma, su rol, institución y datos de perfil.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "email",
+     "type": "varchar(190)",
+     "null": false,
+     "key": "UNI",
+     "default": null,
+     "extra": "",
+     "purpose": "Correo electrónico (único).",
+     "fk": null
+    },
+    {
+     "name": "password_hash",
+     "type": "varchar(255)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Hash bcrypt de la contraseña (nunca el texto).",
+     "fk": null
+    },
+    {
+     "name": "display_name",
+     "type": "varchar(120)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre visible para otras personas.",
+     "fk": null
+    },
+    {
+     "name": "role",
+     "type": "varchar(30)",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Código del rol (FK a roles).",
+     "fk": "roles.code"
+    },
+    {
+     "name": "status",
+     "type": "enum('invited','active','disabled')",
+     "null": false,
+     "key": "",
+     "default": "invited",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "invitation_token_hash",
+     "type": "char(64)",
+     "null": true,
+     "key": "UNI",
+     "default": null,
+     "extra": "",
+     "purpose": "Hash del token de invitación.",
+     "fk": null
+    },
+    {
+     "name": "invitation_expires_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Vencimiento de la invitación.",
+     "fk": null
+    },
+    {
+     "name": "failed_login_count",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Intentos fallidos de inicio de sesión seguidos.",
+     "fk": null
+    },
+    {
+     "name": "locked_until",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Bloqueo temporal por intentos fallidos.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    },
+    {
+     "name": "first_name",
+     "type": "varchar(80)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre de pila.",
+     "fk": null
+    },
+    {
+     "name": "last_name",
+     "type": "varchar(80)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Apellidos.",
+     "fk": null
+    },
+    {
+     "name": "phone",
+     "type": "varchar(30)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Teléfono de contacto (opcional).",
+     "fk": null
+    },
+    {
+     "name": "bio",
+     "type": "varchar(500)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Presentación breve escrita por la persona.",
+     "fk": null
+    },
+    {
+     "name": "avatar_file",
+     "type": "varchar(64)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre interno del archivo de la foto de perfil.",
+     "fk": null
+    },
+    {
+     "name": "avatar_updated_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha del último cambio de foto.",
+     "fk": null
+    },
+    {
+     "name": "anonymized_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se anonimizó la cuenta tras la baja.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Seguridad e identidad",
+   "table": "user_sessions",
+   "purpose": "Sesiones abiertas; el JWT lleva el identificador cuyo hash se guarda aquí para poder revocarlo.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "user_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "token_hash",
+     "type": "char(64)",
+     "null": false,
+     "key": "UNI",
+     "default": null,
+     "extra": "",
+     "purpose": "Hash SHA-256 del token (nunca el token).",
+     "fk": null
+    },
+    {
+     "name": "csrf_token",
+     "type": "char(64)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Token anti-CSRF de la sesión.",
+     "fk": null
+    },
+    {
+     "name": "expires_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha de vencimiento.",
+     "fk": null
+    },
+    {
+     "name": "revoked_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se revocó.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Seguridad e identidad",
+   "table": "password_resets",
+   "purpose": "Enlaces de un solo uso para restablecer la contraseña (solo el hash del token).",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "user_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "token_hash",
+     "type": "char(64)",
+     "null": false,
+     "key": "UNI",
+     "default": null,
+     "extra": "",
+     "purpose": "Hash SHA-256 del token (nunca el token).",
+     "fk": null
+    },
+    {
+     "name": "expires_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha de vencimiento.",
+     "fk": null
+    },
+    {
+     "name": "used_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se usó.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Seguridad e identidad",
+   "table": "institutions",
+   "purpose": "Instituciones educativas (aislamiento de datos) y sus topes de uso.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "name",
+     "type": "varchar(150)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre.",
+     "fk": null
+    },
+    {
+     "name": "slug",
+     "type": "varchar(100)",
+     "null": false,
+     "key": "UNI",
+     "default": null,
+     "extra": "",
+     "purpose": "Identificador legible en URL.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('active','inactive')",
+     "null": false,
+     "key": "",
+     "default": "active",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "max_documents",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Máximo de documentos de la institución.",
+     "fk": null
+    },
+    {
+     "name": "ai_daily_question_limit",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Límite diario de preguntas al tutor por estudiante.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Seguridad e identidad",
+   "table": "user_preferences",
+   "purpose": "Preferencias de apariencia, accesibilidad y metas de cada persona.",
+   "columns": [
+    {
+     "name": "user_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "theme",
+     "type": "enum('system','light','dark')",
+     "null": false,
+     "key": "",
+     "default": "system",
+     "extra": "",
+     "purpose": "Tema visual preferido.",
+     "fk": null
+    },
+    {
+     "name": "text_scale",
+     "type": "smallint",
+     "null": false,
+     "key": "",
+     "default": "100",
+     "extra": "",
+     "purpose": "Tamaño de texto preferido.",
+     "fk": null
+    },
+    {
+     "name": "high_contrast",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Preferencia de alto contraste.",
+     "fk": null
+    },
+    {
+     "name": "reduced_motion",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Preferencia de movimiento reducido.",
+     "fk": null
+    },
+    {
+     "name": "reading_spacing",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Preferencia de espaciado de lectura.",
+     "fk": null
+    },
+    {
+     "name": "underline_links",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Preferencia de enlaces subrayados.",
+     "fk": null
+    },
+    {
+     "name": "time_zone",
+     "type": "varchar(64)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Zona horaria.",
+     "fk": null
+    },
+    {
+     "name": "daily_goal_minutes",
+     "type": "smallint",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Meta diaria de estudio en minutos.",
+     "fk": null
+    },
+    {
+     "name": "practice_size",
+     "type": "tinyint",
+     "null": false,
+     "key": "",
+     "default": "5",
+     "extra": "",
+     "purpose": "Cantidad de preguntas de la práctica diaria.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Gobernanza y bitácoras",
+   "table": "consent_records",
+   "purpose": "Aceptación de cada versión de términos y política de privacidad.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "user_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "document",
+     "type": "enum('terms','privacy')",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Documento aceptado (términos o privacidad).",
+     "fk": null
+    },
+    {
+     "name": "version",
+     "type": "varchar(20)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Versión del documento.",
+     "fk": null
+    },
+    {
+     "name": "accepted_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de aceptación.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Gobernanza y bitácoras",
+   "table": "data_deletion_requests",
+   "purpose": "Solicitudes de baja, su procesamiento y lo que se conservó.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "user_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "status",
+     "type": "enum('pending','completed','rejected')",
+     "null": false,
+     "key": "",
+     "default": "pending",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "reason",
+     "type": "varchar(500)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Motivo indicado por la persona.",
+     "fk": null
+    },
+    {
+     "name": "identity_confirmed_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se confirmó la identidad (contraseña).",
+     "fk": null
+    },
+    {
+     "name": "processed_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se procesó.",
+     "fk": null
+    },
+    {
+     "name": "processed_via",
+     "type": "enum('app','n8n')",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Medio que procesó la baja (app o n8n).",
+     "fk": null
+    },
+    {
+     "name": "retained_summary",
+     "type": "text",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Qué datos se conservan y por qué (obligación legal).",
+     "fk": null
+    },
+    {
+     "name": "notification_status",
+     "type": "enum('sent','not_configured','failed')",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Estado del aviso enviado a la persona.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Gobernanza y bitácoras",
+   "table": "audit_logs",
+   "purpose": "Bitácora de auditoría de acciones importantes.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "actor_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "action",
+     "type": "varchar(80)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Acción registrada.",
+     "fk": null
+    },
+    {
+     "name": "resource_type",
+     "type": "varchar(60)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tipo de recurso afectado.",
+     "fk": null
+    },
+    {
+     "name": "resource_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Identificador del recurso afectado.",
+     "fk": null
+    },
+    {
+     "name": "metadata_json",
+     "type": "json",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Datos adicionales en JSON.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Gobernanza y bitácoras",
+   "table": "agent_runs",
+   "purpose": "Bitácora de cada ejecución de un agente de IA (sin contenido).",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "user_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "agent",
+     "type": "varchar(40)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Clave del agente de IA ejecutado.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('running','completed','no_evidence','failed')",
+     "null": false,
+     "key": "",
+     "default": "running",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "provider",
+     "type": "varchar(40)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Proveedor de IA.",
+     "fk": null
+    },
+    {
+     "name": "model",
+     "type": "varchar(120)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Modelo de IA utilizado.",
+     "fk": null
+    },
+    {
+     "name": "input_chars",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Caracteres de entrada enviados al agente.",
+     "fk": null
+    },
+    {
+     "name": "output_chars",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Caracteres de salida del agente.",
+     "fk": null
+    },
+    {
+     "name": "input_tokens",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tokens de entrada informados por el proveedor.",
+     "fk": null
+    },
+    {
+     "name": "output_tokens",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tokens de salida informados por el proveedor.",
+     "fk": null
+    },
+    {
+     "name": "latency_ms",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Duración en milisegundos.",
+     "fk": null
+    },
+    {
+     "name": "error_code",
+     "type": "varchar(40)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Código del error, si hubo.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Gobernanza y bitácoras",
+   "table": "integration_runs",
+   "purpose": "Bitácora de llamadas a APIs externas y de entradas desde n8n.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "integration",
+     "type": "varchar(40)",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre de la integración (hacienda, nager, n8n).",
+     "fk": null
+    },
+    {
+     "name": "direction",
+     "type": "enum('outbound','inbound')",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Dirección de la llamada (entrada o salida).",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('ok','error')",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "detail",
+     "type": "varchar(255)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Detalle legible del evento.",
+     "fk": null
+    },
+    {
+     "name": "latency_ms",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Duración en milisegundos.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Gobernanza y bitácoras",
+   "table": "exchange_rates",
+   "purpose": "Tipo de cambio de referencia del dólar por día y fuente.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "rate_date",
+     "type": "date",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha del tipo de cambio.",
+     "fk": null
+    },
+    {
+     "name": "source",
+     "type": "varchar(30)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fuente del dato.",
+     "fk": null
+    },
+    {
+     "name": "buy",
+     "type": "decimal(10,4)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tipo de cambio de compra (CRC por USD).",
+     "fk": null
+    },
+    {
+     "name": "sell",
+     "type": "decimal(10,4)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tipo de cambio de venta (CRC por USD).",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Gobernanza y bitácoras",
+   "table": "rate_limit_hits",
+   "purpose": "Contadores compartidos de límites por IP (varias instancias).",
+   "columns": [
+    {
+     "name": "rate_key",
+     "type": "varchar(255)",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "",
+     "purpose": "Clave del límite de solicitudes.",
+     "fk": null
+    },
+    {
+     "name": "hits",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Cantidad de solicitudes en la ventana.",
+     "fk": null
+    },
+    {
+     "name": "reset_at",
+     "type": "datetime(3)",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Momento en que se reinicia el contador.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Gobernanza y bitácoras",
+   "table": "job_leases",
+   "purpose": "Turno de tareas periódicas entre instancias del servidor.",
+   "columns": [
+    {
+     "name": "name",
+     "type": "varchar(60)",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre.",
+     "fk": null
+    },
+    {
+     "name": "owner",
+     "type": "varchar(64)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Propietario del registro.",
+     "fk": null
+    },
+    {
+     "name": "expires_at",
+     "type": "datetime(3)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha de vencimiento.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Cursos y contenido",
+   "table": "courses",
+   "purpose": "Cursos de una institución.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "code",
+     "type": "varchar(40)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Código único.",
+     "fk": null
+    },
+    {
+     "name": "title",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Título visible.",
+     "fk": null
+    },
+    {
+     "name": "description",
+     "type": "text",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Descripción.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('draft','published','archived')",
+     "null": false,
+     "key": "",
+     "default": "draft",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "created_by",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Cursos y contenido",
+   "table": "course_teachers",
+   "purpose": "Relación N:M entre cursos y docentes.",
+   "columns": [
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "user_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Cursos y contenido",
+   "table": "enrollments",
+   "purpose": "Relación N:M entre cursos y estudiantes (matrícula).",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "status",
+     "type": "enum('active','withdrawn')",
+     "null": false,
+     "key": "",
+     "default": "active",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Cursos y contenido",
+   "table": "modules",
+   "purpose": "Módulos de un curso.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "title",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Título visible.",
+     "fk": null
+    },
+    {
+     "name": "position",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Orden dentro de su grupo.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Cursos y contenido",
+   "table": "topics",
+   "purpose": "Temas de un módulo.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "module_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a modules.id (llave foránea).",
+     "fk": "modules.id"
+    },
+    {
+     "name": "title",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Título visible.",
+     "fk": null
+    },
+    {
+     "name": "learning_objective",
+     "type": "varchar(500)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Objetivo de aprendizaje.",
+     "fk": null
+    },
+    {
+     "name": "position",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Orden dentro de su grupo.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Cursos y contenido",
+   "table": "topic_prerequisites",
+   "purpose": "Relación N:M de prerrequisitos entre temas.",
+   "columns": [
+    {
+     "name": "topic_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a topics.id (llave foránea).",
+     "fk": "topics.id"
+    },
+    {
+     "name": "prerequisite_topic_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a topics.id (llave foránea).",
+     "fk": "topics.id"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Cursos y contenido",
+   "table": "lessons",
+   "purpose": "Lecciones de un tema (contenido en Markdown).",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "topic_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a topics.id (llave foránea).",
+     "fk": "topics.id"
+    },
+    {
+     "name": "title",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Título visible.",
+     "fk": null
+    },
+    {
+     "name": "body_md",
+     "type": "mediumtext",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Contenido de la lección en Markdown.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('draft','published')",
+     "null": false,
+     "key": "",
+     "default": "draft",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "position",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Orden dentro de su grupo.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    },
+    {
+     "name": "video_url",
+     "type": "varchar(500)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Enlace de video.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Cursos y contenido",
+   "table": "lesson_progress",
+   "purpose": "Lecciones completadas por cada estudiante.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "lesson_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a lessons.id (llave foránea).",
+     "fk": "lessons.id"
+    },
+    {
+     "name": "status",
+     "type": "enum('completed')",
+     "null": false,
+     "key": "",
+     "default": "completed",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "completed_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se completó.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Cursos y contenido",
+   "table": "lesson_comments",
+   "purpose": "Comentarios en las lecciones.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "lesson_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a lessons.id (llave foránea).",
+     "fk": "lessons.id"
+    },
+    {
+     "name": "author_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "parent_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a lesson_comments.id (llave foránea).",
+     "fk": "lesson_comments.id"
+    },
+    {
+     "name": "body",
+     "type": "text",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Texto del contenido.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Cursos y contenido",
+   "table": "materials",
+   "purpose": "Materiales del curso (archivos o enlaces).",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "lesson_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a lessons.id (llave foránea).",
+     "fk": "lessons.id"
+    },
+    {
+     "name": "title",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Título visible.",
+     "fk": null
+    },
+    {
+     "name": "kind",
+     "type": "enum('link','file')",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tipo de registro.",
+     "fk": null
+    },
+    {
+     "name": "url",
+     "type": "varchar(500)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Dirección web (HTTPS).",
+     "fk": null
+    },
+    {
+     "name": "file_name",
+     "type": "varchar(200)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre original del archivo.",
+     "fk": null
+    },
+    {
+     "name": "stored_name",
+     "type": "varchar(120)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre interno del archivo guardado.",
+     "fk": null
+    },
+    {
+     "name": "mime_type",
+     "type": "varchar(120)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tipo de archivo (MIME).",
+     "fk": null
+    },
+    {
+     "name": "size_bytes",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tamaño en bytes.",
+     "fk": null
+    },
+    {
+     "name": "uploaded_by",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Cursos y contenido",
+   "table": "announcements",
+   "purpose": "Anuncios del curso (Novedades).",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "author_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "title",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Título visible.",
+     "fk": null
+    },
+    {
+     "name": "body",
+     "type": "text",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Texto del contenido.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Cursos y contenido",
+   "table": "class_sessions",
+   "purpose": "Clases en vivo programadas.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "topic_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a topics.id (llave foránea).",
+     "fk": "topics.id"
+    },
+    {
+     "name": "title",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Título visible.",
+     "fk": null
+    },
+    {
+     "name": "description",
+     "type": "text",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Descripción.",
+     "fk": null
+    },
+    {
+     "name": "starts_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de inicio.",
+     "fk": null
+    },
+    {
+     "name": "duration_minutes",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "60",
+     "extra": "",
+     "purpose": "Duración en minutos.",
+     "fk": null
+    },
+    {
+     "name": "meeting_url",
+     "type": "varchar(500)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Enlace de la clase en vivo.",
+     "fk": null
+    },
+    {
+     "name": "recording_url",
+     "type": "varchar(500)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Enlace de la grabación.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('scheduled','cancelled')",
+     "null": false,
+     "key": "",
+     "default": "scheduled",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "created_by",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Cursos y contenido",
+   "table": "session_attendance",
+   "purpose": "Asistencia a clases en vivo.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "session_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a class_sessions.id (llave foránea).",
+     "fk": "class_sessions.id"
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "joined_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha de ingreso a la clase.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Evaluación y calificaciones",
+   "table": "assessments",
+   "purpose": "Evaluaciones con corrección automática.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "topic_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a topics.id (llave foránea).",
+     "fk": "topics.id"
+    },
+    {
+     "name": "title",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Título visible.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('draft','published','closed')",
+     "null": false,
+     "key": "",
+     "default": "draft",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "passing_score",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "60",
+     "extra": "",
+     "purpose": "Porcentaje mínimo para aprobar.",
+     "fk": null
+    },
+    {
+     "name": "max_attempts",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "3",
+     "extra": "",
+     "purpose": "Intentos máximos permitidos.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Evaluación y calificaciones",
+   "table": "questions",
+   "purpose": "Preguntas de una evaluación.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "assessment_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a assessments.id (llave foránea).",
+     "fk": "assessments.id"
+    },
+    {
+     "name": "topic_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a topics.id (llave foránea).",
+     "fk": "topics.id"
+    },
+    {
+     "name": "stem",
+     "type": "text",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Enunciado de la pregunta.",
+     "fk": null
+    },
+    {
+     "name": "explanation",
+     "type": "text",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Explicación de la respuesta correcta.",
+     "fk": null
+    },
+    {
+     "name": "points",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Puntos asignados.",
+     "fk": null
+    },
+    {
+     "name": "position",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Orden dentro de su grupo.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Evaluación y calificaciones",
+   "table": "question_options",
+   "purpose": "Opciones de respuesta (incluye la clave, nunca visible para el estudiante).",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "question_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a questions.id (llave foránea).",
+     "fk": "questions.id"
+    },
+    {
+     "name": "body",
+     "type": "varchar(500)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Texto del contenido.",
+     "fk": null
+    },
+    {
+     "name": "is_correct",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Indica si la opción o respuesta es correcta.",
+     "fk": null
+    },
+    {
+     "name": "position",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Orden dentro de su grupo.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Evaluación y calificaciones",
+   "table": "assessment_attempts",
+   "purpose": "Intentos de evaluación y su puntaje.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "assessment_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a assessments.id (llave foránea).",
+     "fk": "assessments.id"
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "status",
+     "type": "enum('in_progress','submitted')",
+     "null": false,
+     "key": "",
+     "default": "in_progress",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "score_pct",
+     "type": "decimal(5,2)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Porcentaje obtenido.",
+     "fk": null
+    },
+    {
+     "name": "earned_points",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Puntos obtenidos.",
+     "fk": null
+    },
+    {
+     "name": "total_points",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Puntaje total.",
+     "fk": null
+    },
+    {
+     "name": "submitted_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha de entrega.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Evaluación y calificaciones",
+   "table": "attempt_answers",
+   "purpose": "Respuestas de cada intento.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "attempt_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a assessment_attempts.id (llave foránea).",
+     "fk": "assessment_attempts.id"
+    },
+    {
+     "name": "question_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a questions.id (llave foránea).",
+     "fk": "questions.id"
+    },
+    {
+     "name": "selected_option_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a question_options.id (llave foránea).",
+     "fk": "question_options.id"
+    },
+    {
+     "name": "is_correct",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Indica si la opción o respuesta es correcta.",
+     "fk": null
+    },
+    {
+     "name": "earned_points",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Puntos obtenidos.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Evaluación y calificaciones",
+   "table": "assignments",
+   "purpose": "Tareas del curso.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "topic_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a topics.id (llave foránea).",
+     "fk": "topics.id"
+    },
+    {
+     "name": "title",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Título visible.",
+     "fk": null
+    },
+    {
+     "name": "instructions",
+     "type": "text",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Instrucciones de la tarea.",
+     "fk": null
+    },
+    {
+     "name": "due_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha límite.",
+     "fk": null
+    },
+    {
+     "name": "max_points",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "100",
+     "extra": "",
+     "purpose": "Puntaje máximo.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('draft','published')",
+     "null": false,
+     "key": "",
+     "default": "draft",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Evaluación y calificaciones",
+   "table": "assignment_submissions",
+   "purpose": "Entregas de tareas y su calificación.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "assignment_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a assignments.id (llave foránea).",
+     "fk": "assignments.id"
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "body",
+     "type": "text",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Texto del contenido.",
+     "fk": null
+    },
+    {
+     "name": "link_url",
+     "type": "varchar(500)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Enlace adjunto (HTTPS).",
+     "fk": null
+    },
+    {
+     "name": "submitted_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha de entrega.",
+     "fk": null
+    },
+    {
+     "name": "grade_points",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Puntos asignados por el docente.",
+     "fk": null
+    },
+    {
+     "name": "feedback",
+     "type": "text",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Retroalimentación del docente.",
+     "fk": null
+    },
+    {
+     "name": "graded_by",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "graded_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se calificó.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Evaluación y calificaciones",
+   "table": "course_grade_policies",
+   "purpose": "Pesos de la nota final y valores del bono por curso.",
+   "columns": [
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "assessments_weight",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "40",
+     "extra": "",
+     "purpose": "Peso (%) de las evaluaciones en la nota final.",
+     "fk": null
+    },
+    {
+     "name": "assignments_weight",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "30",
+     "extra": "",
+     "purpose": "Peso (%) de las tareas en la nota final.",
+     "fk": null
+    },
+    {
+     "name": "classwork_weight",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "30",
+     "extra": "",
+     "purpose": "Peso (%) del trabajo en clase en la nota final.",
+     "fk": null
+    },
+    {
+     "name": "quiz_bonus",
+     "type": "decimal(4,2)",
+     "null": false,
+     "key": "",
+     "default": "0.10",
+     "extra": "",
+     "purpose": "Puntos extra por quizzes perfectos (0,1 c/u).",
+     "fk": null
+    },
+    {
+     "name": "streak_day_bonus",
+     "type": "decimal(4,2)",
+     "null": false,
+     "key": "",
+     "default": "0.09",
+     "extra": "",
+     "purpose": "Puntos por día de racha (0,09).",
+     "fk": null
+    },
+    {
+     "name": "bonus_cap",
+     "type": "decimal(4,2)",
+     "null": false,
+     "key": "",
+     "default": "1.00",
+     "extra": "",
+     "purpose": "Tope de puntos extra que fija el docente.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Evaluación y calificaciones",
+   "table": "class_work_items",
+   "purpose": "Actividades de trabajo en clase.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "title",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Título visible.",
+     "fk": null
+    },
+    {
+     "name": "max_points",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "100",
+     "extra": "",
+     "purpose": "Puntaje máximo.",
+     "fk": null
+    },
+    {
+     "name": "work_date",
+     "type": "date",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha del trabajo en clase.",
+     "fk": null
+    },
+    {
+     "name": "created_by",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Evaluación y calificaciones",
+   "table": "class_work_grades",
+   "purpose": "Notas de trabajo en clase por estudiante.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "item_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a class_work_items.id (llave foránea).",
+     "fk": "class_work_items.id"
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "points",
+     "type": "decimal(6,2)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Puntos asignados.",
+     "fk": null
+    },
+    {
+     "name": "feedback",
+     "type": "varchar(1000)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Retroalimentación del docente.",
+     "fk": null
+    },
+    {
+     "name": "graded_by",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Evaluación y calificaciones",
+   "table": "grade_bonus_events",
+   "purpose": "Bono ganado (quiz perfecto o día de racha), una vez por evento.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "kind",
+     "type": "enum('quiz','streak_day')",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tipo de registro.",
+     "fk": null
+    },
+    {
+     "name": "reference",
+     "type": "varchar(40)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia externa.",
+     "fk": null
+    },
+    {
+     "name": "amount",
+     "type": "decimal(5,2)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Monto o cantidad registrada.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "quick_quizzes",
+   "purpose": "Quizzes rápidos con tiempo por pregunta.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "title",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Título visible.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('draft','published','archived')",
+     "null": false,
+     "key": "",
+     "default": "draft",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "seconds_per_question",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "20",
+     "extra": "",
+     "purpose": "Segundos por pregunta del quiz.",
+     "fk": null
+    },
+    {
+     "name": "created_by",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "quick_quiz_questions",
+   "purpose": "Preguntas de un quiz rápido (banco de la práctica diaria).",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "quiz_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a quick_quizzes.id (llave foránea).",
+     "fk": "quick_quizzes.id"
+    },
+    {
+     "name": "prompt",
+     "type": "varchar(500)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Enunciado de la pregunta.",
+     "fk": null
+    },
+    {
+     "name": "position",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Orden dentro de su grupo.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "quick_quiz_options",
+   "purpose": "Opciones de un quiz rápido.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "question_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a quick_quiz_questions.id (llave foránea).",
+     "fk": "quick_quiz_questions.id"
+    },
+    {
+     "name": "body",
+     "type": "varchar(200)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Texto del contenido.",
+     "fk": null
+    },
+    {
+     "name": "is_correct",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Indica si la opción o respuesta es correcta.",
+     "fk": null
+    },
+    {
+     "name": "position",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Orden dentro de su grupo.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "quiz_plays",
+   "purpose": "Partidas de un estudiante.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "quiz_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a quick_quizzes.id (llave foránea).",
+     "fk": "quick_quizzes.id"
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "status",
+     "type": "enum('in_progress','finished')",
+     "null": false,
+     "key": "",
+     "default": "in_progress",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "total_questions",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Cantidad total de preguntas.",
+     "fk": null
+    },
+    {
+     "name": "correct_count",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Cantidad de respuestas correctas.",
+     "fk": null
+    },
+    {
+     "name": "score",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Puntaje obtenido.",
+     "fk": null
+    },
+    {
+     "name": "perfect",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Indica si el quiz se respondió completo y sin errores.",
+     "fk": null
+    },
+    {
+     "name": "finished_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de finalización.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "quiz_play_answers",
+   "purpose": "Respuestas de una partida con el momento medido por el servidor.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "play_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a quiz_plays.id (llave foránea).",
+     "fk": "quiz_plays.id"
+    },
+    {
+     "name": "question_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a quick_quiz_questions.id (llave foránea).",
+     "fk": "quick_quiz_questions.id"
+    },
+    {
+     "name": "option_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a quick_quiz_options.id (llave foránea).",
+     "fk": "quick_quiz_options.id"
+    },
+    {
+     "name": "shown_at",
+     "type": "datetime(3)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se mostró.",
+     "fk": null
+    },
+    {
+     "name": "answered_at",
+     "type": "datetime(3)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de la respuesta.",
+     "fk": null
+    },
+    {
+     "name": "is_correct",
+     "type": "tinyint(1)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Indica si la opción o respuesta es correcta.",
+     "fk": null
+    },
+    {
+     "name": "points",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Puntos asignados.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "daily_practices",
+   "purpose": "Práctica diaria de 5 preguntas por estudiante y curso.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "practice_day",
+     "type": "date",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Día de la práctica.",
+     "fk": null
+    },
+    {
+     "name": "question_ids",
+     "type": "json",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Preguntas asignadas (JSON).",
+     "fk": null
+    },
+    {
+     "name": "answered_count",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Cantidad de preguntas respondidas.",
+     "fk": null
+    },
+    {
+     "name": "completed_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se completó.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "daily_practice_answers",
+   "purpose": "Respuestas de la práctica diaria.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "practice_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a daily_practices.id (llave foránea).",
+     "fk": "daily_practices.id"
+    },
+    {
+     "name": "question_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a quick_quiz_questions.id (llave foránea).",
+     "fk": "quick_quiz_questions.id"
+    },
+    {
+     "name": "option_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a quick_quiz_options.id (llave foránea).",
+     "fk": "quick_quiz_options.id"
+    },
+    {
+     "name": "is_correct",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Indica si la opción o respuesta es correcta.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "course_streaks",
+   "purpose": "Racha actual y mejor racha por curso.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "current_days",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Días seguidos de la racha actual.",
+     "fk": null
+    },
+    {
+     "name": "best_days",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Mejor racha alcanzada (días).",
+     "fk": null
+    },
+    {
+     "name": "last_day",
+     "type": "date",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Último día con práctica cumplida.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "topic_mastery",
+   "purpose": "Dominio estimado por tema y estudiante.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "topic_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a topics.id (llave foránea).",
+     "fk": "topics.id"
+    },
+    {
+     "name": "mastery_score",
+     "type": "decimal(4,3)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Dominio del tema (0 a 100).",
+     "fk": null
+    },
+    {
+     "name": "evidence_count",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Cantidad de pasajes usados como evidencia.",
+     "fk": null
+    },
+    {
+     "name": "algorithm_version",
+     "type": "varchar(40)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Versión del algoritmo de repaso espaciado.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "learning_recommendations",
+   "purpose": "Recomendaciones de estudio generadas por reglas.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "topic_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a topics.id (llave foránea).",
+     "fk": "topics.id"
+    },
+    {
+     "name": "next_topic_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a topics.id (llave foránea).",
+     "fk": "topics.id"
+    },
+    {
+     "name": "type",
+     "type": "enum('reinforce','practice','advance')",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tipo.",
+     "fk": null
+    },
+    {
+     "name": "reason",
+     "type": "varchar(500)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Motivo indicado por la persona.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('active','replaced','dismissed')",
+     "null": false,
+     "key": "",
+     "default": "active",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "topic_reviews",
+   "purpose": "Programación del repaso espaciado (FSRS) por tema.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "topic_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a topics.id (llave foránea).",
+     "fk": "topics.id"
+    },
+    {
+     "name": "stability",
+     "type": "decimal(9,3)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Estabilidad del recuerdo (repaso espaciado).",
+     "fk": null
+    },
+    {
+     "name": "difficulty",
+     "type": "decimal(5,3)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Dificultad estimada del tema para el estudiante.",
+     "fk": null
+    },
+    {
+     "name": "due_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha límite.",
+     "fk": null
+    },
+    {
+     "name": "last_reviewed_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha del último repaso.",
+     "fk": null
+    },
+    {
+     "name": "reps",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Repeticiones del repaso espaciado.",
+     "fk": null
+    },
+    {
+     "name": "lapses",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Veces que se olvidó el tema.",
+     "fk": null
+    },
+    {
+     "name": "last_grade",
+     "type": "tinyint",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Última calificación del repaso.",
+     "fk": null
+    },
+    {
+     "name": "algorithm_version",
+     "type": "varchar(40)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Versión del algoritmo de repaso espaciado.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "topic_review_logs",
+   "purpose": "Historial de repasos.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "review_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a topic_reviews.id (llave foránea).",
+     "fk": "topic_reviews.id"
+    },
+    {
+     "name": "grade",
+     "type": "tinyint",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nota obtenida.",
+     "fk": null
+    },
+    {
+     "name": "source",
+     "type": "enum('assessment','self')",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fuente del dato.",
+     "fk": null
+    },
+    {
+     "name": "elapsed_days",
+     "type": "decimal(9,3)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Días transcurridos desde el último repaso.",
+     "fk": null
+    },
+    {
+     "name": "scheduled_days",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Días hasta el próximo repaso.",
+     "fk": null
+    },
+    {
+     "name": "reviewed_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha de revisión.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "study_plans",
+   "purpose": "Planes de estudio del estudiante.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "title",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Título visible.",
+     "fk": null
+    },
+    {
+     "name": "start_date",
+     "type": "date",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha de inicio.",
+     "fk": null
+    },
+    {
+     "name": "target_date",
+     "type": "date",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha objetivo.",
+     "fk": null
+    },
+    {
+     "name": "minutes_per_session",
+     "type": "smallint",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Minutos por sesión de estudio.",
+     "fk": null
+    },
+    {
+     "name": "study_days",
+     "type": "varchar(20)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Días de la semana para estudiar.",
+     "fk": null
+    },
+    {
+     "name": "time_zone",
+     "type": "varchar(64)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Zona horaria.",
+     "fk": null
+    },
+    {
+     "name": "unscheduled_minutes",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Minutos sin asignar del plan.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('active','archived')",
+     "null": false,
+     "key": "",
+     "default": "active",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "algorithm_version",
+     "type": "varchar(40)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Versión del algoritmo de repaso espaciado.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "study_plan_items",
+   "purpose": "Sesiones de un plan de estudio.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "study_plan_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a study_plans.id (llave foránea).",
+     "fk": "study_plans.id"
+    },
+    {
+     "name": "topic_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a topics.id (llave foránea).",
+     "fk": "topics.id"
+    },
+    {
+     "name": "kind",
+     "type": "enum('learn','reinforce','practice','review')",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tipo de registro.",
+     "fk": null
+    },
+    {
+     "name": "description",
+     "type": "varchar(300)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Descripción.",
+     "fk": null
+    },
+    {
+     "name": "minutes",
+     "type": "smallint",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Minutos planificados.",
+     "fk": null
+    },
+    {
+     "name": "scheduled_date",
+     "type": "date",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha programada.",
+     "fk": null
+    },
+    {
+     "name": "position",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Orden dentro de su grupo.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('pending','done','skipped')",
+     "null": false,
+     "key": "",
+     "default": "pending",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Tutor IA, fuentes e integraciones",
+   "table": "ai_threads",
+   "purpose": "Conversaciones con el tutor.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "user_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "title",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Título visible.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Tutor IA, fuentes e integraciones",
+   "table": "ai_messages",
+   "purpose": "Mensajes de una conversación con el tutor.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "thread_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a ai_threads.id (llave foránea).",
+     "fk": "ai_threads.id"
+    },
+    {
+     "name": "role",
+     "type": "enum('user','assistant')",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Código del rol (FK a roles).",
+     "fk": null
+    },
+    {
+     "name": "content",
+     "type": "text",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Texto del mensaje o contenido.",
+     "fk": null
+    },
+    {
+     "name": "citations_json",
+     "type": "json",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Citas verificadas de la respuesta (JSON).",
+     "fk": null
+    },
+    {
+     "name": "grounded",
+     "type": "tinyint(1)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Indica si la respuesta se basó en evidencia.",
+     "fk": null
+    },
+    {
+     "name": "model",
+     "type": "varchar(120)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Modelo de IA utilizado.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    },
+    {
+     "name": "kind",
+     "type": "enum('answer','notice')",
+     "null": false,
+     "key": "",
+     "default": "answer",
+     "extra": "",
+     "purpose": "Tipo de registro.",
+     "fk": null
+    },
+    {
+     "name": "notice_code",
+     "type": "varchar(60)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Código del aviso mostrado.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Tutor IA, fuentes e integraciones",
+   "table": "ai_message_sources",
+   "purpose": "Citas de cada respuesta del tutor.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "message_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a ai_messages.id (llave foránea).",
+     "fk": "ai_messages.id"
+    },
+    {
+     "name": "source_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a knowledge_sources.id (llave foránea).",
+     "fk": "knowledge_sources.id"
+    },
+    {
+     "name": "source_version_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a source_versions.id (llave foránea).",
+     "fk": "source_versions.id"
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "position",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Orden dentro de su grupo.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Tutor IA, fuentes e integraciones",
+   "table": "ai_usage_events",
+   "purpose": "Consumo técnico del tutor (cuota, tokens, latencia).",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "user_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "provider",
+     "type": "varchar(30)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Proveedor de IA.",
+     "fk": null
+    },
+    {
+     "name": "model",
+     "type": "varchar(120)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Modelo de IA utilizado.",
+     "fk": null
+    },
+    {
+     "name": "retrieval_mode",
+     "type": "varchar(20)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Modo de recuperación de pasajes.",
+     "fk": null
+    },
+    {
+     "name": "streamed",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Indica si la respuesta se transmitió en vivo.",
+     "fk": null
+    },
+    {
+     "name": "outcome",
+     "type": "enum('reserved','completed','no_evidence','no_citations','invalid_format','provider_error','retrieval_error','cancelled')",
+     "null": false,
+     "key": "",
+     "default": "reserved",
+     "extra": "",
+     "purpose": "Resultado de la operación.",
+     "fk": null
+    },
+    {
+     "name": "latency_ms",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Duración en milisegundos.",
+     "fk": null
+    },
+    {
+     "name": "input_tokens",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tokens de entrada informados por el proveedor.",
+     "fk": null
+    },
+    {
+     "name": "output_tokens",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tokens de salida informados por el proveedor.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Tutor IA, fuentes e integraciones",
+   "table": "ai_usage_monthly",
+   "purpose": "Resumen mensual del consumo de IA.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "month",
+     "type": "char(7)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Mes del resumen (AAAA-MM).",
+     "fk": null
+    },
+    {
+     "name": "provider",
+     "type": "varchar(30)",
+     "null": false,
+     "key": "",
+     "default": "",
+     "extra": "",
+     "purpose": "Proveedor de IA.",
+     "fk": null
+    },
+    {
+     "name": "model",
+     "type": "varchar(120)",
+     "null": false,
+     "key": "",
+     "default": "",
+     "extra": "",
+     "purpose": "Modelo de IA utilizado.",
+     "fk": null
+    },
+    {
+     "name": "outcome",
+     "type": "varchar(30)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Resultado de la operación.",
+     "fk": null
+    },
+    {
+     "name": "events",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Cantidad de eventos del periodo.",
+     "fk": null
+    },
+    {
+     "name": "input_tokens",
+     "type": "bigint",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Tokens de entrada informados por el proveedor.",
+     "fk": null
+    },
+    {
+     "name": "output_tokens",
+     "type": "bigint",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Tokens de salida informados por el proveedor.",
+     "fk": null
+    },
+    {
+     "name": "latency_ms_total",
+     "type": "bigint",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Latencia acumulada en milisegundos.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Tutor IA, fuentes e integraciones",
+   "table": "knowledge_sources",
+   "purpose": "Fuentes del tutor (lecciones, materiales y Drive).",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "origin",
+     "type": "enum('lesson','material','drive')",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Origen del registro.",
+     "fk": null
+    },
+    {
+     "name": "source_key",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Clave única de la fuente.",
+     "fk": null
+    },
+    {
+     "name": "lesson_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a lessons.id (llave foránea).",
+     "fk": "lessons.id"
+    },
+    {
+     "name": "material_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a materials.id (llave foránea).",
+     "fk": "materials.id"
+    },
+    {
+     "name": "drive_file_id",
+     "type": "varchar(128)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Identificador del archivo en Google Drive.",
+     "fk": null
+    },
+    {
+     "name": "title",
+     "type": "varchar(200)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Título visible.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('active','retired')",
+     "null": false,
+     "key": "",
+     "default": "active",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "retired_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha de retiro.",
+     "fk": null
+    },
+    {
+     "name": "retire_reason",
+     "type": "varchar(60)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Motivo del retiro.",
+     "fk": null
+    },
+    {
+     "name": "active_version_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Versión vigente que usa el tutor.",
+     "fk": null
+    },
+    {
+     "name": "cleanup_status",
+     "type": "enum('none','pending','done','error')",
+     "null": false,
+     "key": "",
+     "default": "none",
+     "extra": "",
+     "purpose": "Estado de la limpieza del archivo remoto.",
+     "fk": null
+    },
+    {
+     "name": "cleanup_attempts",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Intentos de limpieza del archivo remoto.",
+     "fk": null
+    },
+    {
+     "name": "cleanup_error",
+     "type": "varchar(500)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Último error de limpieza.",
+     "fk": null
+    },
+    {
+     "name": "created_by",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    },
+    {
+     "name": "drive_link_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a course_drive_links.id (llave foránea).",
+     "fk": "course_drive_links.id"
+    },
+    {
+     "name": "last_seen_run",
+     "type": "varchar(36)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Última sincronización en que se vio el archivo.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Tutor IA, fuentes e integraciones",
+   "table": "source_versions",
+   "purpose": "Versiones indexadas de cada fuente.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "source_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a knowledge_sources.id (llave foránea).",
+     "fk": "knowledge_sources.id"
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "version_no",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Número de versión.",
+     "fk": null
+    },
+    {
+     "name": "content_hash",
+     "type": "char(64)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Huella SHA-256 del contenido para detectar cambios.",
+     "fk": null
+    },
+    {
+     "name": "state",
+     "type": "enum('pending','processing','ready','error','superseded','retired')",
+     "null": false,
+     "key": "MUL",
+     "default": "pending",
+     "extra": "",
+     "purpose": "Estado del proceso.",
+     "fk": null
+    },
+    {
+     "name": "error_code",
+     "type": "varchar(60)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Código del error, si hubo.",
+     "fk": null
+    },
+    {
+     "name": "error_message",
+     "type": "varchar(500)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Mensaje de error sin datos personales.",
+     "fk": null
+    },
+    {
+     "name": "text_content",
+     "type": "longtext",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Texto extraído para el tutor.",
+     "fk": null
+    },
+    {
+     "name": "char_count",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Cantidad de caracteres del texto.",
+     "fk": null
+    },
+    {
+     "name": "pages_json",
+     "type": "json",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Páginas del documento (JSON).",
+     "fk": null
+    },
+    {
+     "name": "mime_type",
+     "type": "varchar(120)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tipo de archivo (MIME).",
+     "fk": null
+    },
+    {
+     "name": "external_revision",
+     "type": "varchar(120)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Revisión del archivo en el sistema externo.",
+     "fk": null
+    },
+    {
+     "name": "gcs_uri",
+     "type": "varchar(500)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Ubicación del archivo en Cloud Storage.",
+     "fk": null
+    },
+    {
+     "name": "rag_file_name",
+     "type": "varchar(400)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre del archivo en el corpus RAG.",
+     "fk": null
+    },
+    {
+     "name": "import_operation",
+     "type": "varchar(400)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Operación de importación en Vertex AI.",
+     "fk": null
+    },
+    {
+     "name": "import_attempts",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Intentos de importación al corpus.",
+     "fk": null
+    },
+    {
+     "name": "remote_cleanup",
+     "type": "enum('none','pending','done','error')",
+     "null": false,
+     "key": "MUL",
+     "default": "none",
+     "extra": "",
+     "purpose": "Indica si falta limpiar el archivo remoto.",
+     "fk": null
+    },
+    {
+     "name": "ready_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que quedó lista para el tutor.",
+     "fk": null
+    },
+    {
+     "name": "created_by",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    },
+    {
+     "name": "text_purged_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se depuró el texto.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Tutor IA, fuentes e integraciones",
+   "table": "course_rag_corpora",
+   "purpose": "Corpus de RAG Engine de cada curso.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "UNI",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "corpus_name",
+     "type": "varchar(300)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre del corpus en Vertex AI RAG Engine.",
+     "fk": null
+    },
+    {
+     "name": "operation_name",
+     "type": "varchar(400)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre de la operación remota.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('pending','creating','ready','error')",
+     "null": false,
+     "key": "",
+     "default": "pending",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "last_error",
+     "type": "varchar(500)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Último error registrado.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Tutor IA, fuentes e integraciones",
+   "table": "course_drive_links",
+   "purpose": "Carpetas de Drive vinculadas a un curso.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "drive_folder_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institution_drive_folders.id (llave foránea).",
+     "fk": "institution_drive_folders.id"
+    },
+    {
+     "name": "status",
+     "type": "enum('active','removed')",
+     "null": false,
+     "key": "",
+     "default": "active",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "sync_state",
+     "type": "enum('idle','running','interrupted','error')",
+     "null": false,
+     "key": "",
+     "default": "idle",
+     "extra": "",
+     "purpose": "Estado de sincronización con Drive.",
+     "fk": null
+    },
+    {
+     "name": "sync_run_id",
+     "type": "varchar(36)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Sincronización que lo detectó.",
+     "fk": null
+    },
+    {
+     "name": "page_token",
+     "type": "text",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Marcador de página de la API externa.",
+     "fk": null
+    },
+    {
+     "name": "files_listed",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Archivos encontrados en la sincronización.",
+     "fk": null
+    },
+    {
+     "name": "last_sync_started_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Inicio de la última sincronización.",
+     "fk": null
+    },
+    {
+     "name": "last_sync_completed_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fin de la última sincronización.",
+     "fk": null
+    },
+    {
+     "name": "last_error",
+     "type": "varchar(500)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Último error registrado.",
+     "fk": null
+    },
+    {
+     "name": "created_by",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Tutor IA, fuentes e integraciones",
+   "table": "institution_drive_folders",
+   "purpose": "Carpetas de Drive autorizadas por la institución.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "folder_id",
+     "type": "varchar(128)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Identificador de la carpeta de Google Drive.",
+     "fk": null
+    },
+    {
+     "name": "label",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Etiqueta visible.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('enabled','disabled')",
+     "null": false,
+     "key": "",
+     "default": "enabled",
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "created_by",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  }
+ ],
+ "fks": [
+  {
+   "table": "agent_runs",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "agent_runs",
+   "column": "user_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "agent_runs",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "ai_message_sources",
+   "column": "message_id",
+   "ref": "ai_messages",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "ai_message_sources",
+   "column": "source_id",
+   "ref": "knowledge_sources",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "ai_message_sources",
+   "column": "source_version_id",
+   "ref": "source_versions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "ai_message_sources",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "ai_messages",
+   "column": "thread_id",
+   "ref": "ai_threads",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "ai_threads",
+   "column": "user_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "ai_threads",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "ai_usage_events",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "ai_usage_events",
+   "column": "user_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "ai_usage_events",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "ai_usage_monthly",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "announcements",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "announcements",
+   "column": "author_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "assessment_attempts",
+   "column": "assessment_id",
+   "ref": "assessments",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "assessment_attempts",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "assessments",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "assessments",
+   "column": "topic_id",
+   "ref": "topics",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "assignment_submissions",
+   "column": "assignment_id",
+   "ref": "assignments",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "assignment_submissions",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "assignment_submissions",
+   "column": "graded_by",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "assignments",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "assignments",
+   "column": "topic_id",
+   "ref": "topics",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "attempt_answers",
+   "column": "attempt_id",
+   "ref": "assessment_attempts",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "attempt_answers",
+   "column": "question_id",
+   "ref": "questions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "attempt_answers",
+   "column": "selected_option_id",
+   "ref": "question_options",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "audit_logs",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "audit_logs",
+   "column": "actor_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "class_sessions",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "class_sessions",
+   "column": "topic_id",
+   "ref": "topics",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "class_sessions",
+   "column": "created_by",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "class_work_grades",
+   "column": "item_id",
+   "ref": "class_work_items",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "class_work_grades",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "class_work_grades",
+   "column": "graded_by",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "class_work_items",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "class_work_items",
+   "column": "created_by",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "consent_records",
+   "column": "user_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "course_drive_links",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "course_drive_links",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "course_drive_links",
+   "column": "drive_folder_id",
+   "ref": "institution_drive_folders",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "course_drive_links",
+   "column": "created_by",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "course_grade_policies",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:1"
+  },
+  {
+   "table": "course_rag_corpora",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "course_rag_corpora",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:1"
+  },
+  {
+   "table": "course_streaks",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "course_streaks",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "course_teachers",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "course_teachers",
+   "column": "user_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "courses",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "courses",
+   "column": "created_by",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "daily_practice_answers",
+   "column": "practice_id",
+   "ref": "daily_practices",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "daily_practice_answers",
+   "column": "question_id",
+   "ref": "quick_quiz_questions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "daily_practice_answers",
+   "column": "option_id",
+   "ref": "quick_quiz_options",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "daily_practices",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "daily_practices",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "data_deletion_requests",
+   "column": "user_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "data_deletion_requests",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "enrollments",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "enrollments",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "grade_bonus_events",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "grade_bonus_events",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "institution_drive_folders",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "institution_drive_folders",
+   "column": "created_by",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "knowledge_sources",
+   "column": "drive_link_id",
+   "ref": "course_drive_links",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "knowledge_sources",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "knowledge_sources",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "knowledge_sources",
+   "column": "lesson_id",
+   "ref": "lessons",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "knowledge_sources",
+   "column": "material_id",
+   "ref": "materials",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "knowledge_sources",
+   "column": "created_by",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "learning_recommendations",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "learning_recommendations",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "learning_recommendations",
+   "column": "topic_id",
+   "ref": "topics",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "learning_recommendations",
+   "column": "next_topic_id",
+   "ref": "topics",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "lesson_comments",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "lesson_comments",
+   "column": "lesson_id",
+   "ref": "lessons",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "lesson_comments",
+   "column": "author_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "lesson_comments",
+   "column": "parent_id",
+   "ref": "lesson_comments",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "lesson_progress",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "lesson_progress",
+   "column": "lesson_id",
+   "ref": "lessons",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "lessons",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "lessons",
+   "column": "topic_id",
+   "ref": "topics",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "materials",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "materials",
+   "column": "lesson_id",
+   "ref": "lessons",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "materials",
+   "column": "uploaded_by",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "modules",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "password_resets",
+   "column": "user_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "question_options",
+   "column": "question_id",
+   "ref": "questions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "questions",
+   "column": "assessment_id",
+   "ref": "assessments",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "questions",
+   "column": "topic_id",
+   "ref": "topics",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "quick_quiz_options",
+   "column": "question_id",
+   "ref": "quick_quiz_questions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "quick_quiz_questions",
+   "column": "quiz_id",
+   "ref": "quick_quizzes",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "quick_quizzes",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "quick_quizzes",
+   "column": "created_by",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "quiz_play_answers",
+   "column": "play_id",
+   "ref": "quiz_plays",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "quiz_play_answers",
+   "column": "question_id",
+   "ref": "quick_quiz_questions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "quiz_play_answers",
+   "column": "option_id",
+   "ref": "quick_quiz_options",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "quiz_plays",
+   "column": "quiz_id",
+   "ref": "quick_quizzes",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "quiz_plays",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "session_attendance",
+   "column": "session_id",
+   "ref": "class_sessions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "session_attendance",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "source_versions",
+   "column": "source_id",
+   "ref": "knowledge_sources",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "source_versions",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "source_versions",
+   "column": "created_by",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "study_plan_items",
+   "column": "study_plan_id",
+   "ref": "study_plans",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "study_plan_items",
+   "column": "topic_id",
+   "ref": "topics",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "study_plans",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "study_plans",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "topic_mastery",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "topic_mastery",
+   "column": "topic_id",
+   "ref": "topics",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "topic_prerequisites",
+   "column": "topic_id",
+   "ref": "topics",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "topic_prerequisites",
+   "column": "prerequisite_topic_id",
+   "ref": "topics",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "topic_review_logs",
+   "column": "review_id",
+   "ref": "topic_reviews",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "topic_reviews",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "topic_reviews",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "topic_reviews",
+   "column": "topic_id",
+   "ref": "topics",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "topics",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "topics",
+   "column": "module_id",
+   "ref": "modules",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "user_preferences",
+   "column": "user_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:1"
+  },
+  {
+   "table": "user_sessions",
+   "column": "user_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "users",
+   "column": "role",
+   "ref": "roles",
+   "refcol": "code",
+   "card": "1:N"
+  },
+  {
+   "table": "users",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  }
+ ],
+ "modules": {
+  "Seguridad e identidad": [
+   "roles",
+   "users",
+   "user_sessions",
+   "password_resets",
+   "institutions",
+   "user_preferences"
+  ],
+  "Gobernanza y bitácoras": [
+   "consent_records",
+   "data_deletion_requests",
+   "audit_logs",
+   "agent_runs",
+   "integration_runs",
+   "exchange_rates",
+   "rate_limit_hits",
+   "job_leases"
+  ],
+  "Cursos y contenido": [
+   "courses",
+   "course_teachers",
+   "enrollments",
+   "modules",
+   "topics",
+   "topic_prerequisites",
+   "lessons",
+   "lesson_progress",
+   "lesson_comments",
+   "materials",
+   "announcements",
+   "class_sessions",
+   "session_attendance"
+  ],
+  "Evaluación y calificaciones": [
+   "assessments",
+   "questions",
+   "question_options",
+   "assessment_attempts",
+   "attempt_answers",
+   "assignments",
+   "assignment_submissions",
+   "course_grade_policies",
+   "class_work_items",
+   "class_work_grades",
+   "grade_bonus_events"
+  ],
+  "Quizzes, racha y aprendizaje": [
+   "quick_quizzes",
+   "quick_quiz_questions",
+   "quick_quiz_options",
+   "quiz_plays",
+   "quiz_play_answers",
+   "daily_practices",
+   "daily_practice_answers",
+   "course_streaks",
+   "topic_mastery",
+   "learning_recommendations",
+   "topic_reviews",
+   "topic_review_logs",
+   "study_plans",
+   "study_plan_items"
+  ],
+  "Tutor IA, fuentes e integraciones": [
+   "ai_threads",
+   "ai_messages",
+   "ai_message_sources",
+   "ai_usage_events",
+   "ai_usage_monthly",
+   "knowledge_sources",
+   "source_versions",
+   "course_rag_corpora",
+   "course_drive_links",
+   "institution_drive_folders"
+  ]
+ },
+ "tables": 62,
+ "columns": 578
+}

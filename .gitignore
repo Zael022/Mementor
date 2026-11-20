@@ -14,3 +14,4 @@ application_default_credentials.json
 frontend/test-results/
 frontend/playwright-report/
 backend/storage/uploads-e2e/
+frontend/capturas/salida/

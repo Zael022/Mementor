@@ -1,6 +1,31 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-20. Personalización: preferencias de apariencia y accesibilidad en la cuenta, repaso espaciado (FSRS) por tema, plan de estudio y metas del estudiante.
+**Última actualización** — 2026-11-20. Requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+
+## Sesión 2026-11-20 · Requisitos FWD y entregables
+
+| Cambio | Dónde | Cómo se comprobó |
+| --- | --- | --- |
+| Contraseñas con bcrypt (12 rondas, rehash de scrypt), sesión JWT HS256 en cookie httpOnly revocable, recuperación de contraseña por correo (PR #1) | `utils/security.js`, `utils/jwt.js`, `authService`, `passwordResetService`, `RecuperarClave.jsx`, `RestablecerClave.jsx` | `security.test.js` |
+| Gobernanza: consentimientos versionados, copia de datos, baja con anonimización y aviso, rol auditor de solo lectura, páginas de privacidad y términos (PR #2) | `consentService`, `governanceService`, `Privacidad.jsx`, `Terminos.jsx`, `PrivacidadDatos.jsx`, `Gobernanza.jsx` | `governance.test.js`, Playwright |
+| 8 agentes de IA con permisos por rol, salida validada, cuota diaria y bitácora `agent_runs` (PR #3) | `services/agents/`, `Asistentes.jsx`, `docs/agentes-ia.md` | `agents.test.js` con proveedor simulado |
+| APIs externas (tipo de cambio de Hacienda, feriados de Nager.Date) y endpoints para 3 workflows de n8n (PR #4) | `services/external/`, `integrationService`, `n8n/*.json` | `integrations.test.js` con respuestas simuladas |
+| Configuración de despliegue: Render (Virginia), Vercel con reescritura `/api`, TiDB Cloud con TLS (PR #5) | `render.yaml`, `frontend/vercel.json`, `docs/despliegue.md` | Revisión; **no desplegado todavía** |
+| Catálogo `roles` con FK desde `users.role` (PR #6) | migración `20261121000500` | Migraciones up/down/up; suite completa |
+| Nuevo logotipo (burbuja azul con «m» de dos arcos y chispa lima), favicon y set de íconos propios (PR #8) | `Logo.jsx`, `Iconos.jsx`, `public/` | Vitest y Playwright |
+| Modelo de datos (ER general y 6 por módulo, diccionario), mockups de 46 pantallas en escritorio y móvil, libro de marca, anteproyecto, plan de producción en Word y PDF | `docs/datos/`, `docs/mockups/`, `docs/marca/`, `docs/produccion/`, `docs/entregables/`, `frontend/capturas/` | PDF renderizados y revisados página por página |
+
+### Resultados
+- Backend: `npm run lint` sin errores; `npm test` **139 de 139**.
+- Frontend: `npm run lint` sin errores; `npm test` **46 de 46**; `npm run build` compila.
+- Navegador: `npm run test:e2e` **24 de 24**; capturas de mockups 10 de 10.
+- Todo lo anterior usa dobles para la IA, Hacienda y Nager.Date: **ninguna integración se probó todavía contra el servicio real.**
+
+### Pendiente
+- Desplegar (TiDB, Render, Vercel, n8n), confirmar las URLs y tomar las capturas de las pruebas posteriores para el Plan de Producción.
+- Verificar en vivo el formato de la API de Hacienda y la importación de los tres workflows en n8n.
+- Crear desde la aplicación las cuentas de prueba por rol para el profesor (no se versionan).
+- Completar grupo y profesor en las portadas de los documentos.
 
 ## Sesión 2026-11-20 · Personalización
 
