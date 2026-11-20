@@ -16,6 +16,7 @@ const GENERAL = {
     { to: '/calendario', texto: 'Calendario', icono: 'calendario' },
     { to: '/admin/drive', texto: 'Drive', icono: 'carpeta' },
     { to: '/admin/consumo', texto: 'Consumo IA', icono: 'grafica' },
+    { to: '/asistentes', texto: 'Asistentes IA', icono: 'chispa' },
     { to: '/admin/auditoria', texto: 'Auditoría', icono: 'lista' },
     { to: '/admin/gobernanza', texto: 'Gobernanza', icono: 'escudo' },
   ],
@@ -23,11 +24,13 @@ const GENERAL = {
   auditor: [
     { to: '/auditoria/bitacora', texto: 'Bitácora', icono: 'lista' },
     { to: '/auditoria/gobernanza', texto: 'Gobernanza', icono: 'escudo' },
+    { to: '/asistentes', texto: 'Asistentes IA', icono: 'chispa' },
   ],
   teacher: [
     { to: '/docente/cursos', texto: 'Página principal', icono: 'casa' },
     { to: '/calendario', texto: 'Calendario', icono: 'calendario' },
     { to: '/pendientes', texto: 'Por revisar', icono: 'lista' },
+    { to: '/asistentes', texto: 'Asistentes IA', icono: 'chispa' },
   ],
   student: [
     { to: '/estudiante/inicio', texto: 'Página principal', icono: 'casa' },
@@ -35,6 +38,7 @@ const GENERAL = {
     { to: '/pendientes', texto: 'Pendientes', icono: 'lista' },
     { to: '/estudiante/plan', texto: 'Mi plan', icono: 'plan' },
     { to: '/estudiante/progreso', texto: 'Mi progreso', icono: 'grafica' },
+    { to: '/asistentes', texto: 'Asistentes IA', icono: 'chispa' },
   ],
 };
 
@@ -47,6 +51,7 @@ const ICONOS = {
   carpeta: 'M3 7h7l2 2h9v10H3z',
   grafica: 'M4 20V4M4 20h16M8 16v-4M12 16V8M16 16v-6',
   plan: 'M5 4h14v16H5zM8 9l2 2 4-4M8 15h8',
+  chispa: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z',
   escudo: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',
   ajustes: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19 12l2-1-1-3-2 .4-1.5-1.5L17 5l-3-1-1 2h-2L10 4 7 5l.5 1.9L6 8.4 4 8 3 11l2 1v0l-2 1 1 3 2-.4 1.5 1.5L7 19l3 1 1-2h2l1 2 3-1-.5-1.9 1.5-1.5 2 .4 1-3z',
 };
