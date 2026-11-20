@@ -67,3 +67,33 @@ test.describe('Gobernanza y asistentes de IA @movil', () => {
     await capturar(page, '26-baja-cuenta');
   });
 });
+
+test.describe('APIs externas', () => {
+  let curso;
+  // eslint-disable-next-line no-empty-pattern
+  test.beforeAll(async ({}, testInfo) => { curso = await prepararCurso(`Api${testInfo.project.name}`); });
+
+  test('el calendario muestra los feriados de Costa Rica y la administración ve el tipo de cambio', async ({ page }) => {
+    await entrar(page, curso.estudiante);
+    await page.goto('/calendario');
+    const diciembre = new Date(new Date().getFullYear(), 11, 25);
+    // Avanza semanas hasta la de Navidad.
+    for (let i = 0; i < 60 && !(await page.getByText('Navidad').isVisible()); i += 1) {
+      if (new Date() > diciembre) break;
+      await page.getByRole('button', { name: 'Semana siguiente' }).click();
+    }
+    await expect(page.getByText('Navidad')).toBeVisible();
+    await capturar(page, '27-calendario-feriados');
+  });
+
+  test('la administración ve el tipo de cambio y la gobernanza', async ({ page }) => {
+    await entrar(page, curso.admin);
+    await page.goto('/admin/consumo');
+    await expect(page.getByRole('heading', { name: 'Tipo de cambio del dólar' })).toBeVisible();
+    await expect(page.getByText(/Referencia del BCCR/)).toBeVisible();
+    await capturar(page, '28-tipo-cambio');
+    await page.goto('/admin/gobernanza');
+    await expect(page.getByRole('heading', { name: 'Gobernanza de datos' })).toBeVisible();
+    await capturar(page, '29-gobernanza');
+  });
+});

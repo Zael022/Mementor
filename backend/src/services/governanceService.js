@@ -58,13 +58,16 @@ export async function requestDeletion(user, { password, reason }) {
     userId: user.id, institutionId: user.institutionId, reason: reason || null, identityConfirmedAt: new Date(),
   });
   await recordAudit({ actor: user, action: 'governance.deletion_requested', resourceType: 'data_deletion_request', resourceId: request.id });
-  // Con DELETION_PROCESSOR=n8n la solicitud queda pendiente para el workflow; si no, se procesa de inmediato.
-  if (process.env.DELETION_PROCESSOR === 'n8n') return deletionDto(request);
+  // Con DELETION_PROCESSOR=n8n el workflow procesa y confirma; si n8n no responde, se procesa aquí para no dejarla esperando.
+  if (process.env.DELETION_PROCESSOR === 'n8n' && process.env.N8N_DELETION_WEBHOOK_URL) {
+    const { notifyDeletionWebhook } = await import('./integrationService.js');
+    if (await notifyDeletionWebhook(request, { email: user.email, displayName: user.displayName })) return deletionDto(request);
+  }
   return processDeletion(request.id, 'app');
 }
 
 // Anonimiza la cuenta, borra lo personal, conserva lo obligatorio y notifica al correo original.
-export async function processDeletion(requestId, via) {
+export async function processDeletion(requestId, via, { notify = true } = {}) {
   let originalEmail;
   let displayName;
   let avatarFile;
@@ -94,7 +97,7 @@ export async function processDeletion(requestId, via) {
   });
 
   if (avatarFile) await unlink(path.join(avatarDir(), path.basename(avatarFile))).catch(() => {});
-  if (originalEmail) await notifyCompletion(request, originalEmail, displayName);
+  if (originalEmail && notify) await notifyCompletion(request, originalEmail, displayName);
   return deletionDto(request);
 }
 

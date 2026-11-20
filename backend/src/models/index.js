@@ -15,6 +15,7 @@ import {
 import { PasswordReset } from './PasswordReset.js';
 import { ConsentRecord, DataDeletionRequest } from './Governance.js';
 import { AgentRun } from './AgentRun.js';
+import { ExchangeRate, IntegrationRun } from './Integration.js';
 import {
   CourseGradePolicy, ClassWorkItem, ClassWorkGrade, QuickQuiz, QuickQuizQuestion, QuickQuizOption, QuizPlay, QuizPlayAnswer,
   DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent,
@@ -123,5 +124,5 @@ export {
   TopicMastery, LearningRecommendation, AiThread, AiMessage, AuditLog,
   CourseGradePolicy, ClassWorkItem, ClassWorkGrade, QuickQuiz, QuickQuizQuestion, QuickQuizOption, QuizPlay, QuizPlayAnswer,
   DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent, PasswordReset,
-  ConsentRecord, DataDeletionRequest, AgentRun,
+  ConsentRecord, DataDeletionRequest, AgentRun, ExchangeRate, IntegrationRun,
 };

@@ -211,3 +211,11 @@ export const deletionRequestSchema = z.object({
   reason: z.string().trim().max(500).optional(),
   confirm: z.literal(true, { error: 'Confirma que entiendes que la baja no se puede deshacer.' }),
 });
+
+// Datos que envía n8n.
+export const exchangeRateInSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha no válida (AAAA-MM-DD).'),
+  buy: z.number().positive().max(10000),
+  sell: z.number().positive().max(10000),
+});
+export const notifiedSchema = z.object({ status: z.enum(['sent', 'failed']) });

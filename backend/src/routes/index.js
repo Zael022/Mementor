@@ -11,6 +11,7 @@ import gamificationRoutes from './gamificationRoutes.js';
 import workspaceRoutes from './workspaceRoutes.js';
 import governanceRoutes from './governanceRoutes.js';
 import agentRoutes from './agentRoutes.js';
+import integrationRoutes from './integrationRoutes.js';
 import personalizationRoutes from './personalizationRoutes.js';
 import profileRoutes from './profileRoutes.js';
 
@@ -28,6 +29,7 @@ router.use(gamificationRoutes);
 router.use(workspaceRoutes);
 router.use(governanceRoutes);
 router.use(agentRoutes);
+router.use(integrationRoutes);
 router.use(personalizationRoutes);
 router.use(profileRoutes);
 export default router;
