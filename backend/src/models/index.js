@@ -13,6 +13,7 @@ import {
   CourseRagCorpus, KnowledgeSource, SourceVersion, AiMessageSource, InstitutionDriveFolder, CourseDriveLink, AiUsageEvent,
 } from './Knowledge.js';
 import { PasswordReset } from './PasswordReset.js';
+import { ConsentRecord, DataDeletionRequest } from './Governance.js';
 import {
   CourseGradePolicy, ClassWorkItem, ClassWorkGrade, QuickQuiz, QuickQuizQuestion, QuickQuizOption, QuizPlay, QuizPlayAnswer,
   DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent,
@@ -92,6 +93,7 @@ Material.hasOne(KnowledgeSource, { foreignKey: 'materialId', as: 'knowledgeSourc
 // Quizzes rápidos, racha y bono de nota.
 Course.hasOne(CourseGradePolicy, { foreignKey: 'courseId', as: 'gradePolicy' });
 ClassWorkItem.hasMany(ClassWorkGrade, { foreignKey: 'itemId', as: 'grades' });
+DataDeletionRequest.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 QuickQuiz.belongsTo(Course, { foreignKey: 'courseId', as: 'course' });
 QuickQuiz.hasMany(QuickQuizQuestion, { foreignKey: 'quizId', as: 'questions' });
 QuickQuizQuestion.belongsTo(QuickQuiz, { foreignKey: 'quizId', as: 'quiz' });
@@ -120,4 +122,5 @@ export {
   TopicMastery, LearningRecommendation, AiThread, AiMessage, AuditLog,
   CourseGradePolicy, ClassWorkItem, ClassWorkGrade, QuickQuiz, QuickQuizQuestion, QuickQuizOption, QuizPlay, QuizPlayAnswer,
   DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent, PasswordReset,
+  ConsentRecord, DataDeletionRequest,
 };

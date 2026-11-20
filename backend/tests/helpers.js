@@ -79,7 +79,7 @@ export async function loginAs(email, password = PASSWORD) {
 
 // Activa una cuenta invitada usando su enlace de un solo uso.
 export async function activate(invitationToken) {
-  return request(app).post('/api/v1/auth/activate').send({ token: invitationToken, password: PASSWORD });
+  return request(app).post('/api/v1/auth/activate').send({ token: invitationToken, password: PASSWORD, acceptTerms: true, acceptPrivacy: true });
 }
 
 export { app, request };

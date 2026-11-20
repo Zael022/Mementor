@@ -4,6 +4,7 @@ import { AppError, invalid, unauthenticated } from '../utils/AppError.js';
 import { jwtHours, signSessionToken, verifySessionToken } from '../utils/jwt.js';
 import { createToken, hashPassword, hashToken, needsRehash, verifyPassword } from '../utils/security.js';
 import { recordAudit } from './auditService.js';
+import { acceptPolicies } from './consentService.js';
 
 const MAX_FAILED = 5;
 const LOCK_MINUTES = 15;
@@ -106,19 +107,18 @@ export function assertStrongPassword(password) {
   if (!ok) throw invalid('La contraseña debe tener al menos 10 caracteres e incluir letras y números.');
 }
 
-// Activa una cuenta invitada con la contraseña elegida por la persona.
+// Activa una cuenta invitada con la contraseña elegida y la aceptación explícita de términos y privacidad.
 export async function activateAccount({ token, password }) {
   assertStrongPassword(password);
   const user = await User.findOne({ where: { invitationTokenHash: hashToken(token), status: 'invited' } });
   if (!user || !user.invitationExpiresAt || user.invitationExpiresAt < new Date()) {
     throw invalid('El enlace de invitación no es válido o ya venció.');
   }
-  await user.update({
-    passwordHash: await hashPassword(password),
-    status: 'active',
-    invitationTokenHash: null,
-    invitationExpiresAt: null,
+  const passwordHash = await hashPassword(password);
+  await sequelize.transaction(async (transaction) => {
+    await user.update({ passwordHash, status: 'active', invitationTokenHash: null, invitationExpiresAt: null }, { transaction });
+    await acceptPolicies(user.id, ['terms', 'privacy'], { transaction });
+    await recordAudit({ actor: user, action: 'user.activated', resourceType: 'user', resourceId: user.id, transaction });
   });
-  await recordAudit({ actor: user, action: 'user.activated', resourceType: 'user', resourceId: user.id });
   return { email: user.email };
 }

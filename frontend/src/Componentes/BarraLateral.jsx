@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useSesion } from '../context/SesionContext.jsx';
 import { useDatos } from '../hooks/useDatos.js';
 import { colorDeCurso, rutaDeCurso } from '../utils/cursos.js';
@@ -8,6 +8,7 @@ const GENERAL = {
   platform_admin: [
     { to: '/plataforma/instituciones', texto: 'Instituciones', icono: 'casa' },
     { to: '/admin/auditoria', texto: 'Auditoría', icono: 'lista' },
+    { to: '/admin/gobernanza', texto: 'Gobernanza', icono: 'escudo' },
   ],
   institution_admin: [
     { to: '/admin/usuarios', texto: 'Usuarios', icono: 'personas' },
@@ -16,6 +17,12 @@ const GENERAL = {
     { to: '/admin/drive', texto: 'Drive', icono: 'carpeta' },
     { to: '/admin/consumo', texto: 'Consumo IA', icono: 'grafica' },
     { to: '/admin/auditoria', texto: 'Auditoría', icono: 'lista' },
+    { to: '/admin/gobernanza', texto: 'Gobernanza', icono: 'escudo' },
+  ],
+  // Auditoría: solo lectura de bitácoras y gobernanza.
+  auditor: [
+    { to: '/auditoria/bitacora', texto: 'Bitácora', icono: 'lista' },
+    { to: '/auditoria/gobernanza', texto: 'Gobernanza', icono: 'escudo' },
   ],
   teacher: [
     { to: '/docente/cursos', texto: 'Página principal', icono: 'casa' },
@@ -40,6 +47,7 @@ const ICONOS = {
   carpeta: 'M3 7h7l2 2h9v10H3z',
   grafica: 'M4 20V4M4 20h16M8 16v-4M12 16V8M16 16v-6',
   plan: 'M5 4h14v16H5zM8 9l2 2 4-4M8 15h8',
+  escudo: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',
   ajustes: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19 12l2-1-1-3-2 .4-1.5-1.5L17 5l-3-1-1 2h-2L10 4 7 5l.5 1.9L6 8.4 4 8 3 11l2 1v0l-2 1 1 3 2-.4 1.5 1.5L7 19l3 1 1-2h2l1 2 3-1-.5-1.9 1.5-1.5 2 .4 1-3z',
 };
 
@@ -88,6 +96,7 @@ export default function BarraLateral() {
       <ul className="barra-pie">
         <li><NavLink to="/configuracion"><Icono nombre="ajustes" />Configuración</NavLink></li>
       </ul>
+      <p className="barra-legal pequeno"><Link to="/privacidad">Privacidad</Link> · <Link to="/terminos">Términos</Link></p>
     </nav>
   );
 }

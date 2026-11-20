@@ -1,4 +1,5 @@
 import { useId, useMemo, useState } from 'react';
+import PrivacidadDatos from '../Componentes/PrivacidadDatos.jsx';
 import Campo from '../Componentes/Campo.jsx';
 import { CambiarContrasena, CambiarCorreo, DatosPersonales, FotoPerfil } from '../Componentes/EditorPerfil.jsx';
 import { MensajeError } from '../Componentes/Estados.jsx';
@@ -11,6 +12,7 @@ const ROLES = {
   institution_admin: 'Administración de institución',
   teacher: 'Docente',
   student: 'Estudiante',
+  auditor: 'Auditoría',
 };
 
 const TEMAS = [
@@ -142,6 +144,8 @@ export default function Configuracion() {
           )}
         </section>
       )}
+
+      <PrivacidadDatos />
 
       <section className="tarjeta">
         <h2>Cuenta</h2>

@@ -20,7 +20,7 @@ export async function sesion(email, password = CLAVE) {
 }
 
 async function activar(token) {
-  const r = await fetch(`${API}/auth/activate`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token, password: CLAVE }) });
+  const r = await fetch(`${API}/auth/activate`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token, password: CLAVE, acceptTerms: true, acceptPrivacy: true }) });
   if (!r.ok) throw new Error(`No se pudo activar la cuenta (${r.status}).`);
 }
 

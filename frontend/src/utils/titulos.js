@@ -7,6 +7,8 @@ const TITULOS = [
   [/^\/calendario$/, 'Calendario'],
   [/^\/pendientes$/, 'Pendientes'],
   [/^\/configuracion$/, 'Configuración'],
+  [/gobernanza$/, 'Gobernanza de datos'],
+  [/bitacora$/, 'Bitácora'],
   [/\/tutor\//, 'Tutor'],
   [/\/citas\//, 'Fuente citada'],
   [/\/contenidos$/, 'Trabajo en clase'],
