@@ -1,4 +1,5 @@
 import { sequelize } from '../config/database.js';
+import { CrmCycle, CrmProspect, CrmApplication, CrmStageEvent, CrmFollowup, CrmDraft, CrmConsent, CrmPrivacyCase } from './Crm.js';
 import { Institution } from './Institution.js';
 import { Role, User } from './User.js';
 import { UserSession } from './UserSession.js';
@@ -23,6 +24,13 @@ import {
 import { UserPreference, TopicReview, TopicReviewLog, StudyPlan, StudyPlanItem } from './Personalization.js';
 
 // Define las relaciones entre los modelos.
+CrmApplication.belongsTo(CrmProspect, { foreignKey: 'prospectId', as: 'prospect' });
+CrmApplication.belongsTo(CrmCycle, { foreignKey: 'cycleId', as: 'cycle' });
+CrmApplication.belongsTo(User, { foreignKey: 'responsibleId', as: 'responsible' });
+CrmApplication.hasMany(CrmStageEvent, { foreignKey: 'applicationId', as: 'events' });
+CrmApplication.hasMany(CrmFollowup, { foreignKey: 'applicationId', as: 'followups' });
+CrmApplication.hasMany(CrmDraft, { foreignKey: 'applicationId', as: 'drafts' });
+CrmCycle.belongsTo(Course, { foreignKey: 'courseId', as: 'course' });
 Institution.hasMany(User, { foreignKey: 'institutionId', as: 'users' });
 User.belongsTo(Institution, { foreignKey: 'institutionId', as: 'institution' });
 User.hasMany(UserSession, { foreignKey: 'userId', as: 'sessions' });
@@ -116,6 +124,7 @@ StudyPlanItem.belongsTo(StudyPlan, { foreignKey: 'studyPlanId', as: 'plan' });
 StudyPlanItem.belongsTo(Topic, { foreignKey: 'topicId', as: 'topic' });
 
 export {
+  CrmCycle, CrmProspect, CrmApplication, CrmStageEvent, CrmFollowup, CrmDraft, CrmConsent, CrmPrivacyCase,
   UserPreference, TopicReview, TopicReviewLog, StudyPlan, StudyPlanItem,
   CourseRagCorpus, KnowledgeSource, SourceVersion, AiMessageSource, InstitutionDriveFolder, CourseDriveLink, AiUsageEvent,
   ClassSession, SessionAttendance, Announcement, Material, LessonComment, Assignment, AssignmentSubmission,

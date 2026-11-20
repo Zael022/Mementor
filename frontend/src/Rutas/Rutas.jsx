@@ -5,6 +5,11 @@ import { Cargando } from '../Componentes/Estados.jsx';
 import RutaProtegida from './RutaProtegida.jsx';
 import Login from '../Pages/Login.jsx';
 const Inicio = lazy(() => import('../Pages/Inicio.jsx'));
+const CrmPanel = lazy(() => import('../Pages/CrmPanel.jsx'));
+const CrmCandidatos = lazy(() => import('../Pages/CrmCandidatos.jsx'));
+const CrmSolicitud = lazy(() => import('../Pages/CrmSolicitud.jsx'));
+const CrmAtencion = lazy(() => import('../Pages/CrmAtencion.jsx'));
+const CrmConvocatorias = lazy(() => import('../Pages/CrmConvocatorias.jsx'));
 const Activar = lazy(() => import('../Pages/Activar.jsx'));
 const RecuperarClave = lazy(() => import('../Pages/RecuperarClave.jsx'));
 const Terminos = lazy(() => import('../Pages/Terminos.jsx'));
@@ -86,6 +91,17 @@ export default function Rutas() {
         <Route element={<Layout />}>
           <Route path="/" element={<Inicio />} />
           <Route path="/configuracion" element={<Configuracion />} />
+          <Route element={<RutaProtegida roles={['institution_admin', 'auditor']} />}>
+            <Route path="/admisiones" element={<CrmPanel />} />
+          </Route>
+          <Route element={<RutaProtegida roles={['institution_admin', 'teacher']} />}>
+            <Route path="/admisiones/candidatos" element={<CrmCandidatos />} />
+            <Route path="/admisiones/solicitudes/:id" element={<CrmSolicitud />} />
+            <Route path="/admisiones/atencion" element={<CrmAtencion />} />
+          </Route>
+          <Route element={<RutaProtegida roles={['institution_admin']} />}>
+            <Route path="/admisiones/convocatorias" element={<CrmConvocatorias />} />
+          </Route>
           <Route element={<RutaProtegida roles={['institution_admin', 'teacher', 'student', 'auditor']} />}>
             <Route path="/asistentes" element={<Asistentes />} />
           </Route>

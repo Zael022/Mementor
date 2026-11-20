@@ -36,6 +36,21 @@
 ## Qué recibe el proveedor de generación
 El prompt del sistema, hasta 6 fragmentos (máximo 1800 caracteres cada uno) con título y página o sección, la pregunta y hasta 6 mensajes previos del mismo hilo. Se omiten los turnos que citaron fuentes retiradas. No se envían nombres, correos ni identificadores.
 
+## Ampliación CRM y revisión de cumplimiento
+
+| Categoría | Finalidad y acceso | Conservación y derechos |
+| --- | --- | --- |
+| Convocatoria/configuraciones | Administración institucional define curso, sede, política, ventanas y plazos; docentes solo convocatorias asignadas; auditoría agregados | Historial de versiones, sin metas ficticias |
+| Contactos mínimos de prospecto | Admisiones; administración y docente explícitamente asignado; sin acceso automático de plataforma | Plazo institucional por convocatoria desde cierre; excepción justificada visible; casos de acceso/corrección/supresión con identidad verificada |
+| Solicitudes, actividades y seguimientos | Trazabilidad operativa y atención; fechas, evidencia referenciada y notas limitadas | Eliminar texto libre/contactos por supresión; conservar hechos/vínculos mínimos sin identidad, revisar procesos abiertos y excepciones |
+| Borradores/destinatario/contexto | Revisión humana en entidad funcional, nunca log técnico | Plazo institucional de borradores; se eliminan por supresión o baja; no hay colas de envío |
+| Consentimientos de prospecto | Admisiones y promoción separados, versión/aceptación/revocación/evidencia externa | No prueban aceptación de cuenta; borrar referencias identificables en supresión y preservar hecho mínimo |
+| Casos de privacidad | Referencia/fecha de verificación por operador institucional, derecho y resolución | Sin documento de identidad ni exportación persistida; acceso institucional auditado |
+| Contexto de agente de admisiones | Proveedor AI_PROVIDER recibe etapa, condiciones/fechas/política autorizadas, sede/curso, canal/tono/objetivo enmascarados | Sin ficha, contactos, notas ni historial académico por defecto; condiciones de retención del proveedor deben ser aprobadas |
+| Texto de cumplimiento | Apoyo a revisión antes de publicar | Patrones conocidos se sustituyen antes del payload; hallazgos no contienen el valor completo; no garantiza detectar todos los datos sensibles |
+
+Exportación propia ampliada: incluye categorías CRM vinculadas y datos propios de estudio sin claves privadas ni datos de compañeros. Anonimización de cuenta revisa CRM en la misma transacción. Correcciones de contacto invalidan aprobación de borradores; la procedencia original de adquisición se conserva como categoría, con eventos de corrección. El operador debe revisar respaldos, copias y descargas ya entregadas; no hay eliminación automática de archivos fuera del sistema ni un plazo legal universal supuesto. Ver ADR 0006 y `docs/CRM.md`.
+
 ## Qué no se registra
 El registro técnico (`ai_usage_events` y la línea `tutor.consulta` del servidor) no guarda credenciales, preguntas, respuestas ni contenido de documentos. Las claves viven en `.env` (no versionado) o en ADC.
 

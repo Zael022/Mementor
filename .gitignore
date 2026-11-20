@@ -15,3 +15,6 @@ frontend/test-results/
 frontend/playwright-report/
 backend/storage/uploads-e2e/
 frontend/capturas/salida/
+# Logs locales de servidores de desarrollo
+backend/api*.log
+frontend/vite*.log

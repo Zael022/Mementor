@@ -16,12 +16,21 @@ function toDto(user) {
     status: user.status,
     institutionId: user.institutionId,
     createdAt: user.createdAt,
+    invitationExpiresAt: user.status === 'invited' ? user.invitationExpiresAt : null,
   };
 }
 
-function newInvitation() {
+export function newInvitation() {
   const { token, tokenHash } = createToken();
   return { token, tokenHash, expiresAt: new Date(Date.now() + INVITATION_HOURS * 3600000) };
+}
+
+// Se usa también en la conversión del CRM, dentro de la transacción de quien llama.
+export async function createInvitedUser(actor, { institutionId, email, displayName, role }, transaction) {
+  const invitation = newInvitation();
+  const user = await User.create({ institutionId, email, displayName, role, status: 'invited', invitationTokenHash: invitation.tokenHash, invitationExpiresAt: invitation.expiresAt }, { transaction });
+  await recordAudit({ actor, institutionId, action: 'user.invited', resourceType: 'user', resourceId: user.id, metadata: { role }, transaction });
+  return { user, invitationToken: invitation.token, invitationExpiresAt: invitation.expiresAt };
 }
 
 // Lista los usuarios de la institución del administrador.
@@ -48,23 +57,8 @@ export async function inviteUser(actor, { email, displayName, role, institutionI
   if (!institution) throw notFound('Institución no encontrada.');
   if (await User.findOne({ where: { email } })) throw conflict('EMAIL_IN_USE', 'Ya existe una cuenta con ese correo.');
 
-  const invitation = newInvitation();
-  const user = await sequelize.transaction(async (transaction) => {
-    const created = await User.create({
-      institutionId: institution.id,
-      email,
-      displayName,
-      role,
-      status: 'invited',
-      invitationTokenHash: invitation.tokenHash,
-      invitationExpiresAt: invitation.expiresAt,
-    }, { transaction });
-    await recordAudit({
-      actor, institutionId: institution.id, action: 'user.invited', resourceType: 'user', resourceId: created.id, metadata: { role }, transaction,
-    });
-    return created;
-  });
-  return { user: toDto(user), invitationToken: invitation.token, invitationExpiresAt: invitation.expiresAt };
+  const result = await sequelize.transaction((transaction) => createInvitedUser(actor, { institutionId: institution.id, email, displayName, role }, transaction));
+  return { ...result, user: toDto(result.user) };
 }
 
 async function findInScope(actor, userId) {
@@ -77,12 +71,18 @@ async function findInScope(actor, userId) {
 
 // Genera un enlace nuevo para una cuenta que aún no se activa.
 export async function renewInvitation(actor, userId) {
-  const user = await findInScope(actor, userId);
-  if (user.status !== 'invited') throw conflict('ALREADY_ACTIVE', 'La cuenta ya fue activada.');
-  const invitation = newInvitation();
-  await user.update({ invitationTokenHash: invitation.tokenHash, invitationExpiresAt: invitation.expiresAt });
-  await recordAudit({ actor, institutionId: user.institutionId, action: 'user.invitation_renewed', resourceType: 'user', resourceId: user.id });
-  return { user: toDto(user), invitationToken: invitation.token, invitationExpiresAt: invitation.expiresAt };
+  await findInScope(actor, userId);
+  return sequelize.transaction(async (transaction) => {
+    const user = await User.findByPk(userId, { transaction, lock: transaction.LOCK.UPDATE });
+    if (user.status !== 'invited') throw conflict('ALREADY_ACTIVE', 'La cuenta ya fue activada o deshabilitada.');
+    // Dos renovaciones simultáneas no invalidan dos enlaces seguidos.
+    const [recent] = await sequelize.query('SELECT id FROM audit_logs WHERE resource_type = :type AND resource_id = :id AND action = :action AND created_at > :since LIMIT 1', { replacements: { type: 'user', id: user.id, action: 'user.invitation_renewed', since: new Date(Date.now() - 30000) }, transaction });
+    if (recent.length) throw conflict('INVITATION_RECENT', 'El enlace se acaba de renovar. Usa el enlace mostrado o espera 30 segundos para renovarlo.');
+    const invitation = newInvitation();
+    await user.update({ invitationTokenHash: invitation.tokenHash, invitationExpiresAt: invitation.expiresAt }, { transaction });
+    await recordAudit({ actor, institutionId: user.institutionId, action: 'user.invitation_renewed', resourceType: 'user', resourceId: user.id, transaction });
+    return { user: toDto(user), invitationToken: invitation.token, invitationExpiresAt: invitation.expiresAt };
+  });
 }
 
 // Actualiza el nombre o habilita/deshabilita una cuenta.

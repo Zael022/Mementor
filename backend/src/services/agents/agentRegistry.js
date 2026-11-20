@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { admissionsAgent } from './admissionsAgent.js';
+import { redactPersonalData } from '../../utils/personalData.js';
 import {
   Assignment, AssignmentSubmission, CourseStreak, Lesson, Topic, TopicMastery,
 } from '../../models/index.js';
@@ -26,6 +28,7 @@ const sourceList = (passages) => passages.map((passage, index) => ({
 const validCitations = (citations, passages) => [...new Set(citations)].filter((cite) => /^S\d+$/.test(cite) && Number(cite.slice(1)) <= passages.length);
 
 export const AGENTS = {
+  admissions_writer: admissionsAgent,
   // 1. Tutor conversacional con RAG: ya existe con su propia pantalla y bitácora de consumo.
   tutor: {
     key: 'tutor',
@@ -146,7 +149,7 @@ export const AGENTS = {
     privacy: 'Primero detecta en el servidor cédulas, teléfonos y correos; el texto se envía al modelo solo para el análisis.',
     inputSchema: z.object({ text: z.string().trim().min(20).max(12000) }),
     async buildContext(user, input) {
-      return { data: { text: input.text }, findings: detectPersonalData(input.text) };
+      return { data: { text: redactPersonalData(input.text) }, findings: detectPersonalData(input.text) };
     },
     system: 'Eres un oficial de cumplimiento de la Ley 8968 de Costa Rica. Detectas datos personales y sensibles y explicas el riesgo y cómo corregirlo.',
     prompt: ({ data, findings }) => `<dato>Hallazgos automáticos: ${asData(JSON.stringify(findings))}</dato>\n<dato>Texto:\n${asData(data.text)}</dato>\nFormato: {"riskLevel":"bajo|medio|alto","issues":[{"type":"...","detail":"...","fix":"..."}],"summary":"..."}`,

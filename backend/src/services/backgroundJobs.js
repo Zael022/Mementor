@@ -22,7 +22,7 @@ export function startBackgroundJobs() {
       try {
         if (await holdLease(LEASE, LEASE_TTL_MS)) await task();
       } catch (error) {
-        console.error(`Tarea ${label} falló:`, error?.message);
+        console.error(JSON.stringify({ evento: 'tarea.fallo', tarea: label, codigo: error?.code || error?.name }));
       } finally {
         busy = false;
       }

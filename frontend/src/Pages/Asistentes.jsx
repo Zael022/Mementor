@@ -244,7 +244,7 @@ export default function Asistentes() {
             <h3>{item.name}</h3>
             <p>{item.purpose}</p>
             <p className="tenue pequeno">{item.privacy}</p>
-            {item.link
+            {item.key === 'admissions_writer' ? <Link className="boton secundario" to="/admisiones/candidatos">Abrir admisiones</Link> : item.link
               ? (enlaceTutor(item) && cursos.datos?.length ? <Link className="boton secundario" to={enlaceTutor(item)}>Abrir el tutor</Link> : <span className="tenue pequeno">Ábrelo desde un curso.</span>)
               : <button type="button" className="boton secundario" onClick={() => elegir(item.key)} aria-pressed={elegido === item.key}>Usar</button>}
           </article>

@@ -2,7 +2,7 @@ import test, { before, after, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { prepareDatabase, closeDatabase, createPlatformAdmin, loginAs, activate } from './helpers.js';
 import { clock } from '../src/utils/clock.js';
-import { GradeBonusEvent } from '../src/models/index.js';
+import { GradeBonusEvent, DailyPractice } from '../src/models/index.js';
 import { pointsFor } from '../src/services/quickQuizService.js';
 import { combine } from '../src/services/gradeService.js';
 
@@ -13,6 +13,7 @@ const DIA = 24 * 3600 * 1000;
 // Mediodía en Costa Rica para que sumar días no cruce la medianoche por accidente.
 const BASE = new Date('2026-11-19T18:00:00Z').getTime();
 const enDia = (dias, ms = 0) => { clock.now = () => new Date(BASE + dias * DIA + ms); };
+
 
 async function inviteAndActivate(session, path, body) {
   const invited = await session.post(path, body);
@@ -185,6 +186,14 @@ async function completarPractica(sesion, courseId) {
   }
   return { hoy: hoy.body.data, ultimo: ultimo?.body.data };
 }
+
+test('dos aperturas simultáneas de práctica crean una sola selección de preguntas', async () => {
+  enDia(30);
+  const replies = await Promise.all([ctx.student.get(`/courses/${ctx.courseId}/daily-practice`), ctx.student.get(`/courses/${ctx.courseId}/daily-practice`)]);
+  replies.forEach((r) => assert.equal(r.status, 200, JSON.stringify(r.body)));
+  assert.deepEqual(replies[0].body.data.questions.map((q) => q.id), replies[1].body.data.questions.map((q) => q.id));
+  assert.equal(await DailyPractice.count({ where: { courseId: ctx.courseId, studentId: ctx.student.user.id, practiceDay: '2026-12-19' } }), 1);
+});
 
 test('la práctica diaria mantiene la racha, suma 0,09 por día y se reinicia si falta un día', async () => {
   assert.equal((await ctx.teacher.get(`/courses/${ctx.courseId}/daily-practice`)).status, 403);

@@ -5,7 +5,9 @@ Plataforma educativa adaptativa: cursos, lecciones, cuestionarios con correcció
 **Stack:** React + Vite (JSX) · Node.js + Express · MySQL 8 + Sequelize (migraciones) · Google Cloud RAG Engine (opcional) · Anthropic u OpenAI para generar respuestas.
 **Sin datos precargados:** después de migrar, la base queda vacía (solo el catálogo de roles). No hay seeds, cuentas demo ni IA simulada.
 
-**En producción:** frontend https://mentor-ai.vercel.app · API https://mentor-api.onrender.com/api/v1 (se confirman al desplegar; ver `docs/despliegue.md`).
+**Admisiones CRM:** convocatorias por curso, nueve etapas, historial y seguimientos, métricas de cohortes, matrícula transaccional, borradores revisados y derechos de prospectos. Recorrido, configuración, pruebas aisladas de 40 solicitudes y estado de requisitos en [docs/CRM.md](docs/CRM.md). No requiere IA para gestionar admisiones. Las migraciones nuevas son `20261122000100` y `20261122000200`.
+
+**Destinos previstos (sin despliegue confirmado):** frontend https://mentor-ai.vercel.app · API https://mentor-api.onrender.com/api/v1 (ver `docs/despliegue.md`).
 
 ## Entregables del Proyecto Final (FWD Costa Rica)
 | Documento | Word y PDF |

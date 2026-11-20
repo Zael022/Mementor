@@ -34,6 +34,7 @@ export async function prepareDatabase() {
 
 // Borra los registros temporales creados por las pruebas.
 export async function cleanDatabase() {
+  if (process.env.NODE_ENV !== 'test' || !/_(test|e2e)$/.test(process.env.TEST_DB_NAME || '') || process.env.TEST_DB_NAME === process.env.DB_NAME) throw new Error('La limpieza requiere una base aislada terminada en _test o _e2e.');
   const tables = await sequelize.getQueryInterface().showAllTables();
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
   for (const table of tables) {

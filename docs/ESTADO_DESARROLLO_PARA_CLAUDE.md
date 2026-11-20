@@ -2,6 +2,45 @@
 
 **Última actualización** — 2026-11-20. Requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
 
+## Sesión 2026-11-20 · CRM de admisiones y mejoras obligatorias
+
+Encargo contrastado con `PROMPT_CODEX_CRM_Y_MEJORAS_MENTOR_AI.md` y texto del taller original. Implementación local; guía, contratos, supuestos, matriz de requisitos y backlog en [CRM.md](CRM.md). No se publicaron cambios, enviaron mensajes reales ni cargaron registros de evaluación en bases compartidas.
+
+| Cambio | Archivos relevantes | Evidencia |
+| --- | --- | --- |
+| Convocatorias por curso, fichas mínimas, solicitudes independientes y nueve etapas | `models/Crm.js`, migraciones `20261122000100`/`20261122000200`, `crmSchemas`, `crmService`, `crmAccessService` | Permisos cruzados, correspondencia prospecto/solicitud, duplicados, versiones concurrentes, requisitos/retrocesos y fechas futuras |
+| Ficha, historial, tablero/lista, filtros, atención, responsables y seguimientos | `Pages/Crm*`, `Componentes/Crm/*`, `crmRoutes`, `crmController` | Integración, componentes y navegador escritorio/móvil; historial y listas paginados, sin búsqueda personal persistida en la dirección |
+| Embudo histórico y cohorte madura | `crmMetricsService`, snapshots de configuración/procedencia, ADR 0006 | Prueba 120/26; ventanas completas, cero/última etapa, cortes y configuración histórica; cerrar convocatoria no cambia la versión métrica |
+| Matrícula atómica | `crmConversionService`, `enrollmentMutationService`, `userService`, `courseService` | Nueva/invitada/compatible/inhabilitada/otra institución/rol, vinculación, reintegro, doble petición simultánea y rollback con fallo de evento |
+| Redactor de admisiones y revisión humana | `agents/admissionsAgent`, registro/runner, `crmDraftService`, `crmContextService` | Contexto sin contactos, JSON validado, sin clave/caído/inválido, edición/aprobación/contexto obsoleto, cuota simultánea. Solo doble de proveedor |
+| Consentimientos, derechos y conservación | `crmPrivacyService`, `governanceService`, retención por leases, casos de verificación | Copia/corrección/supresión sin cuenta, exportación propia y anonimización de cuenta vinculada, cierre independiente y excepción de conservación |
+| Privacidad efectiva y costos | `personalData`, compliance checker, `agentRunner`, `usageService`, `costService` | Payload enmascarado antes del proveedor; límites persona/institución con reservas y orden institución→usuario; tutor excluido de cuota de asistentes; tarifas por modelo y desconocidos nulos |
+| Formularios e invitaciones | `useEnvio`, `useDatos`, `Campo`, `AdminUsuarios`, `EnlaceInvitacion` | Bloqueo sincrónico de dobles clics, cancelación/respuestas obsoletas, errores ligados al control, enlaces vencidos/renovación explícita, texto preservado ante conflicto |
+| Accesibilidad | `styles.css`, diálogos nativos, lista/columna móvil | 12 estados medidos por dispositivo: botón mínimo 5,178:1, campo 3,929:1, texto seleccionado 8,584:1, indicador 4,792:1, foco 5,660:1; teclado, retorno de foco y reflujo a 360px/200 % |
+| Regresión de práctica diaria | `streakService`, `gamification.test` | La segunda lectura tras bloquear matrícula ahora es una lectura actual; REPEATABLE READ conservaba una ausencia inicial en aperturas simultáneas. No cambió la fórmula de notas ni bonos |
+| Documentación y fuentes generadas | `CRM.md`, contratos, ADR, agentes, APIs, inventario/riesgos, `docs/datos`, `docs/mockups` | Modelo desde esquema aislado: **70 tablas, 689 columnas, 148 FKs**. Capturas inspeccionadas, SVG/PNG de CRM y general generados |
+
+### Validación real de la sesión
+
+- Entorno: Windows, Node **24.14.0**, MySQL local **8.0**, Vite 7, Chromium de Playwright. No se cambió el stack.
+- Backend: `npm run lint` sin errores; `npm test` **159/159**. Incluye **18 pruebas CRM** y una prueba de migraciones que crea/elimina una base descartable, verifica esquema sin contenido, preserva un registro previo y ejecuta down/up. Repetición final focalizada: **18/18** CRM.
+- Frontend: `npm run lint` sin errores; `npm test` **51/51**; `npm run build` compila.
+- Navegador: `npm run test:e2e` **28/28** en escritorio/móvil, con backend/MySQL reales aislados y proveedores falsos. Subconjunto CRM tras la mejora de conservación de texto en conflictos: **4/4**; lint, 51 pruebas de componentes y compilación repetidos con éxito.
+- Escenario CRM40: **40** solicitudes con distribución actual **6/5/5/5/5/4/4/3/3**; agenda→asiste **24/29 = 82,7586 %**, brecha frente a meta de prueba 75 % **−7,7586 pp**, **3 matrículas nuevas**. Reloj simulado, todas las escrituras por la API, limpieza al terminar; no es dataset entregado para producción.
+- Bases separadas de `mentor`; limpieza de registros de integración y navegador al terminar. El catálogo `roles` y `SequelizeMeta` se preservan. La prueba de migraciones elimina exclusivamente su base recién creada.
+- MySQL local `mentor`: se aplicaron las dos migraciones aditivas, **8 tablas CRM y 0 filas CRM**. API reiniciada y `/api/v1/health` confirmó conexión. Frontend local devuelve HTTP 200 en `127.0.0.1:5173`.
+- IA, SMTP, Hacienda, feriados y nube se prueban con dobles; **ningún proveedor real de pago o correo real fue usado**. IA local sigue sin configurar. Configuración/conectividad se distinguen en Consumo.
+- Advertencias observadas: jsdom informa `scrollTo` no implementado en pruebas existentes; una conexión cancelada produjo aviso de express-rate-limit por IP no disponible, sin fallar la prueba. No se ocultan como pruebas fallidas ni se confunden con conectividad de servicios reales.
+
+### Pendiente comprobado
+
+- Word/PDF de `docs/entregables`: fuentes actualizadas, **binarios sin regenerar**. No hay Python instalado (`py -0p`), LibreOffice ni cargador de dependencias de documentos accesible para el renderer. Alcance exacto y pasos de render/inspección en `entregables/ACTUALIZACION_CRM.md`.
+- Evaluación manual con NVDA/VoiceOver y auditoría integral de accesibilidad; no se afirma conformidad integral WCAG ni cumplimiento legal certificado.
+- Verificación con proveedor IA real y MySQL 8.4, activación de integraciones, revisión institucional de políticas/plazos, respaldos/exportaciones y tarifas; no forman parte de las llamadas automáticas de prueba.
+- Formulario público, campañas/gastos/atribución, bonus social, WhatsApp, publicación y automatizaciones externas/programas multicurso permanecen en el backlog opcional descrito en `CRM.md`.
+
+El acceso de plataforma se mantiene operativo sin acceso automático al CRM personal. Para usar Admisiones, crear una institución e invitar a su administración mediante el flujo habitual. No se crearon cuentas ficticias ni contenido académico en desarrollo.
+
 ## Sesión 2026-11-20 · Requisitos FWD y entregables
 
 | Cambio | Dónde | Cómo se comprobó |

@@ -77,15 +77,17 @@ test('los feriados vienen de Nager.Date, se filtran y se guardan en memoria', as
 });
 
 test('el costo estimado no inventa tarifas y usa el tipo de cambio de venta', async () => {
-  await AgentRun.create({ institutionId: ctx.org.institutionId, userId: ctx.org.teacher.user.id, agent: 'course_analyst', status: 'completed', inputTokens: 1_000_000, outputTokens: 200_000 });
+  await AgentRun.create({ institutionId: ctx.org.institutionId, userId: ctx.org.teacher.user.id, agent: 'course_analyst', status: 'completed', provider: 'prueba', model: 'modelo-con-tarifa', inputTokens: 1_000_000, outputTokens: 200_000 });
   const sinPrecio = await ctx.org.admin.get('/institution/ai-cost');
   assert.equal(sinPrecio.body.data.priceConfigured, false);
   assert.equal(sinPrecio.body.data.crc, null);
   process.env.AI_PRICE_INPUT_USD_PER_MTOK = '3';
   process.env.AI_PRICE_OUTPUT_USD_PER_MTOK = '15';
+  process.env.AI_MODEL_PRICES_JSON = '[{"provider":"prueba","model":"modelo-con-tarifa","input":3,"output":15}]';
   const conPrecio = await ctx.org.admin.get('/institution/ai-cost');
   delete process.env.AI_PRICE_INPUT_USD_PER_MTOK;
   delete process.env.AI_PRICE_OUTPUT_USD_PER_MTOK;
+  delete process.env.AI_MODEL_PRICES_JSON;
   // 1 M de entrada × 3 + 0,2 M de salida × 15 = 6 USD.
   assert.equal(conPrecio.body.data.usd, 6);
   assert.equal(conPrecio.body.data.crc, Math.round(6 * conPrecio.body.data.rate.sell * 100) / 100);

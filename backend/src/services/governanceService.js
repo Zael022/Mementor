@@ -1,8 +1,10 @@
 import { unlink } from 'node:fs/promises';
+import { anonymizeLinkedCrm, exportLinkedCrm } from './crmPrivacyService.js';
 import path from 'node:path';
 import { avatarDir } from '../middlewares/upload.js';
 import {
   ConsentRecord, DataDeletionRequest, PasswordReset, User, UserSession, sequelize,
+  Enrollment, LessonProgress, AssessmentAttempt, AttemptAnswer, TopicMastery, LearningRecommendation, UserPreference, StudyPlan, StudyPlanItem, TopicReview, TopicReviewLog, AiThread, AiMessage, AssignmentSubmission, QuizPlay, QuizPlayAnswer, GradeBonusEvent,
 } from '../models/index.js';
 import { POLICY_VERSIONS, pendingConsents } from './consentService.js';
 import { conflict, forbidden, notFound } from '../utils/AppError.js';
@@ -29,6 +31,10 @@ export async function myConsents(user) {
 // Copia de los datos personales propios (derecho de acceso).
 export async function exportMyData(user) {
   const row = await User.findByPk(user.id);
+  const [attempts, plans, reviews, threads, plays] = await Promise.all([
+    AssessmentAttempt.findAll({ where: { studentId: user.id } }), StudyPlan.findAll({ where: { studentId: user.id } }), TopicReview.findAll({ where: { studentId: user.id } }), AiThread.findAll({ where: { userId: user.id } }), QuizPlay.findAll({ where: { studentId: user.id } }),
+  ]);
+  const ownRows = (Model, key, rows) => rows.length ? Model.findAll({ where: { [key]: rows.map((r) => r.id) } }) : [];
   return {
     generatedAt: new Date().toISOString(),
     profile: {
@@ -36,6 +42,15 @@ export async function exportMyData(user) {
       phone: row.phone, bio: row.bio, role: row.role, createdAt: row.createdAt,
     },
     consents: (await myConsents(user)).history,
+    admissions: await exportLinkedCrm(user),
+    learning: {
+      enrollments: await Enrollment.findAll({ where: { studentId: user.id } }), lessonProgress: await LessonProgress.findAll({ where: { studentId: user.id } }),
+      attempts, answers: await ownRows(AttemptAnswer, 'attemptId', attempts.filter((a) => a.status === 'submitted')),
+      mastery: await TopicMastery.findAll({ where: { studentId: user.id } }), recommendations: await LearningRecommendation.findAll({ where: { studentId: user.id } }),
+      preferences: await UserPreference.findOne({ where: { userId: user.id } }), plans, planItems: await ownRows(StudyPlanItem, 'studyPlanId', plans), reviews, reviewLogs: await ownRows(TopicReviewLog, 'reviewId', reviews),
+      threads, messages: await ownRows(AiMessage, 'threadId', threads), submissions: await AssignmentSubmission.findAll({ where: { studentId: user.id } }),
+      plays, playAnswers: await ownRows(QuizPlayAnswer, 'playId', plays), bonuses: await GradeBonusEvent.findAll({ where: { studentId: user.id } }),
+    },
     deletionRequests: await DataDeletionRequest.findAll({ where: { userId: user.id }, attributes: ['id', 'status', 'createdAt', 'processedAt'] }),
   };
 }
@@ -87,6 +102,7 @@ export async function processDeletion(requestId, via, { notify = true } = {}) {
       passwordHash: null, invitationTokenHash: null, invitationExpiresAt: null,
       status: 'disabled', anonymizedAt: new Date(),
     }, { transaction });
+    await anonymizeLinkedCrm(user, transaction);
     await UserSession.update({ revokedAt: new Date() }, { where: { userId: user.id, revokedAt: null }, transaction });
     await PasswordReset.destroy({ where: { userId: user.id }, transaction });
     // Conversaciones con el tutor (sus mensajes y citas se borran en cascada) y preferencias personales.

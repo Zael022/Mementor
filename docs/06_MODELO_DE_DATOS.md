@@ -49,3 +49,9 @@
 
 ## Evolución
 Membresías multi-institución, rúbricas de ensayos, badges, calendario, analítica histórica, índice RAG, embeddings, notifications, consentimientos y exportación de datos en migraciones posteriores.
+
+## Admisiones CRM
+
+Migraciones `20261122000100` y `20261122000200`: `crm_admission_cycles`, `crm_prospects`, `crm_applications`, `crm_stage_events`, `crm_followups`, `crm_message_drafts`, `crm_consent_records`, `crm_privacy_cases`. Institución y curso se resuelven en servidor; prospecto y participación están separados. Únicos persona/convocatoria y correo institucional; matrícula conserva su único curso/estudiante. Cada solicitud guarda versión, configuración/procedencia de adquisición y fechas independientes de etapa/contacto/revisión/cierre. Eventos conservan fecha efectiva y de registro. La referencia de caso de privacidad no almacena documentos de identidad.
+
+Modelo real regenerable desde una base aislada: `backend/src/scripts/exportDataModel.js`. Fuentes en `docs/datos/modelo.json` y `diccionario-de-datos.md`; ER general y módulo `er-7-crm.svg`. Semántica de permisos y conversiones en ADR 0006 y `docs/CRM.md`.

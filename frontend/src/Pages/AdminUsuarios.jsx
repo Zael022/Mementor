@@ -48,6 +48,7 @@ export default function AdminUsuarios() {
   return (
     <>
       <h1>Usuarios</h1>
+      <p>Invitar genera un enlace privado; la persona elige su contraseña y activa la cuenta. Invitada significa activación pendiente. Si el enlace vence, genera uno nuevo; esto invalida el anterior y no envía un correo automáticamente.</p>
       <EnlaceInvitacion invitacion={invitacion} alCerrar={() => setInvitacion(null)} />
       <form className="tarjeta fila-formulario" onSubmit={invitar}>
         <Campo etiqueta="Correo" tipo="email" valor={formulario.email} alCambiar={cambiar('email')} required />
@@ -68,13 +69,13 @@ export default function AdminUsuarios() {
                   <td>{persona.displayName}</td>
                   <td>{persona.email}</td>
                   <td>{nombreRol(persona.role)}</td>
-                  <td><Insignia estado={persona.status} /></td>
+                  <td><Insignia estado={persona.status} />{persona.status === 'invited' && <small> Activación pendiente · {new Date(persona.invitationExpiresAt) < new Date() ? 'Enlace vencido; genera uno nuevo' : 'Enlace vigente'}</small>}</td>
                   <td className="acciones">
-                    {persona.status === 'invited' && <button type="button" className="boton secundario" onClick={() => renovar(persona)}>Nuevo enlace</button>}
+                    {persona.status === 'invited' && <button type="button" disabled={enviando} className="boton secundario" onClick={() => renovar(persona)}>Nuevo enlace</button>}
                     {persona.status === 'active' && persona.id !== usuario.id && (
-                      <button type="button" className="boton secundario" onClick={() => cambiarEstado(persona, 'disabled')}>Deshabilitar</button>
+                      <button type="button" disabled={enviando} className="boton secundario" onClick={() => window.confirm('La cuenta perderá el acceso y se cerrarán sus sesiones. ¿Deshabilitar?') && cambiarEstado(persona, 'disabled')}>Deshabilitar</button>
                     )}
-                    {persona.status === 'disabled' && <button type="button" className="boton secundario" onClick={() => cambiarEstado(persona, 'active')}>Habilitar</button>}
+                    {persona.status === 'disabled' && <button type="button" disabled={enviando} className="boton secundario" onClick={() => cambiarEstado(persona, 'active')}>Habilitar</button>}
                   </td>
                 </tr>
               ))}
