@@ -1,27 +1,44 @@
+import bcrypt from 'bcryptjs';
 import { createHash, randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
 
 const scryptAsync = promisify(scrypt);
-const COSTO = { N: 16384, r: 8, p: 1 };
 
-// Genera el hash de una contraseña con scrypt y sal aleatoria.
-export async function hashPassword(password) {
-  const salt = randomBytes(16);
-  const hash = await scryptAsync(password, salt, 64, COSTO);
-  return `scrypt$${COSTO.N}$${COSTO.r}$${COSTO.p}$${salt.toString('base64')}$${hash.toString('base64')}`;
+// Costo de bcrypt: 12 en uso normal; las pruebas usan uno bajo para ir rápido.
+function bcryptRounds() {
+  const configured = Number(process.env.BCRYPT_ROUNDS);
+  if (Number.isInteger(configured) && configured >= 4 && configured <= 15) return configured;
+  return process.env.NODE_ENV === 'test' ? 4 : 12;
 }
 
-// Compara una contraseña con su hash guardado.
+// Genera el hash de una contraseña con bcrypt (incluye su propia sal).
+export async function hashPassword(password) {
+  return bcrypt.hash(String(password), bcryptRounds());
+}
+
+// Compara una contraseña con su hash guardado (bcrypt, o scrypt de cuentas anteriores).
 export async function verifyPassword(password, stored) {
   try {
-    const [scheme, N, r, p, salt, hash] = String(stored).split('$');
-    if (scheme !== 'scrypt') return false;
-    const expected = Buffer.from(hash, 'base64');
-    const actual = await scryptAsync(password, Buffer.from(salt, 'base64'), expected.length, { N: Number(N), r: Number(r), p: Number(p) });
-    return timingSafeEqual(expected, actual);
+    const value = String(stored || '');
+    if (value.startsWith('$2')) return await bcrypt.compare(String(password), value);
+    return await verifyLegacyScrypt(password, value);
   } catch {
     return false;
   }
+}
+
+// Indica si un hash viene del esquema anterior y debe regenerarse con bcrypt.
+export function needsRehash(stored) {
+  return !String(stored || '').startsWith('$2');
+}
+
+// Hashes scrypt creados antes del cambio a bcrypt; se convierten en el siguiente inicio de sesión.
+async function verifyLegacyScrypt(password, stored) {
+  const [scheme, N, r, p, salt, hash] = stored.split('$');
+  if (scheme !== 'scrypt') return false;
+  const expected = Buffer.from(hash, 'base64');
+  const actual = await scryptAsync(password, Buffer.from(salt, 'base64'), expected.length, { N: Number(N), r: Number(r), p: Number(p) });
+  return timingSafeEqual(expected, actual);
 }
 
 // Crea un token aleatorio y el hash que se guarda en la base.

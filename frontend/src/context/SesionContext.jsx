@@ -41,10 +41,25 @@ export function SesionProvider({ children }) {
       .finally(() => setCargando(false));
   }, [cargarPreferencias]);
 
+  // Token vencido: se limpia la sesión local y el inicio de sesión muestra el motivo.
+  const [vencida, setVencida] = useState(false);
+  const usuarioActual = useRef(null);
+  useEffect(() => { usuarioActual.current = usuario; }, [usuario]);
+  useEffect(() => {
+    const alVencer = () => {
+      setCsrfToken(null);
+      if (usuarioActual.current) setVencida(true);
+      setUsuario(null);
+    };
+    window.addEventListener('mentor:sesion-vencida', alVencer);
+    return () => window.removeEventListener('mentor:sesion-vencida', alVencer);
+  }, []);
+
   const iniciarSesion = useCallback(async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
     setCsrfToken(data.csrfToken);
     setUsuario(data.user);
+    setVencida(false);
     await cargarPreferencias();
     return data.user;
   }, [cargarPreferencias]);
@@ -79,8 +94,8 @@ export function SesionProvider({ children }) {
   const actualizarUsuario = useCallback((cambios) => setUsuario((previo) => (previo ? { ...previo, ...cambios } : previo)), []);
 
   const valor = useMemo(
-    () => ({ usuario, cargando, iniciarSesion, cerrarSesion, actualizarUsuario, preferencias, guardarPreferencias }),
-    [usuario, cargando, iniciarSesion, cerrarSesion, actualizarUsuario, preferencias, guardarPreferencias],
+    () => ({ usuario, cargando, vencida, iniciarSesion, cerrarSesion, actualizarUsuario, preferencias, guardarPreferencias }),
+    [usuario, cargando, vencida, iniciarSesion, cerrarSesion, actualizarUsuario, preferencias, guardarPreferencias],
   );
   return <SesionContext.Provider value={valor}>{children}</SesionContext.Provider>;
 }

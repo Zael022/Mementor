@@ -6,6 +6,8 @@ import RutaProtegida from './RutaProtegida.jsx';
 import Login from '../Pages/Login.jsx';
 const Inicio = lazy(() => import('../Pages/Inicio.jsx'));
 const Activar = lazy(() => import('../Pages/Activar.jsx'));
+const RecuperarClave = lazy(() => import('../Pages/RecuperarClave.jsx'));
+const RestablecerClave = lazy(() => import('../Pages/RestablecerClave.jsx'));
 const PlataformaInstituciones = lazy(() => import('../Pages/PlataformaInstituciones.jsx'));
 const AdminUsuarios = lazy(() => import('../Pages/AdminUsuarios.jsx'));
 const AdminAuditoria = lazy(() => import('../Pages/AdminAuditoria.jsx'));
@@ -68,6 +70,8 @@ export default function Rutas() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/activar" element={<Suspense fallback={<Cargando />}><Activar /></Suspense>} />
+      <Route path="/recuperar" element={<Suspense fallback={<Cargando />}><RecuperarClave /></Suspense>} />
+      <Route path="/restablecer" element={<Suspense fallback={<Cargando />}><RestablecerClave /></Suspense>} />
 
       <Route element={<RutaProtegida />}>
         <Route element={<Layout />}>

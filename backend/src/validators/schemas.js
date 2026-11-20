@@ -192,3 +192,7 @@ export const studyPlanItemSchema = z.object({
   scheduledDate: day.optional(),
   minutes: z.number().int().min(5).max(240).optional(),
 }).refine((data) => Object.keys(data).length > 0, 'No hay cambios.');
+
+// Recuperación de contraseña.
+export const forgotPasswordSchema = z.object({ email: z.string().trim().toLowerCase().email('Correo no válido.').max(190) });
+export const resetPasswordSchema = z.object({ token: z.string().regex(/^[a-f0-9]{64}$/, 'Enlace no válido.'), password: z.string().min(10).max(200) });

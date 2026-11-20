@@ -45,6 +45,8 @@ async function request(method, path, body, { signal } = {}) {
   }
   if (!response.ok) {
     const error = payload?.error || {};
+    // Si el JWT venció o se cerró la sesión en otro lado, la aplicación vuelve al inicio de sesión.
+    if (response.status === 401 && !path.startsWith('/auth/')) window.dispatchEvent(new Event('mentor:sesion-vencida'));
     const detail = Array.isArray(error.details) && error.details.length ? ` ${error.details.map((item) => item.message).join(' ')}` : '';
     throw new ApiError(response.status, error.code || 'ERROR', `${error.message || 'No se pudo completar la solicitud.'}${detail}`, error.details);
   }

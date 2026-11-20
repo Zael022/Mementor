@@ -1,4 +1,5 @@
 import * as authService from '../services/authService.js';
+import * as passwordResetService from '../services/passwordResetService.js';
 import { SESSION_COOKIE } from '../middlewares/auth.js';
 
 const cookieOptions = (expires) => ({
@@ -35,4 +36,17 @@ export function csrf(req, res) {
 // Activa una cuenta invitada.
 export async function activate(req, res) {
   res.json({ data: await authService.activateAccount(req.body) });
+}
+
+// Pide el enlace para restablecer la contraseña; la respuesta no revela si el correo existe.
+export async function forgotPassword(req, res) {
+  await passwordResetService.requestReset(req.body.email);
+  res.json({ data: { ok: true, message: 'Si el correo pertenece a una cuenta activa, enviamos un enlace para restablecer la contraseña.' } });
+}
+
+// Cambia la contraseña con el enlace recibido.
+export async function resetPassword(req, res) {
+  await passwordResetService.resetPassword(req.body);
+  res.clearCookie(SESSION_COOKIE, { path: '/' });
+  res.json({ data: { ok: true } });
 }
