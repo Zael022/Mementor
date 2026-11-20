@@ -37,7 +37,8 @@ export async function cleanDatabase() {
   const tables = await sequelize.getQueryInterface().showAllTables();
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
   for (const table of tables) {
-    if (table !== 'SequelizeMeta') await sequelize.query(`TRUNCATE TABLE \`${table}\``);
+    // En Windows MySQL guarda los nombres en minúsculas: se compara sin distinguir mayúsculas.
+    if (table.toLowerCase() !== 'sequelizemeta') await sequelize.query(`TRUNCATE TABLE \`${table}\``);
   }
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
 }

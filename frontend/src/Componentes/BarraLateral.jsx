@@ -26,6 +26,7 @@ const GENERAL = {
     { to: '/estudiante/inicio', texto: 'Página principal', icono: 'casa' },
     { to: '/calendario', texto: 'Calendario', icono: 'calendario' },
     { to: '/pendientes', texto: 'Pendientes', icono: 'lista' },
+    { to: '/estudiante/plan', texto: 'Mi plan', icono: 'plan' },
     { to: '/estudiante/progreso', texto: 'Mi progreso', icono: 'grafica' },
   ],
 };
@@ -38,6 +39,7 @@ const ICONOS = {
   personas: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20c0-3 3-5 6-5s6 2 6 5M16 11a3 3 0 1 0 0-6M21 20c0-2.5-2-4.4-4.5-4.9',
   carpeta: 'M3 7h7l2 2h9v10H3z',
   grafica: 'M4 20V4M4 20h16M8 16v-4M12 16V8M16 16v-6',
+  plan: 'M5 4h14v16H5zM8 9l2 2 4-4M8 15h8',
   ajustes: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19 12l2-1-1-3-2 .4-1.5-1.5L17 5l-3-1-1 2h-2L10 4 7 5l.5 1.9L6 8.4 4 8 3 11l2 1v0l-2 1 1 3 2-.4 1.5 1.5L7 19l3 1 1-2h2l1 2 3-1-.5-1.9 1.5-1.5 2 .4 1-3z',
 };
 

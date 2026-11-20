@@ -25,6 +25,7 @@ const CursoAnuncios = lazy(() => import('../Pages/CursoAnuncios.jsx'));
 const EstudianteEvaluacion = lazy(() => import('../Pages/EstudianteEvaluacion.jsx'));
 const EstudianteResultado = lazy(() => import('../Pages/EstudianteResultado.jsx'));
 const EstudianteProgreso = lazy(() => import('../Pages/EstudianteProgreso.jsx'));
+const EstudiantePlan = lazy(() => import('../Pages/EstudiantePlan.jsx'));
 const TutorCurso = lazy(() => import('../Pages/TutorCurso.jsx'));
 const CitaTutor = lazy(() => import('../Pages/CitaTutor.jsx'));
 const CursoFuentes = lazy(() => import('../Pages/CursoFuentes.jsx'));
@@ -113,6 +114,7 @@ export default function Rutas() {
             <Route path="/estudiante/tutor/:courseId" element={<TutorCurso />} />
             <Route path="/estudiante/citas/:messageId/:posicion" element={<CitaTutor />} />
             <Route path="/estudiante/progreso" element={<EstudianteProgreso />} />
+            <Route path="/estudiante/plan" element={<EstudiantePlan />} />
           </Route>
 
           {/* Cualquier otra dirección muestra la página de «no encontrada» dentro del diseño. */}

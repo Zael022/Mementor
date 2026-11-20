@@ -5,7 +5,7 @@ import {
 import { forbidden, invalid } from '../utils/AppError.js';
 import { clock, dayKey } from '../utils/clock.js';
 import { getCourseAccess } from './accessService.js';
-import { recordAudit } from './auditService.js';
+import { avatarUrl } from './authService.js';
 import { streakView } from './streakService.js';
 
 // Cursos visibles para el usuario (los mismos que su barra lateral).
@@ -25,17 +25,25 @@ async function myCourses(user) {
   return Course.findAll({ where, attributes: ['id', 'code', 'title', 'status'], order: [['title', 'ASC']] });
 }
 
-// Docentes y compañeros del curso; el estudiante solo ve nombres, el docente también los correos.
+// Docentes y compañeros del curso; el estudiante ve nombre, foto y presentación, el docente también los correos.
 export async function getPeople(user, courseId) {
   const { course, canEdit } = await getCourseAccess(user, courseId);
-  const attributes = canEdit ? ['id', 'displayName', 'email'] : ['id', 'displayName'];
+  const shared = ['id', 'displayName', 'bio', 'avatarFile', 'avatarUpdatedAt'];
+  const attributes = canEdit ? [...shared, 'email'] : shared;
   const teachers = await course.getTeachers({ attributes, joinTableAttributes: [], order: [['displayName', 'ASC']] });
   const enrollments = await Enrollment.findAll({
     where: { courseId: course.id, status: 'active' },
     include: [{ model: User, as: 'student', attributes }],
     order: [[{ model: User, as: 'student' }, 'displayName', 'ASC']],
   });
-  const person = (row) => ({ id: row.id, displayName: row.displayName, ...(canEdit ? { email: row.email } : {}), isMe: row.id === user.id });
+  const person = (row) => ({
+    id: row.id,
+    displayName: row.displayName,
+    bio: row.bio,
+    avatarUrl: avatarUrl(row),
+    ...(canEdit ? { email: row.email } : {}),
+    isMe: row.id === user.id,
+  });
   return { teachers: teachers.map(person), students: enrollments.map((row) => person(row.student)) };
 }
 
@@ -133,14 +141,4 @@ export async function getTodo(user) {
     ...streakView(streaks.find((row) => row.courseId === courseId), today),
   }));
   return result;
-}
-
-// El usuario cambia su nombre visible.
-export async function updateProfile(user, { displayName }) {
-  const row = await User.findByPk(user.id);
-  await sequelize.transaction(async (transaction) => {
-    await row.update({ displayName }, { transaction });
-    await recordAudit({ actor: user, action: 'user.profile_updated', resourceType: 'user', resourceId: user.id, transaction });
-  });
-  return { id: row.id, displayName: row.displayName, email: row.email, role: row.role };
 }

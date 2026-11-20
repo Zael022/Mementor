@@ -1,3 +1,4 @@
+import Avatar from './Avatar.jsx';
 import { Cargando, MensajeError } from './Estados.jsx';
 import { useDatos } from '../hooks/useDatos.js';
 import { colorDeCurso } from '../utils/cursos.js';
@@ -5,8 +6,11 @@ import { colorDeCurso } from '../utils/cursos.js';
 function Persona({ persona }) {
   return (
     <li>
-      <span className="avatar" style={{ background: colorDeCurso(persona.id) }} aria-hidden="true">{persona.displayName.charAt(0).toUpperCase()}</span>
-      <span>{persona.displayName}{persona.isMe && <span className="tenue"> (tú)</span>}</span>
+      <Avatar nombre={persona.displayName} url={persona.avatarUrl} estilo={{ background: colorDeCurso(persona.id) }} />
+      <span>
+        {persona.displayName}{persona.isMe && <span className="tenue"> (tú)</span>}
+        {persona.bio && <span className="tenue pequeno presentacion">{persona.bio}</span>}
+      </span>
       {persona.email && <span className="tenue pequeno correo">{persona.email}</span>}
     </li>
   );

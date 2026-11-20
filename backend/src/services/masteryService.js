@@ -5,7 +5,7 @@ import { MASTERY, computeMastery, evidenceLabel, recommendationType } from '../u
 import { getCourseAccess } from './accessService.js';
 
 // Obtiene los temas del curso en el orden en que se estudian.
-async function orderedTopics(courseId, transaction) {
+export async function orderedTopics(courseId, transaction) {
   return Topic.findAll({
     where: { courseId },
     include: [{ model: Module, as: 'module', attributes: ['position'] }],

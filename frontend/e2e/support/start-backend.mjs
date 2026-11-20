@@ -1,7 +1,7 @@
 // Arranca el backend para las pruebas en navegador sobre una base dedicada que se reinicia en cada corrida.
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import dotenv from '../../../backend/node_modules/dotenv/lib/main.js';
 
 const backend = path.resolve(fileURLToPath(new URL('.', import.meta.url)), '../../../backend');
@@ -33,7 +33,8 @@ const env = {
 // Protección: este script borra y recrea tablas, así que solo acepta bases cuyo nombre termina en _e2e.
 if (!dbName.endsWith('_e2e')) throw new Error(`La base de pruebas en navegador debe terminar en _e2e (recibido: ${dbName}).`);
 
-const run = (args) => execFileSync('npx', ['sequelize-cli', ...args], { cwd: backend, env, stdio: 'inherit' });
+// En Windows npx es un .cmd y necesita la consola para ejecutarse.
+const run = (args) => execFileSync('npx', ['sequelize-cli', ...args], { cwd: backend, env, stdio: 'inherit', shell: process.platform === 'win32' });
 run(['db:migrate:undo:all']);
 run(['db:migrate']);
 execFileSync(process.execPath, ['src/scripts/createPlatformAdmin.js'], {
@@ -42,4 +43,5 @@ execFileSync(process.execPath, ['src/scripts/createPlatformAdmin.js'], {
 
 Object.assign(process.env, env);
 process.chdir(backend);
-await import(path.join(backend, 'src/server.js'));
+// import() necesita una URL file:// (en Windows una ruta con «C:» no sirve).
+await import(pathToFileURL(path.join(backend, 'src/server.js')).href);

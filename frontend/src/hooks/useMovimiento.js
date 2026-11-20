@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
-// Indica si la persona pidió reducir las animaciones.
+// Indica si la persona pidió reducir las animaciones (en su cuenta o en el sistema operativo).
 export function prefiereMenosMovimiento() {
-  return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (typeof window === 'undefined') return false;
+  if (document.documentElement.getAttribute('data-movimiento') === 'reducido') return true;
+  return Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 }
 
 // Avisa cuando un elemento entra en la pantalla.

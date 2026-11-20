@@ -41,6 +41,11 @@ function looksLikeText(sample) {
 export async function matchesSignature(filePath, extension) {
   const ext = String(extension || '').toLowerCase();
   if (ext === '.txt') return looksLikeText(await readStart(filePath, TEXT_SAMPLE_BYTES));
+  // WebP: «RIFF», 4 bytes de tamaño y luego «WEBP».
+  if (ext === '.webp') {
+    const start = await readStart(filePath, 12);
+    return start.subarray(0, 4).toString('latin1') === 'RIFF' && start.subarray(8, 12).toString('latin1') === 'WEBP';
+  }
   const expected = SIGNATURES[ext];
   if (!expected) return false;
   const start = await readStart(filePath, 16);

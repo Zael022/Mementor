@@ -152,4 +152,43 @@ export const classWorkGradesSchema = z.object({
     feedback: z.string().trim().max(1000).optional(),
   })).min(1).max(500),
 });
-export const profileSchema = z.object({ displayName: text(120, 2) });
+// Datos personales propios: un texto vacío borra el dato opcional.
+const optionalText = (max) => z.string().trim().max(max, `Máximo ${max} caracteres.`).optional();
+export const profileSchema = z.object({
+  displayName: text(120, 2).optional(),
+  firstName: optionalText(80),
+  lastName: optionalText(80),
+  phone: z.string().trim().max(30).regex(/^$|^\+?[0-9 ()-]{6,30}$/, 'Usa solo números, espacios, guiones, paréntesis y un + inicial.').optional(),
+  bio: optionalText(500),
+}).strict().refine((data) => Object.keys(data).length > 0, 'No hay cambios.');
+export const passwordChangeSchema = z.object({ currentPassword: z.string().min(1).max(200), newPassword: z.string().min(1).max(200) });
+export const emailChangeSchema = z.object({ currentPassword: z.string().min(1).max(200), newEmail: email });
+
+// --- Personalización ---
+const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Usa el formato AAAA-MM-DD.');
+const timeZone = z.string().trim().min(1).max(64).regex(/^[A-Za-z0-9_+\-/]+$/, 'Zona horaria no válida.');
+export const preferencesSchema = z.object({
+  theme: z.enum(['system', 'light', 'dark']).optional(),
+  textScale: z.union([z.literal(100), z.literal(115), z.literal(130), z.literal(150)]).optional(),
+  highContrast: z.boolean().optional(),
+  reducedMotion: z.boolean().optional(),
+  readingSpacing: z.boolean().optional(),
+  underlineLinks: z.boolean().optional(),
+  timeZone: timeZone.nullable().optional(),
+  dailyGoalMinutes: z.number().int().min(10).max(240).nullable().optional(),
+  practiceSize: z.union([z.literal(5), z.literal(10), z.literal(15)]).optional(),
+}).strict().refine((data) => Object.keys(data).length > 0, 'No hay cambios.');
+
+export const selfReviewSchema = z.object({ grade: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]) });
+
+export const studyPlanSchema = z.object({
+  targetDate: day,
+  minutesPerSession: z.number().int().min(15).max(240),
+  studyDays: z.array(z.number().int().min(1).max(7)).min(1).max(7),
+  timeZone: timeZone.optional(),
+});
+export const studyPlanItemSchema = z.object({
+  status: z.enum(['pending', 'done', 'skipped']).optional(),
+  scheduledDate: day.optional(),
+  minutes: z.number().int().min(5).max(240).optional(),
+}).refine((data) => Object.keys(data).length > 0, 'No hay cambios.');

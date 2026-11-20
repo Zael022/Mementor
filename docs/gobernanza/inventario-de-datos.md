@@ -19,6 +19,11 @@
 | Quizzes rápidos y partidas | MySQL `quick_quizzes`, `quick_quiz_*`, `quiz_plays`, `quiz_play_answers` | Docente (quizzes) y estudiante (partidas) | Docente: todo. Estudiante: sus partidas y la tabla de posiciones del quiz (nombre visible y puntaje de compañeros) | Mientras exista el curso | Docente del curso |
 | Práctica diaria, racha y bono | MySQL `daily_practices`, `daily_practice_answers`, `course_streaks`, `grade_bonus_events` | Estudiante | El propio estudiante y los docentes del curso | Mientras exista el curso | Docente del curso |
 | Trabajo en clase y pesos de la nota | MySQL `class_work_items`, `class_work_grades`, `course_grade_policies` | Docente | Docente: todo. Estudiante: solo sus propias notas | Mientras exista el curso | Docente del curso |
+| Preferencias de apariencia, accesibilidad y metas | MySQL `user_preferences`; copia en `localStorage` del navegador | La propia persona | Solo la propia persona | Mientras exista la cuenta; la copia local se borra al cerrar sesión | La propia persona |
+| Repaso espaciado (estado por tema e historial con origen de la nota) | MySQL `topic_reviews`, `topic_review_logs` | MENTOR al enviar evaluaciones y el estudiante al autoevaluarse | Solo el propio estudiante | Mientras exista el curso o la cuenta (borrado en cascada) | Docente del curso |
+| Planes de estudio y sus sesiones | MySQL `study_plans`, `study_plan_items` | Estudiante | Solo el propio estudiante | Mientras exista el curso; los planes archivados se conservan | Docente del curso |
+| Datos personales (nombres, apellidos, teléfono, presentación) | MySQL `users` | La propia persona | Nombres y teléfono: la persona y la administración. Presentación: también docentes y compañeros de curso | Mientras exista la cuenta | La propia persona |
+| Foto de perfil | Disco `UPLOAD_DIR/avatars` (nombre aleatorio; solo PNG, JPG o WebP de hasta 2 MB validados por contenido) | La propia persona | Personas de la misma institución, con sesión | Se borra al cambiarla o quitarla | La propia persona |
 | Auditoría | MySQL `audit_logs` | MENTOR | Administración | Sin contenido de documentos | Administración de la institución |
 
 ## Qué recibe el proveedor de generación

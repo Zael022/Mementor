@@ -16,8 +16,3 @@ export async function calendar(req, res) {
 export async function todo(req, res) {
   res.json({ data: await workspaceService.getTodo(req.user) });
 }
-
-// Perfil propio.
-export async function updateProfile(req, res) {
-  res.json({ data: await workspaceService.updateProfile(req.user, req.body) });
-}

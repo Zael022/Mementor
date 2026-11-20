@@ -1,6 +1,32 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-19. Interfaz tipo aula para estudiante y docente, quizzes rápidos con tiempo, práctica diaria con racha, trabajo en clase y nota final del curso.
+**Última actualización** — 2026-11-20. Personalización: preferencias de apariencia y accesibilidad en la cuenta, repaso espaciado (FSRS) por tema, plan de estudio y metas del estudiante.
+
+## Sesión 2026-11-20 · Personalización
+
+| Cambio | Dónde | Cómo se comprobó |
+| --- | --- | --- |
+| Migración `20261120000100`: `user_preferences`, `topic_reviews`, `topic_review_logs`, `study_plans`, `study_plan_items` | `database/migrations`, `models/Personalization.js` | Pruebas sobre base nueva; aplicada en desarrollo |
+| Preferencias en la cuenta (tema, tamaño de texto, alto contraste, menos movimiento, espaciado de lectura, subrayar enlaces, zona horaria, metas) | `preferenceService.js`, `GET/PATCH /me/preferences`, `Configuracion.jsx`, `services/preferencias.js` | `personalization.test.js`, `Preferencias.test.jsx`, capturas en Chrome |
+| Tema oscuro y alto contraste: los colores fijos de `styles.css` pasaron a variables; el texto escala con `%` | `styles.css` | Capturas claro, oscuro, alto contraste y móvil (sin desborde horizontal) |
+| Repaso espaciado FSRS-4.5 por tema: se programa en la transacción del envío; autoevaluación solo cuando toca | `utils/spacedRepetition.js`, `reviewService.js`, `assessmentService.js` | `personalizationUnits.test.js` (valores calculados), `personalization.test.js` (reloj simulado) |
+| Plan de estudio determinista (`planner-1`): prioriza brechas, respeta prerrequisitos, no supera los minutos y avisa lo que no cabe | `utils/studyPlanner.js`, `studyPlanService.js`, `EstudiantePlan.jsx` (ruta `/estudiante/plan`) | Pruebas unitarias e integración; plan creado en Chrome |
+| Práctica diaria de 5, 10 o 15 preguntas (el mínimo de la racha sigue en 5) | `streakService.js` | Suite completa sin cambios en `gamification.test.js` |
+| ADR 0005, gobernanza (R21 a R23) y `docs/07` (rutas reales del plan) | `docs/` | Revisión |
+| Perfil: foto (validada por contenido, servida con `nosniff` y solo dentro de la institución), nombres, apellidos, teléfono, presentación, cambio de correo y de contraseña con la contraseña actual (mismo bloqueo que el inicio de sesión; cierra las demás sesiones). Migración `20261120000200` | `profileService.js`, `profileRoutes.js`, `EditorPerfil.jsx`, `Avatar.jsx` | `profile.test.js`, `Perfil.test.jsx`, captura en Chrome |
+| Reintegrar estudiantes retirados: botón en Matrículas que reactiva la misma matrícula (conserva el historial); auditoría `enrollment.reinstated`; con la cuenta deshabilitada se explica por qué no se puede | `courseService.enrollStudent`, `CursoMatriculas.jsx` | `enrollment.test.js`, `Matriculas.test.jsx` |
+| Correcciones encontradas al verificar: `cleanDatabase` vaciaba `SequelizeMeta` en Windows (nombre en minúsculas); el arranque e2e no corría en Windows (`npx` y `import()` de ruta); el aviso «Calificaciones guardadas» se borraba al recargar | `tests/helpers.js`, `e2e/support/start-backend.mjs`, `CursoCalificaciones.jsx` | La suite completa ahora corre en Windows |
+
+### Resultados
+- Backend: `npm run lint` sin errores; `npm test` **113 de 113**.
+- Frontend: `npm run lint` sin errores; `npm test` **46 de 46**; `npm run build` compila.
+- Navegador: `npm run test:e2e` **16 de 16** (con `E2E_CHROME_PATH` y la base vacía `mentor_ai_e2e`).
+
+### Pendiente
+- Probar el modo oscuro y el alto contraste con NVDA/VoiceOver y medir contraste con una herramienta (se revisó a ojo en capturas).
+- Las preguntas no tienen dificultad ni los quizzes tema: la práctica no se adapta por dificultad y los repasos solo nacen de evaluaciones.
+- Ajustar los parámetros de FSRS con `topic_review_logs` cuando haya datos reales.
+- El naranja de los botones principales (`#f0591a`) tiene 3,3:1 con texto blanco en el tema normal; solo el alto contraste lo corrige. Decidir si se oscurece para todos.
 
 ## Sesión 2026-11-19 · Aula, quizzes, racha y nota
 
@@ -169,7 +195,7 @@ Todas con **dobles** (Google Cloud en memoria y generador de prueba); ninguna co
 - [x] Tests, lint, build, documentación
 - [x] Aula: clases en vivo con asistencia, video en lecciones, materiales, anuncios, preguntas por lección, tareas con nota, inicio del estudiante
 - [x] Tutor con fuentes: RAG Engine (Google Cloud) o búsqueda local, citas protegidas, Drive, streaming, cuota y consumo
-- [ ] Planificador de estudio (`study_plans`)
+- [x] Planificador de estudio (`study_plans`), repaso espaciado y preferencias de accesibilidad
 - [ ] Borradores de preguntas generados por IA con aprobación docente
 - [ ] Restablecimiento de contraseña, MFA, notificaciones por correo, entrega de tareas con archivo
 
@@ -246,5 +272,5 @@ Decisiones:
 
 ## Próximo paso
 1. Ejecutar las comprobaciones pendientes con servicios reales (arriba).
-2. Planificador de estudio (Fase 3) y borradores de preguntas con IA revisados por el docente (Fase 4).
+2. Borradores de preguntas con IA revisados por el docente (Fase 4).
 3. Política de retención y borrado de conversaciones; OCR para PDF escaneados; restablecimiento de contraseña y envío de invitaciones por correo.

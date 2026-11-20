@@ -5,6 +5,7 @@ import { conflict, forbidden, invalid, notFound } from '../utils/AppError.js';
 import { getCourseAccess } from './accessService.js';
 import { recordAudit } from './auditService.js';
 import { refreshMastery } from './masteryService.js';
+import { recordAssessmentReviews } from './reviewService.js';
 
 const assessmentDto = (assessment) => ({
   id: assessment.id,
@@ -218,6 +219,13 @@ export async function submitAttempt(user, attemptId, answers) {
 
     const mastery = await refreshMastery({
       studentId: user.id, courseId: assessment.courseId, topicIds: questions.map((question) => question.topicId), transaction,
+    });
+    // Las mismas respuestas objetivas programan el próximo repaso de cada tema.
+    await recordAssessmentReviews({
+      studentId: user.id,
+      courseId: assessment.courseId,
+      answers: rows.map((row) => ({ topicId: questions.find((question) => question.id === row.questionId).topicId, isCorrect: row.isCorrect })),
+      transaction,
     });
     await recordAudit({ actor: user, action: 'attempt.submitted', resourceType: 'attempt', resourceId: attempt.id, metadata: { assessmentId: assessment.id }, transaction });
 

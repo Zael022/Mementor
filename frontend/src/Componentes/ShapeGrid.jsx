@@ -2,8 +2,11 @@
 // Origen: github.com/DavidHDev/react-bits, src/content/Backgrounds/ShapeGrid (copiado el 2026-11-16).
 // Licencia: MIT + Commons Clause, Copyright (c) 2026 David Haz. Ver THIRD_PARTY_NOTICES.md en la raíz.
 // Cambios de MENTOR AI: prop «interactive» para no escuchar el puntero (capa decorativa)
-// y pausa explícita cuando la pestaña se oculta. El resto del motor se conserva sin cambios.
+// y pausa explícita cuando la pestaña se oculta; respeta también «menos movimiento» de la cuenta.
+// El resto del motor se conserva sin cambios.
 import { useEffect, useRef } from 'react';
+import { prefiereMenosMovimiento } from '../hooks/useMovimiento.js';
+import { EVENTO_PREFERENCIAS } from '../services/preferencias.js';
 
 import './ShapeGrid.css';
 
@@ -319,7 +322,7 @@ export default function ShapeGrid({
     const ctx = canvas.getContext('2d');
     if (!ctx) return undefined;
     const motionPreference = window.matchMedia?.('(prefers-reduced-motion: reduce)');
-    let reduce = motionPreference?.matches ?? false;
+    let reduce = prefiereMenosMovimiento();
 
     const state = {
       alive: true,
@@ -730,7 +733,7 @@ export default function ShapeGrid({
     };
     document.addEventListener('visibilitychange', onVisibility);
     const onMotionPreference = () => {
-      reduce = motionPreference.matches;
+      reduce = prefiereMenosMovimiento();
       cancelAnimationFrame(state.raf);
       state.raf = 0;
       state.last = 0;
@@ -740,6 +743,7 @@ export default function ShapeGrid({
       }
     };
     motionPreference?.addEventListener('change', onMotionPreference);
+    window.addEventListener(EVENTO_PREFERENCIAS, onMotionPreference);
 
     if (interactive) {
       window.addEventListener('pointermove', onMove, { passive: true });
@@ -766,6 +770,7 @@ export default function ShapeGrid({
       visibility.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);
       motionPreference?.removeEventListener('change', onMotionPreference);
+      window.removeEventListener(EVENTO_PREFERENCIAS, onMotionPreference);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerdown', onDown);
       document.documentElement.removeEventListener('pointerleave', onLeave);

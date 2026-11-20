@@ -16,6 +16,7 @@ import {
   CourseGradePolicy, ClassWorkItem, ClassWorkGrade, QuickQuiz, QuickQuizQuestion, QuickQuizOption, QuizPlay, QuizPlayAnswer,
   DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent,
 } from './Gamification.js';
+import { UserPreference, TopicReview, TopicReviewLog, StudyPlan, StudyPlanItem } from './Personalization.js';
 
 // Define las relaciones entre los modelos.
 Institution.hasMany(User, { foreignKey: 'institutionId', as: 'users' });
@@ -100,7 +101,16 @@ QuizPlay.belongsTo(User, { foreignKey: 'studentId', as: 'student' });
 QuizPlay.hasMany(QuizPlayAnswer, { foreignKey: 'playId', as: 'answers' });
 DailyPractice.hasMany(DailyPracticeAnswer, { foreignKey: 'practiceId', as: 'answers' });
 
+// Personalización: preferencias, repaso espaciado y planes de estudio.
+User.hasOne(UserPreference, { foreignKey: 'userId', as: 'preferences' });
+TopicReview.belongsTo(Topic, { foreignKey: 'topicId', as: 'topic' });
+TopicReview.hasMany(TopicReviewLog, { foreignKey: 'reviewId', as: 'logs' });
+StudyPlan.hasMany(StudyPlanItem, { foreignKey: 'studyPlanId', as: 'items' });
+StudyPlanItem.belongsTo(StudyPlan, { foreignKey: 'studyPlanId', as: 'plan' });
+StudyPlanItem.belongsTo(Topic, { foreignKey: 'topicId', as: 'topic' });
+
 export {
+  UserPreference, TopicReview, TopicReviewLog, StudyPlan, StudyPlanItem,
   CourseRagCorpus, KnowledgeSource, SourceVersion, AiMessageSource, InstitutionDriveFolder, CourseDriveLink, AiUsageEvent,
   ClassSession, SessionAttendance, Announcement, Material, LessonComment, Assignment, AssignmentSubmission,
   sequelize, Institution, User, UserSession, Course, CourseTeacher, Enrollment,

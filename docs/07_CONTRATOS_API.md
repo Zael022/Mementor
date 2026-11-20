@@ -43,8 +43,17 @@ Prefijo: `/api/v1`. JSON: `{ "data": ... , "meta": ... }` éxito; `{ "error": {"
 | POST | `/courses/:courseId/tutor/threads` | Participante autorizado |
 | POST | `/tutor/threads/:id/messages` | Dueño y curso autorizado |
 | GET | `/tutor/threads/:id/messages` | Dueño |
-| POST | `/me/study-plans` | Estudiante propio |
-| GET | `/me/study-plans` | Estudiante propio |
+| GET | `/courses/:courseId/study-plan` | Estudiante matriculado (su plan vigente o `null`) |
+| POST | `/courses/:courseId/study-plan` | Estudiante matriculado (archiva el anterior) |
+| PATCH | `/study-plan-items/:id` | Dueño del plan |
+| DELETE | `/study-plans/:id` | Dueño del plan (archiva) |
+| GET | `/me/reviews?courseId=` | Estudiante propio (repaso espaciado) |
+| POST | `/topics/:topicId/reviews` | Estudiante matriculado; solo si el repaso ya toca (`409 REVIEW_NOT_DUE`) |
+| GET/PATCH | `/me/preferences` | Cualquier cuenta (solo las propias) |
+| GET/PATCH | `/me/profile` | Datos personales propios |
+| POST | `/me/password` · `/me/email` | Propia cuenta, con la contraseña actual |
+| POST/DELETE | `/me/avatar` | Foto propia (multipart `avatar`) |
+| GET | `/users/:id/avatar` | Misma institución o la propia persona |
 | GET | `/teacher/courses/:id/analytics` | Docente asignado |
 | POST | `/teacher/courses/:id/ai-question-drafts` | Docente asignado |
 | POST | `/teacher/ai-question-drafts/:id/approve` | Docente asignado |

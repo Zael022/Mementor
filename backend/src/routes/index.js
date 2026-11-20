@@ -9,6 +9,8 @@ import knowledgeRoutes from './knowledgeRoutes.js';
 import driveRoutes from './driveRoutes.js';
 import gamificationRoutes from './gamificationRoutes.js';
 import workspaceRoutes from './workspaceRoutes.js';
+import personalizationRoutes from './personalizationRoutes.js';
+import profileRoutes from './profileRoutes.js';
 
 // Reúne todas las rutas de la API.
 const router = Router();
@@ -22,4 +24,6 @@ router.use(knowledgeRoutes);
 router.use(driveRoutes);
 router.use(gamificationRoutes);
 router.use(workspaceRoutes);
+router.use(personalizationRoutes);
+router.use(profileRoutes);
 export default router;

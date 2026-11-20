@@ -175,7 +175,7 @@ export async function listEnrollableStudents(user, courseId) {
   return students.map((student) => ({ id: student.id, displayName: student.displayName, email: student.email }));
 }
 
-// Matricula a un estudiante de la misma institución.
+// Matricula a un estudiante de la misma institución; si estaba retirado, lo reintegra con su historial.
 export async function enrollStudent(user, courseId, studentId) {
   const { course } = await getCourseAccess(user, courseId, { write: true });
   const student = await findInstitutionUser(user, studentId, 'student');
@@ -185,8 +185,14 @@ export async function enrollStudent(user, courseId, studentId) {
   });
   if (!created && enrollment.status === 'active') throw conflict('ALREADY_ENROLLED', 'El estudiante ya está matriculado.');
   if (!created) await enrollment.update({ status: 'active' });
-  await recordAudit({ actor: user, action: 'enrollment.created', resourceType: 'course', resourceId: course.id, metadata: { studentId: student.id } });
-  return { id: enrollment.id, status: 'active', student: { id: student.id, displayName: student.displayName, email: student.email } };
+  const action = created ? 'enrollment.created' : 'enrollment.reinstated';
+  await recordAudit({ actor: user, action, resourceType: 'course', resourceId: course.id, metadata: { studentId: student.id } });
+  return {
+    id: enrollment.id,
+    status: 'active',
+    reinstated: !created,
+    student: { id: student.id, displayName: student.displayName, email: student.email },
+  };
 }
 
 // Retira la matrícula sin borrar el historial.

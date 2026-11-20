@@ -31,6 +31,29 @@ const storage = multer.diskStorage({
   filename: (req, file, done) => done(null, `${randomBytes(16).toString('hex')}${path.extname(file.originalname).toLowerCase()}`),
 });
 
+// Fotos de perfil: carpeta propia para que la reconciliación de materiales no las toque. Sin SVG (puede llevar scripts).
+const AVATAR_TYPES = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp' };
+export const AVATAR_MAX_MB = 2;
+
+export function avatarDir() {
+  const dir = path.join(uploadDir(), 'avatars');
+  mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
+export function avatarContentType(fileName) {
+  return AVATAR_TYPES[path.extname(fileName).toLowerCase()] || null;
+}
+
+export const receiveAvatar = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, done) => done(null, avatarDir()),
+    filename: (req, file, done) => done(null, `${randomBytes(16).toString('hex')}${path.extname(file.originalname).toLowerCase()}`),
+  }),
+  limits: { fileSize: AVATAR_MAX_MB * 1024 * 1024, files: 1 },
+  fileFilter: (req, file, done) => done(null, AVATAR_TYPES[path.extname(file.originalname).toLowerCase()] === file.mimetype),
+}).single('avatar');
+
 // Recibe un solo archivo con límite de tamaño y tipo.
 export const receiveFile = multer({
   storage,

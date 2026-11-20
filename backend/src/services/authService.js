@@ -17,7 +17,13 @@ export function publicUser(user) {
     role: user.role,
     institutionId: user.institutionId,
     institutionName: user.institution?.name ?? null,
+    avatarUrl: avatarUrl(user),
   };
+}
+
+// Dirección de la foto; la fecha en la consulta obliga al navegador a pedir la nueva tras un cambio.
+export function avatarUrl(user) {
+  return user.avatarFile ? `/api/v1/users/${user.id}/avatar?v=${new Date(user.avatarUpdatedAt || 0).getTime()}` : null;
 }
 
 // Busca la sesión vigente a partir del token de la cookie.
@@ -62,6 +68,23 @@ export async function login({ email, password }) {
     await recordAudit({ actor: user, action: 'auth.login', resourceType: 'user', resourceId: user.id, transaction });
   });
   return { token, csrfToken: csrf, expiresAt, user: publicUser(user) };
+}
+
+// Confirma la contraseña actual antes de un cambio sensible; aplica el mismo bloqueo que el inicio de sesión.
+export async function confirmPassword(userId, password) {
+  const user = await User.findByPk(userId);
+  if (!user?.passwordHash) throw unauthenticated();
+  if (user.lockedUntil && user.lockedUntil > new Date()) {
+    throw new AppError(429, 'RATE_LIMITED', 'Cuenta bloqueada temporalmente por intentos fallidos. Intenta más tarde.');
+  }
+  if (!(await verifyPassword(String(password || ''), user.passwordHash))) {
+    const failed = user.failedLoginCount + 1;
+    const lockedUntil = failed >= MAX_FAILED ? new Date(Date.now() + LOCK_MINUTES * 60000) : null;
+    await user.update({ failedLoginCount: lockedUntil ? 0 : failed, lockedUntil });
+    throw invalid('La contraseña actual no es correcta.', [{ field: 'currentPassword', message: 'La contraseña actual no es correcta.' }]);
+  }
+  if (user.failedLoginCount) await user.update({ failedLoginCount: 0 });
+  return user;
 }
 
 // Cierra la sesión actual.

@@ -15,7 +15,8 @@ export default function CursoMatriculas() {
   const matriculas = useDatos(`/courses/${id}/enrollments`);
   const disponibles = useDatos(`/courses/${id}/enrollable-students`);
   const [elegido, setElegido] = useState('');
-  const { error, ejecutar } = useEnvio();
+  const [aviso, setAviso] = useState('');
+  const { enviando, error, ejecutar } = useEnvio();
 
   function recargar() {
     matriculas.recargar();
@@ -31,8 +32,21 @@ export default function CursoMatriculas() {
     }
   }
 
-  async function retirar(matriculaId) {
-    if (await ejecutar(() => api.delete(`/courses/${id}/enrollments/${matriculaId}`))) recargar();
+  async function retirar(matricula) {
+    setAviso('');
+    if (await ejecutar(() => api.delete(`/courses/${id}/enrollments/${matricula.id}`))) {
+      setAviso(`${matricula.student.displayName} fue retirado del curso. Puedes reintegrarlo cuando quieras.`);
+      recargar();
+    }
+  }
+
+  // Reactiva la misma matrícula: el estudiante recupera su progreso, intentos y notas.
+  async function reintegrar(matricula) {
+    setAviso('');
+    if (await ejecutar(() => api.post(`/courses/${id}/enrollments`, { studentId: matricula.student.id }))) {
+      setAviso(`${matricula.student.displayName} fue reintegrado al curso con su historial.`);
+      recargar();
+    }
   }
 
   if (curso.cargando && !curso.datos) return <Cargando />;
@@ -56,6 +70,7 @@ export default function CursoMatriculas() {
       </section>
 
       <MensajeError error={matriculas.error} />
+      <p role="status" className="texto-exito">{aviso}</p>
       {matriculas.cargando && <Cargando />}
       {matriculas.datos?.length === 0 && <EstadoVacio titulo="No hay estudiantes matriculados" detalle="Las matrículas aparecerán aquí cuando agregues estudiantes." />}
       {matriculas.datos?.length > 0 && (
@@ -68,7 +83,19 @@ export default function CursoMatriculas() {
                   <td>{matricula.student.displayName}</td>
                   <td>{matricula.student.email}</td>
                   <td><Insignia estado={matricula.status} /></td>
-                  <td>{matricula.status === 'active' && <button type="button" className="boton secundario" onClick={() => retirar(matricula.id)}>Retirar</button>}</td>
+                  <td>
+                    {matricula.status === 'active' && (
+                      <button type="button" className="boton secundario" disabled={enviando} onClick={() => retirar(matricula)}
+                        aria-label={`Retirar a ${matricula.student.displayName}`}>Retirar</button>
+                    )}
+                    {matricula.status === 'withdrawn' && matricula.student.status !== 'disabled' && (
+                      <button type="button" className="boton secundario" disabled={enviando} onClick={() => reintegrar(matricula)}
+                        aria-label={`Reintegrar a ${matricula.student.displayName}`}>Reintegrar</button>
+                    )}
+                    {matricula.status === 'withdrawn' && matricula.student.status === 'disabled' && (
+                      <span className="tenue pequeno">Cuenta deshabilitada: la administración debe reactivarla primero.</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -5,8 +5,9 @@ import { conflict, forbidden, invalid } from '../utils/AppError.js';
 import { addDays, clock, dayKey } from '../utils/clock.js';
 import { getCourseAccess } from './accessService.js';
 import { awardBonus } from './bonusService.js';
+import { getPreferences } from './preferenceService.js';
 
-// Preguntas que hay que responder cada día para mantener la racha.
+// Mínimo de preguntas diarias para mantener la racha; cada estudiante puede pedir más (5, 10 o 15).
 export const DAILY_QUESTIONS = 5;
 
 // Racha vigente: si el último día cumplido fue antes de ayer, la racha ya se perdió.
@@ -30,12 +31,12 @@ async function assertStudent(user, courseId, transaction) {
 }
 
 // Banco del curso: preguntas de los quizzes publicados.
-async function pickQuestionIds(courseId, transaction) {
+async function pickQuestionIds(courseId, size, transaction) {
   const rows = await QuickQuizQuestion.findAll({
     attributes: ['id'],
     include: [{ model: QuickQuiz, as: 'quiz', attributes: [], where: { courseId, status: 'published' } }],
     order: sequelize.random(),
-    limit: DAILY_QUESTIONS,
+    limit: Math.max(DAILY_QUESTIONS, size),
     transaction,
   });
   return rows.map((row) => row.id);
@@ -89,7 +90,9 @@ export async function getTodayPractice(user, courseId) {
       await Enrollment.findOne({ where: { courseId: course.id, studentId: user.id }, lock: transaction.LOCK.UPDATE, transaction });
       practice = await DailyPractice.findOne({ where: { courseId: course.id, studentId: user.id, practiceDay: today }, transaction });
       if (!practice) {
-        const ids = await pickQuestionIds(course.id, transaction);
+        // El tamaño elegido se aplica al abrir la práctica del día; si se cambia, cuenta desde la siguiente.
+        const { practiceSize } = await getPreferences(user, { transaction });
+        const ids = await pickQuestionIds(course.id, practiceSize, transaction);
         if (ids.length === 0) return { available: false, streak: streakView(streak, today) };
         practice = await DailyPractice.create({ courseId: course.id, studentId: user.id, practiceDay: today, questionIds: ids }, { transaction });
       }

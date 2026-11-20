@@ -14,4 +14,10 @@ export const User = sequelize.define('User', {
   invitationExpiresAt: { type: DataTypes.DATE, allowNull: true },
   failedLoginCount: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
   lockedUntil: { type: DataTypes.DATE, allowNull: true },
+  firstName: { type: DataTypes.STRING(80), allowNull: true },
+  lastName: { type: DataTypes.STRING(80), allowNull: true },
+  phone: { type: DataTypes.STRING(30), allowNull: true },
+  bio: { type: DataTypes.STRING(500), allowNull: true },
+  avatarFile: { type: DataTypes.STRING(64), allowNull: true },
+  avatarUpdatedAt: { type: DataTypes.DATE, allowNull: true },
 }, { tableName: 'users', underscored: true });

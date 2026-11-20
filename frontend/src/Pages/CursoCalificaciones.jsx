@@ -63,8 +63,10 @@ function CalificarActividad({ actividad, estudiantes, alGuardar }) {
       const nota = actividad.grades.find((item) => item.studentId === estudiante.studentId);
       return [estudiante.studentId, { points: nota ? String(nota.points) : '', feedback: nota?.feedback || '' }];
     })));
-    setGuardado(false);
   }, [actividad, estudiantes]);
+
+  // El aviso de guardado solo se borra al cambiar de actividad, no al recargar los datos tras guardar.
+  useEffect(() => { setGuardado(false); }, [actividad.id]);
 
   async function guardar(evento) {
     evento.preventDefault();

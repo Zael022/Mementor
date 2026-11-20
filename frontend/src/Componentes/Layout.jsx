@@ -1,5 +1,6 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import Avatar from './Avatar.jsx';
 import BarraLateral from './BarraLateral.jsx';
 import { Cargando } from './Estados.jsx';
 import LimiteErrores from './LimiteErrores.jsx';
@@ -49,7 +50,9 @@ export default function Layout() {
         </button>
         <Link to="/" className="marca">MENTOR <span>AI</span></Link>
         <div className="perfil">
-          <Link to="/configuracion" className="perfil-inicial" aria-label="Configuración de tu perfil">{usuario.displayName.charAt(0).toUpperCase()}</Link>
+          <Link to="/configuracion" className="perfil-enlace" aria-label="Configuración de tu perfil">
+            <Avatar nombre={usuario.displayName} url={usuario.avatarUrl} className="perfil-inicial" />
+          </Link>
           <div className="perfil-nombre">
             <strong>{usuario.displayName}</strong>
             <span>{ROLES[usuario.role]}{usuario.institutionName ? `, ${usuario.institutionName}` : ''}</span>
