@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { Sequelize } from 'sequelize';
 import { readFileSync } from 'node:fs';
 
+
 // Configura la conexión con MySQL.
 const file = new URL('../../config/db.json', import.meta.url);
 const settings = JSON.parse(readFileSync(file, 'utf8'));
@@ -18,10 +19,17 @@ if (envName === 'test' && value('databaseEnv') === process.env.DB_NAME) {
   throw new Error('TEST_DB_NAME debe ser una base distinta a DB_NAME.');
 }
 
+// TLS opcional para bases en la nube (DB_SSL=true y DB_SSL_CA si el proveedor entrega un certificado propio).
+const prefix = envName === 'test' ? 'TEST_' : '';
+const ssl = process.env[`${prefix}DB_SSL`] === 'true'
+  ? { ssl: { minVersion: 'TLSv1.2', rejectUnauthorized: true, ...(process.env[`${prefix}DB_SSL_CA`] ? { ca: readFileSync(process.env[`${prefix}DB_SSL_CA`], 'utf8') } : {}) } }
+  : undefined;
+
 export const sequelize = new Sequelize(value('databaseEnv'), value('usernameEnv'), value('passwordEnv', ''), {
   host: value('hostEnv', '127.0.0.1'),
   port: Number(value('portEnv', '3306')),
   dialect: 'mysql',
+  dialectOptions: ssl,
   logging: false,
   timezone: '+00:00',
   define: { underscored: true },
