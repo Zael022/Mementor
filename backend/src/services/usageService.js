@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import { AiUsageEvent, Institution, User, sequelize } from '../models/index.js';
+import { AgentRun, AiUsageEvent, Institution, User, sequelize } from '../models/index.js';
 import { AppError } from '../utils/AppError.js';
 import { pageMeta } from '../utils/http.js';
 
@@ -42,6 +42,12 @@ export async function finishQuestion(event, { outcome, provider = null, model = 
     latencyMs: startedAt ? Date.now() - startedAt : null,
     inputTokens: Number.isFinite(usage?.inputTokens) ? usage.inputTokens : null,
     outputTokens: Number.isFinite(usage?.outputTokens) ? usage.outputTokens : null,
+  });
+  // El tutor también queda en la bitácora común de agentes (sin contenido).
+  await AgentRun.create({
+    institutionId: event.institutionId, userId: event.userId, courseId: event.courseId, agent: 'tutor',
+    status: { completed: 'completed', no_evidence: 'no_evidence' }[outcome] ?? 'failed',
+    provider, model, latencyMs: event.latencyMs, inputTokens: event.inputTokens, outputTokens: event.outputTokens, errorCode: outcome === 'completed' ? null : outcome,
   });
   if (process.env.NODE_ENV !== 'test') {
     // Registro técnico sin credenciales, preguntas, respuestas ni contenido de documentos.

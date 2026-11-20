@@ -10,6 +10,7 @@ const NOTIFICACION = { sent: 'Enviada', not_configured: 'Correo no configurado',
 export default function Gobernanza() {
   const solicitudes = useDatos('/governance/deletion-requests');
   const consentimientos = useDatos('/governance/consents');
+  const ejecuciones = useDatos('/governance/agent-runs');
 
   return (
     <>
@@ -32,6 +33,28 @@ export default function Gobernanza() {
             ))}
           </tbody>
         </table>
+      )}
+
+      <h2>Uso de los agentes de IA</h2>
+      <MensajeError error={ejecuciones.error} />
+      {ejecuciones.datos?.length === 0 && <p className="tenue">Todavía no hay ejecuciones registradas.</p>}
+      {ejecuciones.datos?.length > 0 && (
+        <div className="tabla-desplazable">
+          <table className="tabla">
+            <thead><tr><th scope="col">Fecha</th><th scope="col">Agente</th><th scope="col">Resultado</th><th scope="col">Modelo</th><th scope="col">Tokens</th></tr></thead>
+            <tbody>
+              {ejecuciones.datos.slice(0, 50).map((fila) => (
+                <tr key={fila.id}>
+                  <td>{fechaHora(fila.createdAt)}</td>
+                  <td>{fila.name}</td>
+                  <td><Insignia estado={fila.status} />{fila.errorCode ? ` ${fila.errorCode}` : ''}</td>
+                  <td>{fila.model || '—'}</td>
+                  <td>{fila.inputTokens ?? '—'} / {fila.outputTokens ?? '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       <h2>Solicitudes de baja</h2>
