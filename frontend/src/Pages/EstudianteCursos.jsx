@@ -11,7 +11,7 @@ export default function EstudianteCursos() {
     <>
       <h1>Mis cursos</h1>
       <MensajeError error={cursos.error} />
-      {cursos.cargando && <Cargando />}
+      {cursos.cargando && <Cargando texto="Cargando tus clases…" forma="tarjetas" />}
       {cursos.datos?.length === 0 && (
         <EstadoVacio ilustracion="libro" titulo="No hay cursos todavía" detalle="Cuando tu docente o la administración te matricule en un curso publicado, aparecerá aquí." />
       )}

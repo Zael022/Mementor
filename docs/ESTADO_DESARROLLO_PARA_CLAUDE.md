@@ -1,6 +1,32 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-20. Requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+**Última actualización** — 2026-11-20. GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+
+## Sesión 2026-11-20 · GSAP, microinteracciones y accesibilidad
+
+| Cambio | Dónde | Cómo se comprobó |
+| --- | --- | --- |
+| GSAP es el motor de `Animaciones.jsx` (Revelar, Contador, AnilloPuntaje, TarjetaInteractiva) con la misma API: React pinta el estado final y GSAP anima «desde»; con movimiento reducido no hay animación | `utils/gsap.js`, `Componentes/Animaciones.jsx`, `hooks/useMovimiento.js` | `tests/Animaciones.test.jsx` (4 pruebas) |
+| Revelar usa solo opacidad (no `visibility`) para que el contenido siga alcanzable con el teclado; opción `inmediato` para respuestas a una acción | `Animaciones.jsx`, `Asistentes.jsx` | Playwright 24/24 (detectó y se corrigió un resultado oculto) |
+| Se quitó el CSS que competía con GSAP (`.revelar`, transform de `.tarjeta-enlace`, transición del anillo); la tarjeta sube también con el foco | `styles.css` | Revisión y Vitest |
+| Rejilla de la portada cargada con `React.lazy` solo cuando entra en pantalla; chunk `vendor-gsap` | `Portada.jsx`, `RejillaRasgos.jsx`, `vite.config.js` | Medición con el build |
+| Anunciador global (`aria-live`) para guardados, resultados, cambios de sección y retroalimentación de quizzes y práctica; el foco pasa al botón «Siguiente» | `Anunciador.jsx`, `Estados.jsx`, `OpcionesQuiz.jsx`, `JugarQuiz.jsx`, `PracticaDiaria.jsx`, `EstudianteCurso.jsx`, `Pendientes.jsx` | Vitest y Playwright |
+| Esqueletos de carga con forma de contenido y textos concretos; botones con `aria-busy` y «Guardando…»; aviso de éxito con ✓; fila nueva o guardada resaltada; panel de sección con entrada suave; racha que «salta» al subir | `Estados.jsx`, `Asistentes.jsx`, `AdminUsuarios.jsx`, `CursoCalificaciones.jsx`, `EstudianteTarea.jsx`, `styles.css` | Vitest y Playwright |
+| Accesibilidad: naranja de botones `#c2410c` (5,2:1 con blanco); efectos de hover también con `:focus-visible`; animaciones infinitas limitadas a una entrada o 3 ciclos; `.boton-texto` de 24 × 24 px como mínimo | `styles.css` | Revisión |
+
+### Peso del JavaScript inicial
+- Carga inicial de `index.html` (entrada + precargas): antes **297,1 kB (95,5 kB gzip)**, después **296,2 kB (95,1 kB gzip)**.
+- Todo lo que descarga `/login` al abrir: antes **310,2 kB (100,9 kB gzip)**, después **309,3 kB (100,6 kB gzip)**. GSAP no se descarga hasta que la rejilla de la portada entra en pantalla.
+- `vendor-gsap`: 115,3 kB (45,7 kB gzip), solo en las páginas que lo usan.
+
+### Resultados
+- Frontend: `npm run lint` sin errores; `npm test` **50 de 50**; `npm run build` compila; `npm run test:e2e` **24 de 24**.
+- Backend: `npm run lint` sin errores; `npm test` **139 de 139** (sin cambios en el backend).
+
+### Pendiente
+- Regenerar las capturas de `docs/mockups` y los documentos: cambian el naranja de los botones y los estados de carga.
+- Probar con NVDA o VoiceOver los anuncios del anunciador global (se revisaron en el árbol de accesibilidad, no con un lector real).
+- Revisar en un navegador real la vista 390 × 844 y 1280 × 900 en modo oscuro y alto contraste.
 
 ## Sesión 2026-11-20 · Requisitos FWD y entregables
 

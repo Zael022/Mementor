@@ -31,7 +31,7 @@ export default function RecuperarClave() {
           <p>Escribe el correo de tu cuenta y te enviaremos un enlace para crear una contraseña nueva.</p>
           <Campo etiqueta="Correo" tipo="email" valor={email} alCambiar={setEmail} autoComplete="username" required />
           <MensajeError error={error} />
-          <button type="submit" className="boton" disabled={enviando}>{enviando ? 'Enviando…' : 'Enviar enlace'}</button>
+          <button type="submit" className="boton" disabled={enviando} aria-busy={enviando}>{enviando ? 'Enviando…' : 'Enviar enlace'}</button>
           <p className="pequeno"><Link to="/login">Volver a iniciar sesión</Link></p>
         </form>
       )}

@@ -17,7 +17,12 @@ Se instalan desde npm con sus propias licencias (consulta `node_modules/<paquete
 | `motion` | MIT | frontend |
 | `@react-spring/web` | MIT | frontend |
 | `react-dropzone` | MIT | frontend |
+| `gsap` | Standard «No Charge» GSAP License (https://gsap.com/standard-license); no es MIT | frontend |
+| `@gsap/react` | Standard «No Charge» GSAP License (https://gsap.com/standard-license); no es MIT | frontend |
 | `@anthropic-ai/sdk` | Apache-2.0 | backend |
 | `google-auth-library` | Apache-2.0 | backend |
 | `unpdf` | MIT | backend |
 | `mammoth` | BSD-2-Clause | backend |
+
+## GSAP
+`gsap` y `@gsap/react` (GreenSock) se usan bajo la Standard «No Charge» GSAP License, que no es una licencia MIT. Antes de redistribuir el proyecto, revisa sus condiciones en el texto completo: https://gsap.com/standard-license
