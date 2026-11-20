@@ -1,6 +1,6 @@
 # Inventario de datos
 
-Última revisión: 2026-11-16 (retención y coordinación entre instancias). El material importado se trata como **datos**, nunca como instrucciones.
+Última revisión: 2026-11-20 (gobernanza Ley 8968, agentes de IA, integraciones y catálogo de roles). El material importado se trata como **datos**, nunca como instrucciones.
 
 | Dato | Dónde | Quién lo crea | Quién lo ve | Retención | Responsable |
 | --- | --- | --- | --- | --- | --- |
@@ -24,7 +24,14 @@
 | Planes de estudio y sus sesiones | MySQL `study_plans`, `study_plan_items` | Estudiante | Solo el propio estudiante | Mientras exista el curso; los planes archivados se conservan | Docente del curso |
 | Datos personales (nombres, apellidos, teléfono, presentación) | MySQL `users` | La propia persona | Nombres y teléfono: la persona y la administración. Presentación: también docentes y compañeros de curso | Mientras exista la cuenta | La propia persona |
 | Foto de perfil | Disco `UPLOAD_DIR/avatars` (nombre aleatorio; solo PNG, JPG o WebP de hasta 2 MB validados por contenido) | La propia persona | Personas de la misma institución, con sesión | Se borra al cambiarla o quitarla | La propia persona |
-| Auditoría | MySQL `audit_logs` | MENTOR | Administración | Sin contenido de documentos | Administración de la institución |
+| Auditoría | MySQL `audit_logs` | MENTOR | Administración y rol auditor (solo lectura) | Sin contenido de documentos | Administración de la institución |
+| Catálogo de roles | MySQL `roles` (FK desde `users.role`) | Migración (dato de referencia) | Nadie lo edita desde la interfaz | Permanente | Operador |
+| Restablecimiento de contraseña (hash del token) | MySQL `password_resets` | La propia persona al pedirlo | Nadie desde la interfaz | Vence a los 60 minutos y sirve una vez | Operador |
+| Aceptación de términos y privacidad (versión, fecha) | MySQL `consent_records` | La propia persona al activar la cuenta o reaceptar | La persona; administración y auditoría de su institución | Se conserva como evidencia aun después de la baja | Administración de la institución |
+| Solicitudes de baja y qué se conservó | MySQL `data_deletion_requests` | La propia persona (confirmando su contraseña) | Administración y auditoría | Permanente, sin datos personales tras anonimizar | Administración de la institución |
+| Ejecuciones de agentes de IA (agente, resultado, modelo, tokens, latencia; sin contenido) | MySQL `agent_runs` | MENTOR | La persona (su historial); administración y auditoría | Mientras exista la institución | Operador |
+| Llamadas a integraciones (Hacienda, Nager.Date, n8n) | MySQL `integration_runs`, `exchange_rates` | MENTOR y n8n | Administración | Sin datos personales | Operador |
+| Recordatorios por correo (nombre, correo, títulos de pendientes) | n8n (en memoria durante la ejecución) y servidor SMTP | Workflow 2 | La propia persona | n8n guarda el historial de ejecuciones según su configuración | Operador |
 
 ## Qué recibe el proveedor de generación
 El prompt del sistema, hasta 6 fragmentos (máximo 1800 caracteres cada uno) con título y página o sección, la pregunta y hasta 6 mensajes previos del mismo hilo. Se omiten los turnos que citaron fuentes retiradas. No se envían nombres, correos ni identificadores.

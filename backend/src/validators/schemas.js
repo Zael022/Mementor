@@ -6,13 +6,20 @@ const id = z.number().int().positive();
 const email = z.string().trim().toLowerCase().email('Correo no válido.').max(190);
 
 export const loginSchema = z.object({ email, password: z.string().min(1).max(200) });
-export const activateSchema = z.object({ token: z.string().trim().length(64), password: z.string().min(1).max(200) });
+// La activación exige aceptar de forma explícita los términos y la política de privacidad.
+const mustAccept = (message) => z.literal(true, { error: message });
+export const activateSchema = z.object({
+  token: z.string().trim().length(64),
+  password: z.string().min(1).max(200),
+  acceptTerms: mustAccept('Debes aceptar los términos y condiciones.'),
+  acceptPrivacy: mustAccept('Debes aceptar la política de privacidad.'),
+});
 
 export const institutionSchema = z.object({ name: text(150, 2), slug: text(100).optional() });
 export const inviteUserSchema = z.object({
   email,
   displayName: text(120, 2),
-  role: z.enum(['institution_admin', 'teacher', 'student']),
+  role: z.enum(['institution_admin', 'teacher', 'student', 'auditor']),
 });
 export const inviteAdminSchema = z.object({ email, displayName: text(120, 2) });
 export const updateUserSchema = z.object({
@@ -192,3 +199,23 @@ export const studyPlanItemSchema = z.object({
   scheduledDate: day.optional(),
   minutes: z.number().int().min(5).max(240).optional(),
 }).refine((data) => Object.keys(data).length > 0, 'No hay cambios.');
+
+// Recuperación de contraseña.
+export const forgotPasswordSchema = z.object({ email: z.string().trim().toLowerCase().email('Correo no válido.').max(190) });
+export const resetPasswordSchema = z.object({ token: z.string().regex(/^[a-f0-9]{64}$/, 'Enlace no válido.'), password: z.string().min(10).max(200) });
+
+// Gobernanza de datos.
+export const consentSchema = z.object({ documents: z.array(z.enum(['terms', 'privacy'])).min(1).max(2) });
+export const deletionRequestSchema = z.object({
+  password: z.string().min(1, 'Escribe tu contraseña para confirmar tu identidad.').max(200),
+  reason: z.string().trim().max(500).optional(),
+  confirm: z.literal(true, { error: 'Confirma que entiendes que la baja no se puede deshacer.' }),
+});
+
+// Datos que envía n8n.
+export const exchangeRateInSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha no válida (AAAA-MM-DD).'),
+  buy: z.number().positive().max(10000),
+  sell: z.number().positive().max(10000),
+});
+export const notifiedSchema = z.object({ status: z.enum(['sent', 'failed']) });

@@ -6,6 +6,13 @@ import RutaProtegida from './RutaProtegida.jsx';
 import Login from '../Pages/Login.jsx';
 const Inicio = lazy(() => import('../Pages/Inicio.jsx'));
 const Activar = lazy(() => import('../Pages/Activar.jsx'));
+const RecuperarClave = lazy(() => import('../Pages/RecuperarClave.jsx'));
+const Terminos = lazy(() => import('../Pages/Terminos.jsx'));
+const Privacidad = lazy(() => import('../Pages/Privacidad.jsx'));
+const CuentaEliminada = lazy(() => import('../Pages/CuentaEliminada.jsx'));
+const Gobernanza = lazy(() => import('../Pages/Gobernanza.jsx'));
+const Asistentes = lazy(() => import('../Pages/Asistentes.jsx'));
+const RestablecerClave = lazy(() => import('../Pages/RestablecerClave.jsx'));
 const PlataformaInstituciones = lazy(() => import('../Pages/PlataformaInstituciones.jsx'));
 const AdminUsuarios = lazy(() => import('../Pages/AdminUsuarios.jsx'));
 const AdminAuditoria = lazy(() => import('../Pages/AdminAuditoria.jsx'));
@@ -68,11 +75,20 @@ export default function Rutas() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/activar" element={<Suspense fallback={<Cargando />}><Activar /></Suspense>} />
+      <Route path="/recuperar" element={<Suspense fallback={<Cargando />}><RecuperarClave /></Suspense>} />
+      <Route path="/restablecer" element={<Suspense fallback={<Cargando />}><RestablecerClave /></Suspense>} />
+      {/* Documentos legales: públicos, se leen sin iniciar sesión. */}
+      <Route path="/terminos" element={<Suspense fallback={<Cargando />}><Terminos /></Suspense>} />
+      <Route path="/privacidad" element={<Suspense fallback={<Cargando />}><Privacidad /></Suspense>} />
+      <Route path="/cuenta-eliminada" element={<Suspense fallback={<Cargando />}><CuentaEliminada /></Suspense>} />
 
       <Route element={<RutaProtegida />}>
         <Route element={<Layout />}>
           <Route path="/" element={<Inicio />} />
           <Route path="/configuracion" element={<Configuracion />} />
+          <Route element={<RutaProtegida roles={['institution_admin', 'teacher', 'student', 'auditor']} />}>
+            <Route path="/asistentes" element={<Asistentes />} />
+          </Route>
 
           {/* Vistas de trabajo diario para quien tiene clases. */}
           <Route element={<RutaProtegida roles={['institution_admin', 'teacher', 'student']} />}>
@@ -86,6 +102,13 @@ export default function Rutas() {
 
           <Route element={<RutaProtegida roles={['institution_admin', 'platform_admin']} />}>
             <Route path="/admin/auditoria" element={<AdminAuditoria />} />
+            <Route path="/admin/gobernanza" element={<Gobernanza />} />
+          </Route>
+
+          {/* Auditoría: solo lectura. */}
+          <Route element={<RutaProtegida roles={['auditor']} />}>
+            <Route path="/auditoria/bitacora" element={<AdminAuditoria />} />
+            <Route path="/auditoria/gobernanza" element={<Gobernanza />} />
           </Route>
 
           <Route element={<RutaProtegida roles={['institution_admin']} />}>

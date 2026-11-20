@@ -1,12 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Marca de MENTOR AI: el mismo cuadro azul con borde lima que aparece junto al nombre. -->
-  <defs>
-    <clipPath id="forma">
-      <path d="M22 2 H42 A20 20 0 0 1 62 22 V42 A20 20 0 0 1 42 62 H8 A6 6 0 0 1 2 56 V22 A20 20 0 0 1 22 2 Z"/>
-    </clipPath>
-  </defs>
-  <g clip-path="url(#forma)">
-    <rect width="64" height="64" fill="#c8f169"/>
-    <path transform="translate(-20 -20)" d="M22 2 H42 A20 20 0 0 1 62 22 V42 A20 20 0 0 1 42 62 H8 A6 6 0 0 1 2 56 V22 A20 20 0 0 1 22 2 Z" fill="#3451e1"/>
-  </g>
+  <!-- Isotipo de MENTOR AI: burbuja azul, «m» de dos arcos y chispa lima de la IA. -->
+  <path d="M16 2H48A14 14 0 0 1 62 16V48A14 14 0 0 1 48 62H7A5 5 0 0 1 2 57V16A14 14 0 0 1 16 2Z" fill="#3451e1"/>
+  <path d="M16 47V32a8 8 0 0 1 16 0v15M32 32a8 8 0 0 1 16 0v15" fill="none" stroke="#fff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M50 5.5c.95 4.6 2.9 6.55 7.5 7.5-4.6.95-6.55 2.9-7.5 7.5-.95-4.6-2.9-6.55-7.5-7.5 4.6-.95 6.55-2.9 7.5-7.5z" fill="#c8f169"/>
 </svg>

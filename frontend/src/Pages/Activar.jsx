@@ -12,6 +12,8 @@ export default function Activar() {
   const token = parametros.get('token') || '';
   const [password, setPassword] = useState('');
   const [confirmacion, setConfirmacion] = useState('');
+  const [aceptaTerminos, setAceptaTerminos] = useState(false);
+  const [aceptaPrivacidad, setAceptaPrivacidad] = useState(false);
   const [activada, setActivada] = useState(null);
   const [errorLocal, setErrorLocal] = useState(null);
   const { enviando, error, ejecutar } = useEnvio();
@@ -23,7 +25,7 @@ export default function Activar() {
       setErrorLocal(new Error('Las contraseñas no coinciden.'));
       return;
     }
-    const respuesta = await ejecutar(() => api.post('/auth/activate', { token, password }));
+    const respuesta = await ejecutar(() => api.post('/auth/activate', { token, password, acceptTerms: aceptaTerminos, acceptPrivacy: aceptaPrivacidad }));
     if (respuesta) setActivada(respuesta.data.email);
   }
 
@@ -40,8 +42,17 @@ export default function Activar() {
           <Campo etiqueta="Nueva contraseña" tipo="password" valor={password} alCambiar={setPassword} autoComplete="new-password"
             ayuda="Mínimo 10 caracteres, con letras y números." required />
           <Campo etiqueta="Repite la contraseña" tipo="password" valor={confirmacion} alCambiar={setConfirmacion} autoComplete="new-password" required />
+          {/* Aceptación explícita e independiente de cada documento (Ley 8968). */}
+          <label className="casilla">
+            <input type="checkbox" checked={aceptaTerminos} onChange={(evento) => setAceptaTerminos(evento.target.checked)} required />
+            <span>Leí y acepto los <Link to="/terminos" target="_blank" rel="noopener">términos y condiciones</Link>.</span>
+          </label>
+          <label className="casilla">
+            <input type="checkbox" checked={aceptaPrivacidad} onChange={(evento) => setAceptaPrivacidad(evento.target.checked)} required />
+            <span>Leí y acepto la <Link to="/privacidad" target="_blank" rel="noopener">política de privacidad</Link>.</span>
+          </label>
           <MensajeError error={errorLocal || error} />
-          <button type="submit" className="boton" disabled={enviando || !token}>{enviando ? 'Activando…' : 'Activar cuenta'}</button>
+          <button type="submit" className="boton" disabled={enviando || !token || !aceptaTerminos || !aceptaPrivacidad}>{enviando ? 'Activando…' : 'Activar cuenta'}</button>
         </form>
       )}
     </Portada>

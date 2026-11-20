@@ -1,6 +1,6 @@
 # Registro de riesgos
 
-Última revisión: 2026-11-19 (quizzes rápidos, racha y nota del curso). Nivel: A alto, M medio, B bajo.
+Última revisión: 2026-11-20 (seguridad JWT, gobernanza, agentes, integraciones y despliegue). Nivel: A alto, M medio, B bajo.
 
 | # | Riesgo | Nivel | Mitigación aplicada | Pendiente | Responsable |
 | --- | --- | --- | --- | --- | --- |
@@ -27,3 +27,9 @@
 | R21 | El repaso o el plan se toman como medida validada del aprendizaje | M | La interfaz dice «estimación del modelo»; FSRS con parámetros por defecto y planificador determinista con versión (`fsrs-4.5-topic`, `planner-1`); la autoevaluación no cambia dominio ni nota | Ajustar parámetros con el historial (`topic_review_logs`) y evaluar antes de afirmar eficacia | Desarrollo |
 | R22 | Calendarios imposibles o en otra zona horaria | B | Nunca se supera el tiempo diario; lo que no cabe se informa; la zona la elige el estudiante y se valida con IANA | — | Desarrollo |
 | R23 | Preferencias visibles en un equipo compartido | B | La copia local se borra al cerrar sesión; no contiene datos académicos | — | Desarrollo |
+| R24 | Robo o reutilización del token de sesión | M | JWT firmado con `JWT_SECRET` (≥ 32 caracteres) y expiración; cookie httpOnly, Secure y SameSite; el id de sesión se guarda con hash y se revoca al cerrar sesión o cambiar la contraseña | Rotar `JWT_SECRET` si se sospecha una fuga | Operador |
+| R25 | Baja incompleta o datos personales que quedan tras la supresión | A | Transacción que anonimiza la cuenta, borra conversaciones, preferencias y foto, revoca sesiones y deja registro; respaldo inline si n8n falla | Revisar los respaldos de la base: una restauración antigua devuelve datos de cuentas ya dadas de baja | Administración |
+| R26 | Datos personales enviados a un agente de IA | M | Los agentes no envían nombres ni correos; el analista usa «Estudiante N»; el asistente de cumplimiento enmascara cédulas, teléfonos y correos | Revisar con material real de la institución | Operador |
+| R27 | Gasto de IA o de APIs fuera de control | M | Cuotas diarias por persona e institución; 30 ejecuciones de agentes por día; caché del tipo de cambio y feriados | Alertas de gasto en el panel del proveedor | Administración |
+| R28 | Clave de integración de n8n filtrada | M | `x-integration-key` de ≥ 32 caracteres comparada en tiempo constante; endpoints de integración con alcance mínimo y registro en `integration_runs` | Rotarla al cambiar de espacio de n8n | Operador |
+| R29 | Planes gratuitos de alojamiento (apagado, disco temporal, prueba de n8n) | M | Plan de producción con limitaciones y mitigaciones; archivos permanentes en Cloud Storage | Pasar a planes de pago si el sistema se usa en serio | Operador |

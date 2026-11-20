@@ -2,6 +2,7 @@ import { useId } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { AnimatePresence, LazyMotion, MotionConfig, domAnimation, m } from 'motion/react';
 import { tamanoArchivo } from '../utils/fechas.js';
+import Icono from './Iconos.jsx';
 
 // Adaptación del componente File Upload de Aceternity UI (https://ui.aceternity.com/components/file-upload):
 // zona con patrón de cuadrícula, react-dropzone y la ficha del archivo animada con Motion.
@@ -71,9 +72,7 @@ export default function CargaArchivo({ archivo, alElegir, alRechazar, deshabilit
               ) : (
                 <MotionDiv key="vacio" className="carga-icono" aria-hidden="true"
                   initial={{ opacity: 0 }} animate={{ opacity: 1, y: isDragActive ? -6 : 0 }} exit={{ opacity: 0 }} transition={TRANSICION}>
-                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /><path d="M7 9l5-5 5 5" /><path d="M12 4v12" />
-                  </svg>
+                  <Icono nombre="subir" tamano={22} />
                 </MotionDiv>
               )}
             </AnimatePresence>

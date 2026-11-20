@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { Revelar } from './Animaciones.jsx';
 import Ilustracion from './Ilustracion.jsx';
+import Logo from './Logo.jsx';
 
 // La cuadrícula decorativa se descarga aparte: el formulario funciona mientras llega.
 const ShapeGrid = lazy(() => import('./ShapeGrid.jsx'));
@@ -38,7 +39,7 @@ export default function Portada({ titulo, children }) {
 
   return (
     <div className="portada">
-      <header className="cabecera"><p className="marca">MENTOR <span>AI</span></p></header>
+      <header className="cabecera"><Logo como="p" /></header>
 
       <section className="portada-hero">
         {/* Capa decorativa: oculta al lector de pantalla y sin eventos del puntero. */}

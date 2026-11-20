@@ -20,7 +20,7 @@ export async function sesion(email, password = CLAVE) {
 }
 
 async function activar(token) {
-  const r = await fetch(`${API}/auth/activate`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token, password: CLAVE }) });
+  const r = await fetch(`${API}/auth/activate`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token, password: CLAVE, acceptTerms: true, acceptPrivacy: true }) });
   if (!r.ok) throw new Error(`No se pudo activar la cuenta (${r.status}).`);
 }
 
@@ -52,7 +52,7 @@ export async function prepararCurso(nombre, { claseEnMs = null } = {}) {
       title: 'Clase de repaso', startsAt: new Date(Date.now() + claseEnMs).toISOString(), durationMinutes: 30, meetingUrl: 'https://meet.google.com/abc-defg-hij',
     });
   }
-  return { cursoId: curso.id, docente: `docente.${sufijo}@e2e.test`, estudiante: `estudiante.${sufijo}@e2e.test` };
+  return { cursoId: curso.id, admin: `admin.${sufijo}@e2e.test`, docente: `docente.${sufijo}@e2e.test`, estudiante: `estudiante.${sufijo}@e2e.test` };
 }
 
 // Inicia sesión desde la pantalla de acceso, como lo haría una persona.

@@ -1,0 +1,189 @@
+{
+  "name": "MENTOR AI · 1. Tipo de cambio diario",
+  "nodes": [
+    {
+      "id": "75069dbb-8908-44f4-8080-7320d2a04a3c",
+      "name": "Todos los días 8:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "5a78a86d-cc0d-4a2e-a993-131a34b5c99c",
+      "name": "Configuración",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4a9de731-e518-48ad-bf55-8eb1e6a1a8db",
+              "name": "apiUrl",
+              "value": "https://TU-API.onrender.com/api/v1",
+              "type": "string"
+            },
+            {
+              "id": "d1985b3f-a244-42fb-95dd-563efec6bdbd",
+              "name": "correoAviso",
+              "value": "administracion@tu-institucion.cr",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "391c0941-891d-4c30-8019-e853c5ab8ff9",
+      "name": "Consultar Hacienda (BCCR)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "url": "https://api.hacienda.go.cr/indicadores/tc/dolar",
+        "options": {
+          "timeout": 10000
+        }
+      }
+    },
+    {
+      "id": "b9317b5f-b4d2-4c8c-b6f2-6c523e617c80",
+      "name": "Preparar datos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Acepta {dolar:{compra,venta}} o {compra,venta}.\nconst d = $json.dolar ?? $json;\nreturn [{ json: { date: String(d.venta.fecha).slice(0, 10), buy: Number(d.compra.valor), sell: Number(d.venta.valor) } }];"
+      }
+    },
+    {
+      "id": "4eb9483b-03c7-4e63-8fef-b4e53ebbb958",
+      "name": "Guardar en MENTOR",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuración').item.json.apiUrl }}/integrations/exchange-rates",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 15000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ date: $json.date, buy: $json.buy, sell: $json.sell }) }}"
+      }
+    },
+    {
+      "id": "1c7ace85-557e-4ba7-9079-b743cae7f233",
+      "name": "Enviar resumen",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        0
+      ],
+      "parameters": {
+        "fromEmail": "MENTOR AI <no-responder@tu-dominio.com>",
+        "toEmail": "={{ $('Configuración').item.json.correoAviso }}",
+        "subject": "=Tipo de cambio {{ $('Preparar datos').item.json.date }}",
+        "emailFormat": "text",
+        "text": "=Tipo de cambio de referencia del BCCR (vía Hacienda):\nCompra: ₡{{ $('Preparar datos').item.json.buy }}\nVenta: ₡{{ $('Preparar datos').item.json.sell }}\n\nGuardado en MENTOR AI para estimar el costo de la IA en colones.",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Todos los días 8:00": {
+      "main": [
+        [
+          {
+            "node": "Configuración",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuración": {
+      "main": [
+        [
+          {
+            "node": "Consultar Hacienda (BCCR)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Hacienda (BCCR)": {
+      "main": [
+        [
+          {
+            "node": "Preparar datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar datos": {
+      "main": [
+        [
+          {
+            "node": "Guardar en MENTOR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar en MENTOR": {
+      "main": [
+        [
+          {
+            "node": "Enviar resumen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Costa_Rica"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

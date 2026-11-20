@@ -32,6 +32,11 @@ export default function Calendario() {
   const domingo = new Date(lunes.getTime() + 7 * DIA_MS);
   const ruta = `/me/calendar?from=${lunes.toISOString()}&to=${domingo.toISOString()}${curso ? `&courseId=${curso}` : ''}`;
   const calendario = useDatos(ruta);
+  // Feriados de Costa Rica (API externa consultada por el backend); si falla, el calendario sigue funcionando.
+  const feriados = useDatos(`/indicators/holidays?year=${lunes.getFullYear()}`);
+  const feriadosFin = useDatos(domingo.getFullYear() !== lunes.getFullYear() ? `/indicators/holidays?year=${domingo.getFullYear()}` : null);
+  const listaFeriados = [...(feriados.datos || []), ...(feriadosFin.datos || [])];
+  const fechaLocal = (dia) => `${dia.getFullYear()}-${String(dia.getMonth() + 1).padStart(2, '0')}-${String(dia.getDate()).padStart(2, '0')}`;
   // Lista de clases para el filtro.
   const cursos = useDatos('/courses?limit=100');
   const opciones = cursos.datos || [];
@@ -61,6 +66,7 @@ export default function Calendario() {
           return (
             <section key={dia.toISOString()} className={`calendario-dia ${mismoDia(dia, hoy) ? 'hoy' : ''}`} aria-label={dia.toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })}>
               <header>
+                {listaFeriados.filter((item) => item.date === fechaLocal(dia)).map((item) => <span key={item.name} className="feriado">{item.name}</span>)}
                 <span className="dia-nombre">{dia.toLocaleDateString('es', { weekday: 'short' })}</span>
                 <span className="dia-numero">{dia.getDate()}</span>
               </header>

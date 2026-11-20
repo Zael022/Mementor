@@ -9,6 +9,8 @@ const SesionContext = createContext(null);
 // Maneja la sesión del usuario y sus preferencias personales.
 export function SesionProvider({ children }) {
   const [usuario, setUsuario] = useState(null);
+  // Documentos legales que falta aceptar (cuentas anteriores o versiones nuevas).
+  const [pendientes, setPendientes] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [preferencias, setPreferencias] = useState(() => ({ ...PREFERENCIAS_BASE, ...leerPreferenciasLocales() }));
   const confirmadas = useRef(preferencias);
@@ -35,16 +37,33 @@ export function SesionProvider({ children }) {
       .then(({ data }) => {
         setCsrfToken(data.csrfToken);
         setUsuario(data.user);
+        setPendientes(data.pendingConsents || []);
         return cargarPreferencias();
       })
       .catch(() => setUsuario(null))
       .finally(() => setCargando(false));
   }, [cargarPreferencias]);
 
+  // Token vencido: se limpia la sesión local y el inicio de sesión muestra el motivo.
+  const [vencida, setVencida] = useState(false);
+  const usuarioActual = useRef(null);
+  useEffect(() => { usuarioActual.current = usuario; }, [usuario]);
+  useEffect(() => {
+    const alVencer = () => {
+      setCsrfToken(null);
+      if (usuarioActual.current) setVencida(true);
+      setUsuario(null);
+    };
+    window.addEventListener('mentor:sesion-vencida', alVencer);
+    return () => window.removeEventListener('mentor:sesion-vencida', alVencer);
+  }, []);
+
   const iniciarSesion = useCallback(async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
     setCsrfToken(data.csrfToken);
     setUsuario(data.user);
+    setPendientes(data.pendingConsents || []);
+    setVencida(false);
     await cargarPreferencias();
     return data.user;
   }, [cargarPreferencias]);
@@ -75,12 +94,24 @@ export function SesionProvider({ children }) {
     }
   }, [fijarPreferencias]);
 
+  const consentimientosAceptados = useCallback(() => setPendientes([]), []);
+  // Tras una baja, el servidor ya cerró la sesión: solo se limpia el estado local.
+  const sesionEliminada = useCallback(() => {
+    setCsrfToken(null);
+    setUsuario(null);
+    setPendientes([]);
+  }, []);
+
   // Aplica cambios del perfil propio sin volver a iniciar sesión.
   const actualizarUsuario = useCallback((cambios) => setUsuario((previo) => (previo ? { ...previo, ...cambios } : previo)), []);
 
   const valor = useMemo(
-    () => ({ usuario, cargando, iniciarSesion, cerrarSesion, actualizarUsuario, preferencias, guardarPreferencias }),
-    [usuario, cargando, iniciarSesion, cerrarSesion, actualizarUsuario, preferencias, guardarPreferencias],
+    () => ({
+      usuario, cargando, vencida, pendientes, iniciarSesion, cerrarSesion, actualizarUsuario, preferencias, guardarPreferencias,
+      consentimientosAceptados, sesionEliminada,
+    }),
+    [usuario, cargando, vencida, pendientes, iniciarSesion, cerrarSesion, actualizarUsuario, preferencias, guardarPreferencias,
+      consentimientosAceptados, sesionEliminada],
   );
   return <SesionContext.Provider value={valor}>{children}</SesionContext.Provider>;
 }
@@ -94,5 +125,6 @@ export function rutaInicial(rol) {
   if (rol === 'platform_admin') return '/plataforma/instituciones';
   if (rol === 'institution_admin') return '/admin/usuarios';
   if (rol === 'teacher') return '/docente/cursos';
+  if (rol === 'auditor') return '/auditoria/bitacora';
   return '/estudiante/inicio';
 }

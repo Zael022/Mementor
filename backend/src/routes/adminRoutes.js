@@ -19,5 +19,6 @@ router.post('/users', institution, validateBody(inviteUserSchema), admin.inviteU
 router.patch('/users/:userId', requireRole('institution_admin', 'platform_admin'), validateBody(updateUserSchema), admin.updateUser);
 router.post('/users/:userId/invitation', requireRole('institution_admin', 'platform_admin'), admin.renewInvitation);
 
-router.get('/audit-logs', requireRole('institution_admin', 'platform_admin'), admin.auditLogs);
+// La auditoría tiene acceso de solo lectura a la bitácora de su institución.
+router.get('/audit-logs', requireRole('institution_admin', 'platform_admin', 'auditor'), admin.auditLogs);
 export default router;

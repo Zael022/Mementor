@@ -38,7 +38,8 @@ export async function cleanDatabase() {
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
   for (const table of tables) {
     // En Windows MySQL guarda los nombres en minúsculas: se compara sin distinguir mayúsculas.
-    if (table.toLowerCase() !== 'sequelizemeta') await sequelize.query(`TRUNCATE TABLE \`${table}\``);
+    // El catálogo de roles es dato de referencia creado por la migración: no se borra.
+    if (!['sequelizemeta', 'roles'].includes(table.toLowerCase())) await sequelize.query(`TRUNCATE TABLE \`${table}\``);
   }
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
 }
@@ -79,7 +80,7 @@ export async function loginAs(email, password = PASSWORD) {
 
 // Activa una cuenta invitada usando su enlace de un solo uso.
 export async function activate(invitationToken) {
-  return request(app).post('/api/v1/auth/activate').send({ token: invitationToken, password: PASSWORD });
+  return request(app).post('/api/v1/auth/activate').send({ token: invitationToken, password: PASSWORD, acceptTerms: true, acceptPrivacy: true });
 }
 
 export { app, request };

@@ -1,0 +1,208 @@
+{
+  "name": "MENTOR AI · 3. Baja de cuenta y eliminación de datos",
+  "nodes": [
+    {
+      "id": "8ac72f59-72ec-415f-94dd-fad4e3ad8eea",
+      "name": "Solicitud de baja (webhook)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "d86a3559-e2b1-4eaa-b4bc-089dfbf42492",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mentor-baja",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      }
+    },
+    {
+      "id": "79ff4358-ca23-4254-9568-ddbcb8015549",
+      "name": "Configuración",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "92f5cbb8-22c6-482c-a9ec-817bdc7f009e",
+              "name": "apiUrl",
+              "value": "https://TU-API.onrender.com/api/v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "9208705e-7104-4290-855a-7dbcbaef234b",
+      "name": "Procesar baja en MENTOR",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuración').item.json.apiUrl }}/integrations/deletion-requests/{{ $('Solicitud de baja (webhook)').item.json.body.requestId }}/process",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 15000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={}"
+      }
+    },
+    {
+      "id": "b360f7f7-31bf-4208-8a85-88ae4d48a904",
+      "name": "¿Completada?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "33850e8d-21c0-45da-826e-08f50c2b187f",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "723b59dd-a1ca-4c00-9403-7eea4752c9d8",
+      "name": "Confirmar al usuario",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        -80
+      ],
+      "parameters": {
+        "fromEmail": "MENTOR AI <no-responder@tu-dominio.com>",
+        "toEmail": "={{ $('Solicitud de baja (webhook)').item.json.body.email }}",
+        "subject": "Tu cuenta de MENTOR AI fue eliminada",
+        "emailFormat": "text",
+        "text": "=Hola, {{ $('Solicitud de baja (webhook)').item.json.body.displayName }}:\n\nProcesamos tu solicitud de baja n.º {{ $json.data.id }}. {{ $json.data.retainedSummary }}\n\nSi no la pediste, contacta a la administración de tu institución.",
+        "options": {}
+      }
+    },
+    {
+      "id": "d7c00f51-82dd-4e50-9872-65e6cde24873",
+      "name": "Registrar aviso enviado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        -80
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuración').item.json.apiUrl }}/integrations/deletion-requests/{{ $('Solicitud de baja (webhook)').item.json.body.requestId }}/notified",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 15000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ status: 'sent' }) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Solicitud de baja (webhook)": {
+      "main": [
+        [
+          {
+            "node": "Configuración",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuración": {
+      "main": [
+        [
+          {
+            "node": "Procesar baja en MENTOR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Procesar baja en MENTOR": {
+      "main": [
+        [
+          {
+            "node": "¿Completada?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Completada?": {
+      "main": [
+        [
+          {
+            "node": "Confirmar al usuario",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Confirmar al usuario": {
+      "main": [
+        [
+          {
+            "node": "Registrar aviso enviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Costa_Rica"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}
