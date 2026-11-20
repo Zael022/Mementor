@@ -1,6 +1,7 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Avatar from './Avatar.jsx';
+import AvisoConsentimiento from './AvisoConsentimiento.jsx';
 import BarraLateral from './BarraLateral.jsx';
 import { Cargando } from './Estados.jsx';
 import LimiteErrores from './LimiteErrores.jsx';
@@ -12,6 +13,7 @@ const ROLES = {
   institution_admin: 'Administración de institución',
   teacher: 'Docente',
   student: 'Estudiante',
+  auditor: 'Auditoría',
 };
 
 // Estructura tipo aula: barra superior, barra lateral con las clases y el contenido de cada página.
@@ -62,6 +64,7 @@ export default function Layout() {
       </header>
       <div className="aula-cuerpo">
         <BarraLateral />
+        <AvisoConsentimiento />
         {/* Velo que cierra el menú al tocar fuera en pantallas angostas. */}
         <div className="velo" aria-hidden="true" onClick={() => setMenuAbierto(false)} />
         <main id="contenido" className="contenido" key={pathname} ref={principal} tabIndex={-1}>

@@ -5,7 +5,7 @@ import { pageMeta } from '../utils/http.js';
 import { recordAudit } from './auditService.js';
 
 const INVITATION_HOURS = 72;
-const INSTITUTION_ROLES = ['institution_admin', 'teacher', 'student'];
+const INSTITUTION_ROLES = ['institution_admin', 'teacher', 'student', 'auditor'];
 
 function toDto(user) {
   return {

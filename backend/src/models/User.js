@@ -8,7 +8,7 @@ export const User = sequelize.define('User', {
   email: { type: DataTypes.STRING(190), allowNull: false, unique: true },
   passwordHash: { type: DataTypes.STRING(255), allowNull: true },
   displayName: { type: DataTypes.STRING(120), allowNull: false },
-  role: { type: DataTypes.ENUM('platform_admin', 'institution_admin', 'teacher', 'student'), allowNull: false },
+  role: { type: DataTypes.ENUM('platform_admin', 'institution_admin', 'teacher', 'student', 'auditor'), allowNull: false },
   status: { type: DataTypes.ENUM('invited', 'active', 'disabled'), allowNull: false, defaultValue: 'invited' },
   invitationTokenHash: { type: DataTypes.CHAR(64), allowNull: true },
   invitationExpiresAt: { type: DataTypes.DATE, allowNull: true },
@@ -20,4 +20,5 @@ export const User = sequelize.define('User', {
   bio: { type: DataTypes.STRING(500), allowNull: true },
   avatarFile: { type: DataTypes.STRING(64), allowNull: true },
   avatarUpdatedAt: { type: DataTypes.DATE, allowNull: true },
+  anonymizedAt: { type: DataTypes.DATE, allowNull: true },
 }, { tableName: 'users', underscored: true });

@@ -9,6 +9,7 @@ import knowledgeRoutes from './knowledgeRoutes.js';
 import driveRoutes from './driveRoutes.js';
 import gamificationRoutes from './gamificationRoutes.js';
 import workspaceRoutes from './workspaceRoutes.js';
+import governanceRoutes from './governanceRoutes.js';
 import personalizationRoutes from './personalizationRoutes.js';
 import profileRoutes from './profileRoutes.js';
 
@@ -24,6 +25,7 @@ router.use(knowledgeRoutes);
 router.use(driveRoutes);
 router.use(gamificationRoutes);
 router.use(workspaceRoutes);
+router.use(governanceRoutes);
 router.use(personalizationRoutes);
 router.use(profileRoutes);
 export default router;

@@ -27,7 +27,7 @@ const ETIQUETAS = {
   active: 'Activo', invited: 'Invitado', disabled: 'Deshabilitado', withdrawn: 'Retirado', inactive: 'Inactiva',
   pending: 'Pendiente', processing: 'Procesando', ready: 'Listo', error: 'Error', retired: 'Retirada', superseded: 'Reemplazada',
   not_indexed: 'Sin indexar', not_indexable: 'No indexable', idle: 'Al día', running: 'Sincronizando', interrupted: 'Interrumpida',
-  enabled: 'Habilitada', creating: 'Creando',
+  enabled: 'Habilitada', creating: 'Creando', completed: 'Completada', rejected: 'Rechazada',
 };
 
 export function Insignia({ estado }) {

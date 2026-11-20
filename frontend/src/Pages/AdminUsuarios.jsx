@@ -12,6 +12,7 @@ const ROLES = [
   { valor: 'student', texto: 'Estudiante' },
   { valor: 'teacher', texto: 'Docente' },
   { valor: 'institution_admin', texto: 'Administrador de institución' },
+  { valor: 'auditor', texto: 'Auditoría (solo lectura)' },
 ];
 const nombreRol = (rol) => ROLES.find((opcion) => opcion.valor === rol)?.texto || rol;
 
