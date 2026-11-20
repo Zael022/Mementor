@@ -1,6 +1,6 @@
 import { sequelize } from '../config/database.js';
 import { Institution } from './Institution.js';
-import { User } from './User.js';
+import { Role, User } from './User.js';
 import { UserSession } from './UserSession.js';
 import { Course, CourseTeacher, Enrollment } from './Course.js';
 import { Module, Topic, TopicPrerequisite, Lesson, LessonProgress } from './Content.js';
@@ -96,6 +96,7 @@ Material.hasOne(KnowledgeSource, { foreignKey: 'materialId', as: 'knowledgeSourc
 Course.hasOne(CourseGradePolicy, { foreignKey: 'courseId', as: 'gradePolicy' });
 ClassWorkItem.hasMany(ClassWorkGrade, { foreignKey: 'itemId', as: 'grades' });
 DataDeletionRequest.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.belongsTo(Role, { foreignKey: 'role', targetKey: 'code', as: 'roleInfo', constraints: false });
 QuickQuiz.belongsTo(Course, { foreignKey: 'courseId', as: 'course' });
 QuickQuiz.hasMany(QuickQuizQuestion, { foreignKey: 'quizId', as: 'questions' });
 QuickQuizQuestion.belongsTo(QuickQuiz, { foreignKey: 'quizId', as: 'quiz' });
@@ -124,5 +125,5 @@ export {
   TopicMastery, LearningRecommendation, AiThread, AiMessage, AuditLog,
   CourseGradePolicy, ClassWorkItem, ClassWorkGrade, QuickQuiz, QuickQuizQuestion, QuickQuizOption, QuizPlay, QuizPlayAnswer,
   DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent, PasswordReset,
-  ConsentRecord, DataDeletionRequest, AgentRun, ExchangeRate, IntegrationRun,
+  ConsentRecord, DataDeletionRequest, AgentRun, ExchangeRate, IntegrationRun, Role,
 };
