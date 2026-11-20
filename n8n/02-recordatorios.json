@@ -1,0 +1,179 @@
+{
+  "name": "MENTOR AI · 2. Recordatorios de tareas y racha",
+  "nodes": [
+    {
+      "id": "58e66df9-d213-4984-90d2-c325be4c013c",
+      "name": "Todos los días 16:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 16
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "f0a543a1-edbd-44a6-a3f1-a68be170787b",
+      "name": "Configuración",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4ea12a1f-9f16-49fe-aeaa-35948de01e5b",
+              "name": "apiUrl",
+              "value": "https://TU-API.onrender.com/api/v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "e5af1e19-a878-4e5a-a402-4a5921e72959",
+      "name": "Pedir recordatorios",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Configuración').item.json.apiUrl }}/integrations/daily-reminders",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 15000
+        }
+      }
+    },
+    {
+      "id": "3d049019-b2bb-45c6-8a6a-db8d650a3967",
+      "name": "Una persona por correo",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        660,
+        0
+      ],
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      }
+    },
+    {
+      "id": "97d45d30-137b-4404-b7b5-a7c43225956c",
+      "name": "Redactar mensaje",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Arma el texto del correo con las tareas y la racha pendientes.\nconst lineas = $json.items.map((i) => i.type === 'racha' ? `• ${i.course}: ${i.title}` : `• ${i.course}: «${i.title}» vence ${new Date(i.dueAt).toLocaleString('es-CR', { timeZone: 'America/Costa_Rica' })}`);\nreturn { json: { email: $json.email, asunto: 'Tus pendientes de hoy en MENTOR AI', texto: `Hola, ${$json.name}:\\n\\nTe recordamos:\\n${lineas.join('\\n')}\\n\\n¡Tú puedes!` } };"
+      }
+    },
+    {
+      "id": "3ac8554a-5a1d-46b8-83e4-378695a0bc6f",
+      "name": "Enviar recordatorio",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        0
+      ],
+      "parameters": {
+        "fromEmail": "MENTOR AI <no-responder@tu-dominio.com>",
+        "toEmail": "={{ $json.email }}",
+        "subject": "={{ $json.asunto }}",
+        "emailFormat": "text",
+        "text": "={{ $json.texto }}",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Todos los días 16:00": {
+      "main": [
+        [
+          {
+            "node": "Configuración",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuración": {
+      "main": [
+        [
+          {
+            "node": "Pedir recordatorios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pedir recordatorios": {
+      "main": [
+        [
+          {
+            "node": "Una persona por correo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Una persona por correo": {
+      "main": [
+        [
+          {
+            "node": "Redactar mensaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redactar mensaje": {
+      "main": [
+        [
+          {
+            "node": "Enviar recordatorio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Costa_Rica"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

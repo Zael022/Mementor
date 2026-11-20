@@ -26,6 +26,8 @@ const env = {
   AI_API_KEY: 'clave-del-doble-local',
   AI_MODEL: 'modelo-doble-e2e',
   AI_BASE_URL: `http://127.0.0.1:${process.env.E2E_FAKE_AI_PORT || '4599'}/v1/messages`,
+  EXCHANGE_RATE_URL: `http://127.0.0.1:${process.env.E2E_FAKE_AI_PORT || '4599'}/hacienda`,
+  HOLIDAYS_URL: `http://127.0.0.1:${process.env.E2E_FAKE_AI_PORT || '4599'}/feriados`,
   UPLOAD_DIR: 'storage/uploads-e2e',
   DRIVE_SYNC_INTERVAL_MINUTES: '0',
 };

@@ -31,6 +31,19 @@ function agentReply(system) {
 http.createServer((req, res) => {
   // /__log devuelve cuántas llamadas recibió (las pruebas comprueban que un aviso no llama al modelo).
   if (req.url === '/__log') { res.end(JSON.stringify(log)); return; }
+  // Dobles de las APIs públicas (Hacienda y Nager.Date) para que las pruebas no dependan de internet.
+  if (req.url === '/hacienda') {
+    const fecha = new Date().toISOString().slice(0, 10);
+    res.setHeader('content-type', 'application/json');
+    res.end(JSON.stringify({ venta: { fecha, valor: 462.29 }, compra: { fecha, valor: 456.56 } }));
+    return;
+  }
+  if (req.url.startsWith('/feriados/')) {
+    const anio = req.url.split('/')[2];
+    res.setHeader('content-type', 'application/json');
+    res.end(JSON.stringify([{ date: `${anio}-12-25`, localName: 'Navidad' }, { date: `${anio}-12-01`, localName: 'Día de la Abolición del Ejército' }]));
+    return;
+  }
   let raw = '';
   req.on('data', (c) => { raw += c; });
   req.on('end', async () => {

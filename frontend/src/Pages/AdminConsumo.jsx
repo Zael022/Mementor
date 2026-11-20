@@ -1,4 +1,5 @@
 import { Cargando, MensajeError } from '../Componentes/Estados.jsx';
+import TipoCambio, { CostoEstimado } from '../Componentes/TipoCambio.jsx';
 import { useDatos } from '../hooks/useDatos.js';
 
 const RESULTADOS = {
@@ -18,6 +19,10 @@ export default function AdminConsumo() {
     <>
       <h1>Consumo del tutor</h1>
       <p className="tenue">Últimos {datos.days} días. El registro no guarda preguntas, respuestas ni contenido de documentos.</p>
+      <div className="dos-columnas-auto">
+        <TipoCambio />
+        <CostoEstimado />
+      </div>
       <section className="tarjeta">
         <p>Consultas en las últimas 24 h: <strong>{datos.usedLast24h}</strong> de un tope institucional de <strong>{datos.dailyLimit}</strong> (máximo {datos.perUserDailyLimit} por persona).</p>
       </section>

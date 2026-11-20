@@ -806,3 +806,11 @@ img.con-foto { object-fit: cover; background: var(--suave-neutro); padding: 0; }
 .riesgo.bajo { background: #eef9d4; color: var(--lima-hondo); }
 .riesgo.medio { background: #fff3cd; color: #7a5300; }
 .riesgo.alto { background: #fde7e5; color: var(--error); }
+
+/* ===== APIs externas ===== */
+.dos-columnas-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.tipo-cambio-valores { display: flex; gap: 28px; margin: 6px 0 10px; }
+.tipo-cambio-valores div { display: flex; flex-direction: column; }
+.tipo-cambio-valores strong { font-family: var(--titulos); font-size: 1.9rem; color: var(--azul-hondo); }
+.costo-grande { font-family: var(--titulos); font-size: 1.6rem; margin: 6px 0; }
+.feriado { order: 3; margin-top: 4px; font-size: 0.7rem; font-weight: 700; color: var(--naranja-hondo); background: #fff1e8; padding: 2px 6px; border-radius: 999px; text-align: center; }
