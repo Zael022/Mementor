@@ -5,7 +5,7 @@ services:
     name: mentor-api
     runtime: node
     plan: free
-    region: oregon
+    region: virginia
     rootDir: backend
     buildCommand: npm ci
     # Aplica las migraciones pendientes antes de arrancar (el plan gratuito no tiene paso previo al despliegue).

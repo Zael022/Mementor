@@ -19,13 +19,17 @@ Este archivo es coherente con `CLAUDE.md`; si hay contradicción, mandan `CLAUDE
 9. Todo texto de documentos o preguntas que va al modelo pasa por `asData` (sin `<` ni `>`); el historial va sin marcas `[S#]`.
 10. Archivos subidos: extensión, tipo y primeros bytes deben coincidir.
 11. Tareas periódicas solo con el turno de `job_leases`; con varias instancias, `RATE_LIMIT_STORE=mysql` y `TRUST_PROXY`.
-12. Quizzes y racha: el tiempo lo mide el servidor (`utils/clock.js`, que las pruebas reemplazan); la clave sale solo después de responder; todo bono pasa por `awardBonus` (índice único). La nota se calcula en `gradeService` (ADR 0004).
+12. Sesión: JWT firmado (`utils/jwt.js`) en cookie httpOnly y revocable en `user_sessions`; contraseñas con bcrypt. Agentes de IA solo en `services/agents` (`agentRegistry`), con permisos por rol, salida validada y registro en `agent_runs`. Integraciones externas en `services/external` con tiempo de espera; n8n entra solo por `/integrations/*` con `x-integration-key`.
+13. Quizzes y racha: el tiempo lo mide el servidor (`utils/clock.js`, que las pruebas reemplazan); la clave sale solo después de responder; todo bono pasa por `awardBonus` (índice único). La nota se calcula en `gradeService` (ADR 0004).
 
 ## Antes de entregar
 - `backend`: `npm run lint` y `npm test` (MySQL de pruebas).
 - `frontend`: `npm run lint`, `npm test` y `npm run build`; si cambia un recorrido de la interfaz, `npm run test:e2e` (base `_e2e`).
 - GitHub Actions (`.github/workflows/ci.yml`) repite todo con MySQL 8.4 en cada push.
 - Actualiza `docs/ESTADO_DESARROLLO_PARA_CLAUDE.md` con resultados reales. Separa las pruebas con dobles de las que usaron servicios reales.
+
+## Documentos
+Los entregables de `docs/entregables/` (Word y PDF) se armaron a partir de `docs/datos/` (modelo y diccionario generados desde las migraciones), `docs/mockups/` (capturas con `playwright.capturas.config.js`) y `docs/marca/`. Si cambian pantallas o tablas, actualiza esas fuentes y los documentos.
 
 ## Mapa rápido del tutor con fuentes
 `knowledgeService` (fuentes, versiones, importación, retiro, limpieza) → `retrievalService` (local o `vertexRagClient`) → `tutorService` (prompt, validación Zod, citas, historial) → `aiProvider` (JSON o streaming) → `usageService` (cuota y consumo). Drive: `driveClient` + `driveSyncService`.

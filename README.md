@@ -3,7 +3,21 @@
 Plataforma educativa adaptativa: cursos, lecciones, cuestionarios con corrección automática, dominio por tema, recomendaciones explicadas, aula (clases en vivo, materiales, tareas) y un **tutor de IA que responde solo con el material autorizado del curso y cita la fuente**.
 
 **Stack:** React + Vite (JSX) · Node.js + Express · MySQL 8 + Sequelize (migraciones) · Google Cloud RAG Engine (opcional) · Anthropic u OpenAI para generar respuestas.
-**Sin datos precargados:** después de migrar, la base queda vacía. No hay seeds, cuentas demo ni IA simulada.
+**Sin datos precargados:** después de migrar, la base queda vacía (solo el catálogo de roles). No hay seeds, cuentas demo ni IA simulada.
+
+**En producción:** frontend https://mentor-ai.vercel.app · API https://mentor-api.onrender.com/api/v1 (se confirman al desplegar; ver `docs/despliegue.md`).
+
+## Entregables del Proyecto Final (FWD Costa Rica)
+| Documento | Word y PDF |
+| --- | --- |
+| Anteproyecto (introducción, desarrollo, objetivos, RF/RNF, historias, mockups, libro de marca y cronograma) | `docs/entregables/Anteproyecto_MENTOR_AI.*` |
+| Modelo de datos (diagramas ER y diccionario) | `docs/entregables/Modelo_de_datos_MENTOR_AI.*` y `docs/datos/` |
+| Libro de marca | `docs/entregables/Libro_de_marca_MENTOR_AI.*` y `docs/marca/` |
+| Plan de producción | `docs/entregables/Plan_de_Produccion_MENTOR_AI.*` y `docs/produccion/` |
+| Agentes de IA y APIs externas | `docs/agentes-ia.md`, `docs/apis-externas.md` |
+| Workflows de n8n exportados | `n8n/` |
+
+Seguridad: contraseñas con **bcrypt**, sesión con **JWT** (secreto y expiración en `.env`) en cookie httpOnly, roles validados en el backend (administración de plataforma, administración de institución, docente, estudiante y auditoría). Ramas: `main`, `develop`, `feature/…` y `fix/…` con pull requests.
 
 ## Requisitos
 - Node.js **22.12 o superior** (22 LTS recomendado). El SDK de Anthropic y las librerías de Google lo exigen.
@@ -142,12 +156,12 @@ Recorrido: el docente crea un quiz en *Quizzes*, le agrega preguntas y lo public
 ## 5. Pruebas
 
 ```powershell
-# Backend: 89 pruebas en mentor_ai_test (crean y borran sus datos). Google Cloud y el generador son dobles.
+# Backend: 139 pruebas en mentor_ai_test (crean y borran sus datos). Google Cloud, la IA y las APIs externas son dobles.
 cd backend
 npm run lint
 npm test
 
-# Frontend: lint, 34 pruebas de componentes y hooks (Vitest + jsdom) y compilación
+# Frontend: lint, 46 pruebas de componentes y hooks (Vitest + jsdom) y compilación
 cd ..\frontend
 npm run lint
 npm test
@@ -164,7 +178,9 @@ cd frontend
 npx playwright install chromium
 npm run test:e2e
 ```
-Usa los datos de conexión de `backend/.env`. Para cambiar puertos o base: `E2E_DB_NAME`, `E2E_API_PORT` (3101), `E2E_WEB_PORT` (5174) y `E2E_FAKE_AI_PORT` (4599).
+Son 24 pruebas. Usan los datos de conexión de `backend/.env`.
+
+Las capturas de los mockups (escritorio y móvil) se generan con `npx playwright test -c playwright.capturas.config.js` sobre la misma base `_e2e` y quedan en `frontend/capturas/salida/` (no se versionan; las optimizadas están en `docs/mockups/`). Para cambiar puertos o base: `E2E_DB_NAME`, `E2E_API_PORT` (3101), `E2E_WEB_PORT` (5174) y `E2E_FAKE_AI_PORT` (4599).
 
 ### Integración continua
 `.github/workflows/ci.yml` corre en GitHub Actions en cada push y pull request: lint y pruebas del backend con **MySQL 8.4**, lint, pruebas y compilación del frontend, y las pruebas en navegador. No necesita secretos.
@@ -174,6 +190,9 @@ Las pruebas automáticas **nunca** llaman a Google Cloud ni al proveedor de IA: 
 - **Modo vertex:** usa un **proyecto de prueba** y material de prueba, configura la sección 3 y repite el recorrido. Comprueba en la consola de Google Cloud que el bucket tiene objetos `mentor-ai/i*/c*/s*/v*.txt` y que el corpus del curso tiene sus archivos.
 
 ## 6. Producción
+
+Despliegue paso a paso (TiDB Cloud, Render, Vercel y n8n) en `docs/despliegue.md`; justificación, costos, respaldos y pruebas en el Plan de Producción. Las variables necesarias están en `backend/.env.example` (solo nombres).
+
 
 - **Proxy o balanceador.** Define `TRUST_PROXY` con la cantidad de proxies delante del backend (normalmente `1`) o sus direcciones. Sin esto, todas las peticiones parecen venir de la IP del proxy y los límites de intentos se comparten entre todos los usuarios. El valor `true` se rechaza porque permitiría falsificar la IP.
 - **Varias instancias.** Con `RATE_LIMIT_STORE=mysql` los límites por IP se cuentan en MySQL y valen para todas las instancias. Las tareas periódicas (importaciones, limpieza, retención y Drive) solo las ejecuta la instancia que tiene el turno en `job_leases`; si se apaga, otra lo toma en 90 segundos. La cuota diaria del tutor ya se reserva en MySQL.
@@ -200,6 +219,8 @@ backend/src/{config,models,controllers,services,routes,middlewares,validators,ut
 backend/database/migrations   # solo esquema
 docs/adr/                      # decisiones de arquitectura
 docs/gobernanza/               # inventario de datos y registro de riesgos
+docs/entregables/              # anteproyecto, modelo de datos, libro de marca y plan de producción (Word y PDF)
+n8n/                           # workflows exportados
 frontend/tests · frontend/e2e  # pruebas de componentes y en navegador
 .github/workflows/ci.yml       # integración continua
 ```
