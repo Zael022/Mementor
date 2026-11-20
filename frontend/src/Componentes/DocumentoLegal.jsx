@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSesion } from '../context/SesionContext.jsx';
+import Logo from './Logo.jsx';
 
 // Marco común de los documentos legales: se leen con o sin sesión iniciada.
 export default function DocumentoLegal({ titulo, version, children }) {
@@ -9,7 +10,7 @@ export default function DocumentoLegal({ titulo, version, children }) {
   return (
     <div className="documento-legal">
       <header>
-        <Link to={usuario ? '/' : '/login'} className="marca">MENTOR <span>AI</span></Link>
+        <Logo como={Link} to={usuario ? '/' : '/login'} aria-label="MENTOR AI, volver" />
         <Link to={usuario ? '/' : '/login'} className="volver">{usuario ? '← Volver a la plataforma' : '← Volver a iniciar sesión'}</Link>
       </header>
       <article className="tarjeta">

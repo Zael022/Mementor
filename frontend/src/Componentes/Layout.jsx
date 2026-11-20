@@ -2,6 +2,8 @@ import { Suspense, useEffect, useRef, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Avatar from './Avatar.jsx';
 import AvisoConsentimiento from './AvisoConsentimiento.jsx';
+import Logo from './Logo.jsx';
+import Icono from './Iconos.jsx';
 import BarraLateral from './BarraLateral.jsx';
 import { Cargando } from './Estados.jsx';
 import LimiteErrores from './LimiteErrores.jsx';
@@ -50,7 +52,7 @@ export default function Layout() {
           aria-controls="barra-lateral" onClick={() => setMenuAbierto((abierto) => !abierto)}>
           <span aria-hidden="true" />
         </button>
-        <Link to="/" className="marca">MENTOR <span>AI</span></Link>
+        <Logo como={Link} to="/" aria-label="MENTOR AI, ir al inicio" />
         <div className="perfil">
           <Link to="/configuracion" className="perfil-enlace" aria-label="Configuración de tu perfil">
             <Avatar nombre={usuario.displayName} url={usuario.avatarUrl} className="perfil-inicial" />
@@ -59,7 +61,7 @@ export default function Layout() {
             <strong>{usuario.displayName}</strong>
             <span>{ROLES[usuario.role]}{usuario.institutionName ? `, ${usuario.institutionName}` : ''}</span>
           </div>
-          <button type="button" className="boton secundario" onClick={salir}>Cerrar sesión</button>
+          <button type="button" className="boton secundario con-icono" onClick={salir}><Icono nombre="salir" tamano={18} />Cerrar sesión</button>
         </div>
       </header>
       <div className="aula-cuerpo">

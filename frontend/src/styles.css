@@ -83,9 +83,13 @@ code { background: var(--cielo); padding: 1px 6px; border-radius: 6px; font-size
 /* ===== Estructura ===== */
 .app { min-height: 100vh; display: flex; flex-direction: column; }
 .cabecera { background: var(--panel); display: flex; align-items: center; gap: 30px; padding: 12px clamp(16px, 5vw, 56px); border-bottom: 1px solid var(--linea); position: sticky; top: 0; z-index: 20; flex-wrap: wrap; }
-.marca { display: inline-flex; align-items: center; gap: 9px; font-family: var(--titulos); font-weight: 800; font-size: 1.3rem; letter-spacing: -0.03em; color: var(--tinta); margin: 0; text-decoration: none; }
-.marca span { color: var(--enlace); }
-.marca::before { content: ''; width: 22px; height: 22px; border-radius: 7px 7px 7px 2px; background: var(--azul); box-shadow: inset -7px -7px 0 var(--lima); }
+.marca { display: inline-flex; align-items: center; gap: 10px; font-family: var(--titulos); font-weight: 800; font-size: 1.3rem; line-height: 1; letter-spacing: -0.035em; color: var(--tinta); margin: 0; text-decoration: none; white-space: nowrap; }
+.marca .isotipo { flex: none; width: 1.45em; height: 1.45em; }
+.marca-ai { display: inline-block; margin-left: 0.08em; padding: 0.07em 0.22em 0.11em; border-radius: 0.24em; background: var(--azul); color: #fff; font-size: 0.82em; letter-spacing: 0; vertical-align: 0.06em; }
+/* Íconos de línea con un tono suave de relleno. */
+.icono { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.icono .icono-tono { fill: currentColor; fill-opacity: 0.16; stroke: none; }
+.con-icono { display: inline-flex; align-items: center; gap: 8px; }
 .cabecera nav { display: flex; gap: 2px; flex: 1; flex-wrap: wrap; }
 .cabecera nav a { color: var(--tenue); text-decoration: none; font-weight: 600; padding: 8px 14px; border-radius: var(--radio-control); transition: color 0.2s, background 0.2s; }
 .cabecera nav a:hover { color: var(--tinta); background: var(--fondo); }
@@ -492,7 +496,7 @@ html[data-movimiento="reducido"] .confeti { display: none; }
 .barra-lateral a { display: flex; align-items: center; gap: 14px; padding: 10px 18px 10px 22px; border-radius: 0 999px 999px 0; color: var(--tinta); text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: background 0.2s, color 0.2s; }
 .barra-lateral a:hover { background: var(--fondo); }
 .barra-lateral a.active { background: var(--cielo); color: var(--azul-hondo); }
-.barra-lateral .icono { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.barra-lateral a.active .icono-tono { fill-opacity: 0.28; }
 .barra-titulo { font-family: var(--texto); font-size: 0.82rem; font-weight: 700; color: var(--tenue); text-transform: uppercase; letter-spacing: 0.04em; margin: 18px 0 6px 22px; padding-top: 14px; border-top: 1px solid var(--linea); }
 .barra-clases a { padding-block: 8px; }
 .inicial-curso { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: #fff; font-size: 0.85rem; font-weight: 700; }
@@ -786,9 +790,10 @@ img.con-foto { object-fit: cover; background: var(--suave-neutro); padding: 0; }
 .documento-legal header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
 .documento-legal h2 { margin-top: 28px; font-size: 1.25rem; }
 .documento-legal li { margin-bottom: 6px; }
-.enlaces-legales, .barra-legal { display: flex; gap: 14px; flex-wrap: wrap; }
+.enlaces-legales { display: flex; gap: 14px; flex-wrap: wrap; }
 .enlaces-legales { margin-top: 32px; padding-top: 14px; border-top: 1px solid var(--linea); }
-.barra-legal { padding: 10px 22px 0; color: var(--tenue); }
+.barra-lateral .barra-legal a { padding-block: 7px; font-size: 0.86rem; font-weight: 500; color: var(--tenue); }
+.barra-lateral .barra-legal a.active { color: var(--azul-hondo); }
 .casilla { display: flex; align-items: flex-start; gap: 10px; margin: 10px 0; cursor: pointer; }
 .casilla input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--azul); flex: none; }
 .dialogo-consentimiento { max-width: 520px; border: 0; border-radius: var(--radio-grande); padding: 26px; box-shadow: var(--sombra-alta); background: var(--panel); color: var(--tinta); }
@@ -814,3 +819,4 @@ img.con-foto { object-fit: cover; background: var(--suave-neutro); padding: 0; }
 .tipo-cambio-valores strong { font-family: var(--titulos); font-size: 1.9rem; color: var(--azul-hondo); }
 .costo-grande { font-family: var(--titulos); font-size: 1.6rem; margin: 6px 0; }
 .feriado { order: 3; margin-top: 4px; font-size: 0.7rem; font-weight: 700; color: var(--naranja-hondo); background: #fff1e8; padding: 2px 6px; border-radius: 999px; text-align: center; }
+.boton.con-icono { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
