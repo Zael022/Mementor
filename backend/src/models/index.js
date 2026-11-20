@@ -12,6 +12,7 @@ import {
 import {
   CourseRagCorpus, KnowledgeSource, SourceVersion, AiMessageSource, InstitutionDriveFolder, CourseDriveLink, AiUsageEvent,
 } from './Knowledge.js';
+import { PasswordReset } from './PasswordReset.js';
 import {
   CourseGradePolicy, ClassWorkItem, ClassWorkGrade, QuickQuiz, QuickQuizQuestion, QuickQuizOption, QuizPlay, QuizPlayAnswer,
   DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent,
@@ -118,5 +119,5 @@ export {
   Assessment, Question, QuestionOption, AssessmentAttempt, AttemptAnswer,
   TopicMastery, LearningRecommendation, AiThread, AiMessage, AuditLog,
   CourseGradePolicy, ClassWorkItem, ClassWorkGrade, QuickQuiz, QuickQuizQuestion, QuickQuizOption, QuizPlay, QuizPlayAnswer,
-  DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent,
+  DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent, PasswordReset,
 };
