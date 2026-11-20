@@ -1,68 +1,47 @@
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useSesion } from '../context/SesionContext.jsx';
 import { useDatos } from '../hooks/useDatos.js';
 import { colorDeCurso, rutaDeCurso } from '../utils/cursos.js';
+import Icono from './Iconos.jsx';
 
 // Enlaces generales de cada rol; las clases se agregan debajo para docentes y estudiantes.
 const GENERAL = {
   platform_admin: [
-    { to: '/plataforma/instituciones', texto: 'Instituciones', icono: 'casa' },
-    { to: '/admin/auditoria', texto: 'Auditoría', icono: 'lista' },
-    { to: '/admin/gobernanza', texto: 'Gobernanza', icono: 'escudo' },
+    { to: '/plataforma/instituciones', texto: 'Instituciones', icono: 'instituciones' },
+    { to: '/admin/auditoria', texto: 'Auditoría', icono: 'bitacora' },
+    { to: '/admin/gobernanza', texto: 'Gobernanza', icono: 'gobernanza' },
   ],
   institution_admin: [
     { to: '/admin/usuarios', texto: 'Usuarios', icono: 'personas' },
-    { to: '/admin/cursos', texto: 'Cursos', icono: 'casa' },
+    { to: '/admin/cursos', texto: 'Cursos', icono: 'cursos' },
     { to: '/calendario', texto: 'Calendario', icono: 'calendario' },
-    { to: '/admin/drive', texto: 'Drive', icono: 'carpeta' },
-    { to: '/admin/consumo', texto: 'Consumo IA', icono: 'grafica' },
-    { to: '/asistentes', texto: 'Asistentes IA', icono: 'chispa' },
-    { to: '/admin/auditoria', texto: 'Auditoría', icono: 'lista' },
-    { to: '/admin/gobernanza', texto: 'Gobernanza', icono: 'escudo' },
+    { to: '/admin/drive', texto: 'Drive', icono: 'drive' },
+    { to: '/admin/consumo', texto: 'Consumo IA', icono: 'consumo' },
+    { to: '/asistentes', texto: 'Asistentes IA', icono: 'asistentes' },
+    { to: '/admin/auditoria', texto: 'Auditoría', icono: 'bitacora' },
+    { to: '/admin/gobernanza', texto: 'Gobernanza', icono: 'gobernanza' },
   ],
   // Auditoría: solo lectura de bitácoras y gobernanza.
   auditor: [
-    { to: '/auditoria/bitacora', texto: 'Bitácora', icono: 'lista' },
-    { to: '/auditoria/gobernanza', texto: 'Gobernanza', icono: 'escudo' },
-    { to: '/asistentes', texto: 'Asistentes IA', icono: 'chispa' },
+    { to: '/auditoria/bitacora', texto: 'Bitácora', icono: 'bitacora' },
+    { to: '/auditoria/gobernanza', texto: 'Gobernanza', icono: 'gobernanza' },
+    { to: '/asistentes', texto: 'Asistentes IA', icono: 'asistentes' },
   ],
   teacher: [
-    { to: '/docente/cursos', texto: 'Página principal', icono: 'casa' },
+    { to: '/docente/cursos', texto: 'Página principal', icono: 'inicio' },
     { to: '/calendario', texto: 'Calendario', icono: 'calendario' },
-    { to: '/pendientes', texto: 'Por revisar', icono: 'lista' },
-    { to: '/asistentes', texto: 'Asistentes IA', icono: 'chispa' },
+    { to: '/pendientes', texto: 'Por revisar', icono: 'revisar' },
+    { to: '/asistentes', texto: 'Asistentes IA', icono: 'asistentes' },
   ],
   student: [
-    { to: '/estudiante/inicio', texto: 'Página principal', icono: 'casa' },
+    { to: '/estudiante/inicio', texto: 'Página principal', icono: 'inicio' },
     { to: '/calendario', texto: 'Calendario', icono: 'calendario' },
-    { to: '/pendientes', texto: 'Pendientes', icono: 'lista' },
+    { to: '/pendientes', texto: 'Pendientes', icono: 'pendientes' },
     { to: '/estudiante/plan', texto: 'Mi plan', icono: 'plan' },
-    { to: '/estudiante/progreso', texto: 'Mi progreso', icono: 'grafica' },
-    { to: '/asistentes', texto: 'Asistentes IA', icono: 'chispa' },
+    { to: '/estudiante/progreso', texto: 'Mi progreso', icono: 'progreso' },
+    { to: '/asistentes', texto: 'Asistentes IA', icono: 'asistentes' },
   ],
 };
-
-// Íconos lineales propios, decorativos.
-const ICONOS = {
-  casa: 'M4 11l8-7 8 7v9h-5v-6H9v6H4z',
-  calendario: 'M5 6h14v14H5zM5 10h14M9 3v5M15 3v5',
-  lista: 'M9 6h11M9 12h11M9 18h11M4 6h1M4 12h1M4 18h1',
-  personas: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20c0-3 3-5 6-5s6 2 6 5M16 11a3 3 0 1 0 0-6M21 20c0-2.5-2-4.4-4.5-4.9',
-  carpeta: 'M3 7h7l2 2h9v10H3z',
-  grafica: 'M4 20V4M4 20h16M8 16v-4M12 16V8M16 16v-6',
-  plan: 'M5 4h14v16H5zM8 9l2 2 4-4M8 15h8',
-  chispa: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z',
-  escudo: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',
-  ajustes: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19 12l2-1-1-3-2 .4-1.5-1.5L17 5l-3-1-1 2h-2L10 4 7 5l.5 1.9L6 8.4 4 8 3 11l2 1v0l-2 1 1 3 2-.4 1.5 1.5L7 19l3 1 1-2h2l1 2 3-1-.5-1.9 1.5-1.5 2 .4 1-3z',
-};
-
-function Icono({ nombre }) {
-  return (
-    <svg className="icono" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
-      <path d={ICONOS[nombre]} />
-    </svg>
-  );
-}
 
 // Barra lateral tipo aula: accesos generales, la lista de clases y la configuración.
 export default function BarraLateral() {
@@ -100,8 +79,9 @@ export default function BarraLateral() {
 
       <ul className="barra-pie">
         <li><NavLink to="/configuracion"><Icono nombre="ajustes" />Configuración</NavLink></li>
+        <li className="barra-legal"><NavLink to="/privacidad"><Icono nombre="privacidad" />Privacidad</NavLink></li>
+        <li className="barra-legal"><NavLink to="/terminos"><Icono nombre="terminos" />Términos</NavLink></li>
       </ul>
-      <p className="barra-legal pequeno"><Link to="/privacidad">Privacidad</Link> · <Link to="/terminos">Términos</Link></p>
     </nav>
   );
 }
