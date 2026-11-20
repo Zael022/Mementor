@@ -1,0 +1,60 @@
+# Blueprint de Render para la API de MENTOR AI (plan gratuito).
+# Los valores secretos (sync: false) se escriben en el panel de Render; nunca en el repositorio.
+services:
+  - type: web
+    name: mentor-api
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm ci
+    # Aplica las migraciones pendientes antes de arrancar (el plan gratuito no tiene paso previo al despliegue).
+    startCommand: npm run db:migrate && npm start
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    branch: main
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22.12.0
+      - key: TRUST_PROXY
+        value: "2"
+      - key: RAG_PROVIDER
+        value: local
+      - key: DB_SSL
+        value: "true"
+      - key: FRONTEND_ORIGIN
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: AI_PROVIDER
+        sync: false
+      - key: AI_MODEL
+        sync: false
+      - key: AI_API_KEY
+        sync: false
+      - key: N8N_INTEGRATION_KEY
+        generateValue: true
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        sync: false
