@@ -38,7 +38,7 @@ Una revisión independiente (`REPORTE_REVISION_MENTOR_AI.md`) consideró el proy
 
 ## Pendiente (fuera del código)
 - **Despliegue real** y su registro de aceptación: health, inicio de sesión, tutor, archivo tras reinicio, correos, n8n y restauración de respaldos.
-- **Plan gratuito:** respuestas largas del tutor frente al corte de 30 s de Vercel, Render dormido y n8n intermitente. Para uso real hacen falta planes de pago o una cola persistente.
+- **Plan gratuito:** respuestas largas del tutor frente al límite de Vercel (120 s para el primer byte; ver ADR 0008), Render dormido y n8n intermitente. Para uso real hacen falta planes de pago o una cola persistente.
 - **Pruebas con personas:** 3–5 docentes y 5–10 estudiantes en el recorrido «crear curso → publicar → matricular → evaluar → ver recomendación», midiendo tiempo y errores.
 - **Experiencia de uso:**
   - código del curso como dato secundario en los banners;

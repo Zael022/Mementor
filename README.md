@@ -157,12 +157,12 @@ Recorrido: el docente crea un quiz en *Quizzes*, le agrega preguntas y lo public
 ## 5. Pruebas
 
 ```powershell
-# Backend: 167 pruebas en mentor_ai_test (crean y borran sus datos). Google Cloud, la IA y las APIs externas son dobles.
+# Backend: 176 pruebas en mentor_ai_test (crean y borran sus datos). Google Cloud, la IA y las APIs externas son dobles.
 cd backend
 npm run lint
 npm test
 
-# Frontend: lint, 56 pruebas de componentes y hooks (Vitest + jsdom) y compilación
+# Frontend: lint, 58 pruebas de componentes y hooks (Vitest + jsdom) y compilación
 cd ..\frontend
 npm run lint
 npm test
@@ -206,7 +206,10 @@ Despliegue paso a paso (TiDB Cloud, Render, Vercel y n8n) en `docs/despliegue.md
 - **Cambio de correo.** El correo de acceso solo cambia al abrir el enlace enviado a la nueva dirección (60 minutos, un solo uso); la dirección anterior recibe un aviso al pedirlo y al confirmarlo. Requiere SMTP configurado.
 - **Fechas.** Las fechas `AAAA-MM-DD` se validan contra el calendario (un 31 de febrero se rechaza con 422).
 - **Retención.** Una vez al día se borra el texto de versiones antiguas que ninguna respuesta cita, se resume por mes el consumo con más de 90 días, se borra el registro detallado de los asistentes con más de 90 días y se borran las conversaciones sin actividad por más de 365 días. Los plazos se cambian en `backend/.env` (0 = no borrar).
-- **Monitoreo.** `GET /api/v1/health` informa si MySQL responde y si el tutor y Google Cloud están configurados, sin exponer claves, proyectos ni proveedores.
+- **Monitoreo.** `GET /api/v1/health` informa si MySQL responde y si el tutor y Google Cloud están configurados, sin exponer claves, proyectos ni proveedores. Cada solicitud deja una línea JSON con su `requestId`, la plantilla de la ruta, el estado y la duración; `GET /api/v1/ops/metrics` (solo la cuenta de la plataforma) muestra p50/p95/p99 y errores de la instancia.
+- **Baja de cuenta.** Se completa en el servidor, en una transacción, antes de responder; n8n solo envía el correo de confirmación. Las solicitudes que hubieran quedado pendientes se completan en la conciliación diaria.
+- **Recordatorios.** Se recorren por páginas con cursor y se registra el envío por persona y día, así nadie queda fuera y un reintento no repite correos. Cada estudiante puede apagarlos en Configuración.
+- **Tutor.** La revisión automática rechaza números que no están en la fuente, números asociados a otra cosa y negaciones que contradicen el pasaje. Es una revisión por palabras, no una prueba de verdad (ADR 0008).
 
 ## Scripts
 | Carpeta | Comando | Qué hace |

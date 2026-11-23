@@ -1,4 +1,5 @@
 import { sequelize } from '../config/database.js';
+import { reconcilePendingDeletions } from './governanceService.js';
 
 // Retención de datos: cuánto tiempo se guarda cada cosa se configura en .env (0 = no borrar).
 const days = (name, fallback) => Math.max(0, Number(process.env[name] ?? fallback));
@@ -76,5 +77,6 @@ export async function runRetention() {
     usageRows: await rollupUsage(),
     conversations: await purgeOldConversations(),
     agentRuns: await purgeOldAgentRuns(),
+    pendingDeletions: await reconcilePendingDeletions(),
   };
 }

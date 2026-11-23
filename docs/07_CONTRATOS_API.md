@@ -6,6 +6,9 @@ Prefijo: `/api/v1`. JSON: `{ "data": ... , "meta": ... }` éxito; `{ "error": {"
 | Método | Ruta | Acceso | Operación |
 |---|---|---|---|
 | GET | `/health` | Público | API+DB salud sin credenciales |
+| GET | `/ops/metrics` | Cuenta de la plataforma | Latencia p50/p95/p99, errores 4xx/5xx y rutas más lentas de la instancia |
+| GET | `/integrations/daily-reminders?after=&limit=` | n8n (`x-integration-key`) | Página de recordatorios; `meta.nextCursor` hasta `null`; excluye enviados hoy y a quien los apagó |
+| POST | `/integrations/daily-reminders/deliveries` | n8n (`x-integration-key`) | `{ day, results: [{ userId, status }] }`; un enviado no vuelve a fallido |
 | POST | `/auth/login` | Público | Crear sesión |
 | POST | `/auth/logout` | Autenticado | Cerrar sesión |
 | GET | `/auth/me` | Autenticado | Perfil y rol actuales |

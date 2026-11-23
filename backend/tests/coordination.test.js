@@ -94,6 +94,22 @@ test('dos instancias con RATE_LIMIT_STORE=mysql comparten el mismo conteo', asyn
   assert.ok(await purgeExpiredRateLimits() >= 0);
 });
 
+test('un límite por cuenta no se salta cambiando la IP aparente (X-Forwarded-For)', async () => {
+  process.env.RATE_LIMIT_TEST_MAX = '2';
+  const app = express();
+  app.set('trust proxy', 2);
+  app.use(express.json());
+  app.post('/recuperar', limiter({ name: 'prueba-correo', windowMinutes: 1, max: 2, key: (req) => req.body.email }), (req, res) => res.json({ ok: true }));
+  delete process.env.RATE_LIMIT_TEST_MAX;
+  const estados = [];
+  for (const ip of ['1.1.1.1', '2.2.2.2', '3.3.3.3']) {
+    estados.push((await request(app).post('/recuperar').set('x-forwarded-for', `${ip}, 10.0.0.1`).send({ email: 'ana@prueba.test' })).status);
+  }
+  assert.deepEqual(estados, [200, 200, 429]);
+  // Otro correo tiene su propio conteo.
+  assert.equal((await request(app).post('/recuperar').send({ email: 'otra@prueba.test' })).status, 200);
+});
+
 test('la retención resume el consumo antiguo y borra chats y textos vencidos sin tocar lo citado', async () => {
   await createPlatformAdmin('operador.retencion@prueba.test');
   const org = await setupInstitution(await loginAs('operador.retencion@prueba.test'), 'Retencion');

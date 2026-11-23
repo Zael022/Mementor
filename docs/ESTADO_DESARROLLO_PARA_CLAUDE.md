@@ -1,6 +1,24 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-23. Correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+**Última actualización** — 2026-11-23. Correcciones de la auditoría de salida a producción (rama `fix/auditoria-produccion`); antes, correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+
+## Sesión 2026-11-23 (noche) · Auditoría de salida a producción
+Rama `fix/auditoria-produccion` (sobre `fix/revision-independiente`). Decisiones en `docs/adr/0008-auditoria-produccion.md`.
+
+| Hallazgo | Cambio | Prueba |
+| --- | --- | --- |
+| H-01 validador del tutor | `claimCheck.js`: contexto de cada número, negaciones contra la oración más parecida, «por ciento»; texto de la interfaz sin prometer corrección | `claimCheck.test.js` (los 4 casos de la auditoría y paráfrasis que no deben rechazarse) |
+| H-02 baja pendiente | Baja en el servidor antes de responder; n8n solo avisa; `reconcilePendingDeletions` en la retención | `integrations.test.js` (webhook 200, webhook caído, pendiente conciliada) |
+| H-03 sesión cerrada antes de tiempo | `PrivacidadDatos.jsx` distingue `completed` | `PrivacidadDatos.test.jsx` |
+| H-04 recordatorios truncados | Cursor `after`/`limit`, `reminder_deliveries` (migración `20261123000300`), `POST /integrations/daily-reminders/deliveries`, preferencia `emailReminders`, workflow 02 con paginación y registro | `integrations.test.js` |
+| H-05 copia incompleta | `exportMyData` con 19 secciones de aprendizaje y `scope` | `integrations.test.js` |
+| H-06 IP falsa | `limiter({ key })` por correo y por cuenta | `coordination.test.js` |
+| H-08 migraciones | Regla ampliar y luego contraer; sin `undo` en producción; `preDeployCommand` documentado | — |
+| H-09 observabilidad | `requestLog` JSON, `utils/requestMetrics.js`, `GET /ops/metrics` | `observability.test.js` |
+| H-10 Vercel | 120 s para el primer byte en guía y Plan de Producción | — |
+
+Ejecutado el 2026-11-23: backend lint + 176/176, frontend lint + 58/58 + build, Playwright 38/38. Prueba de la auditoría: 4/4. Entregables regenerados (modelo de datos con 64 tablas).
+Pendiente: H-07 (servicio sin suspensión y cola), H-11 (staging con TiDB y servicios reales), prueba de `TRUST_PROXY` en el despliegue, H-12 (inventario por campo y aprobación institucional), validación docente del tutor con el modelo real.
 
 ## Sesión 2026-11-23 (noche) · Correcciones de la revisión independiente
 Rama `fix/revision-independiente` (sobre `feature/seguridad-web`). Decisiones en `docs/adr/0007-revision-independiente.md`.

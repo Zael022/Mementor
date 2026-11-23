@@ -26,18 +26,21 @@ Cada llamada que llega desde n8n queda en la tabla `integration_runs`.
 - **Problema de negocio:** evitar entregas tardías y que el estudiante pierda su racha diaria por olvido.
 - **Disparador:** todos los días a las 16:00.
 - **Pasos:**
-  1. Pide a MENTOR la lista con `GET /integrations/daily-reminders`. Incluye a quienes tienen tareas que vencen en 36 horas sin entregar o la racha en riesgo hoy.
+  1. Pide a MENTOR la lista con `GET /integrations/daily-reminders?after=0&limit=200`, página por página: el nodo sigue pidiendo con `after = meta.nextCursor` hasta que llega `null`, así nadie queda fuera. Incluye a quienes tienen tareas que vencen en 36 horas sin entregar o la racha en riesgo hoy.
   2. Separa a cada persona.
   3. Redacta un mensaje con sus pendientes.
-  4. Lo envía a su correo.
+  4. Lo envía a su correo. Si el envío falla, sigue con las demás.
+  5. Registra qué salió y qué falló con `POST /integrations/daily-reminders/deliveries`.
+- **Reintentos sin repetir:** quien ya recibió el recordatorio hoy no vuelve a aparecer en la lista. Si el workflow se ejecuta otra vez, solo intenta de nuevo los fallidos y los que faltaron.
+- **Darse de baja:** cada estudiante puede apagar «Recordatorios por correo» en Configuración; desde ese momento no aparece en la lista.
 - **Datos personales:** solo el correo, el nombre y los títulos de los pendientes, como indica la política de privacidad.
 
 ## 3. Baja de cuenta y eliminación de datos (`03-baja-de-cuenta.json`)
 - **Problema de negocio:** cumplir el derecho de supresión de la Ley 8968, con evidencia y aviso a la persona.
 - **Disparador:** webhook. MENTOR lo llama cuando alguien confirma su baja con su contraseña (con `DELETION_PROCESSOR=n8n`).
 - **Pasos:**
-  1. Recibe la solicitud.
-  2. Pide a MENTOR que la procese con `POST /integrations/deletion-requests/:id/process`. MENTOR anonimiza la cuenta, borra lo personal y conserva lo académico con su motivo.
-  3. Si quedó completada, envía el correo de confirmación.
+  1. Recibe el aviso. Para entonces MENTOR **ya completó la baja** en una transacción: anonimizó la cuenta, borró lo personal, conservó lo académico con su motivo y cerró las sesiones.
+  2. Confirma el estado con `POST /integrations/deletion-requests/:id/process` (idempotente: no repite nada).
+  3. Si está completada, envía el correo de confirmación.
   4. Registra que el aviso salió con `POST /integrations/deletion-requests/:id/notified`.
-- **Respaldo:** si n8n no responde, MENTOR procesa la baja por su cuenta y envía el aviso, para que ninguna solicitud quede esperando.
+- **Si n8n falla:** el webhook responde 200 al recibir, antes de ejecutar el resto. Por eso la baja nunca depende de n8n: si el webhook no responde, MENTOR envía el aviso por su cuenta; si responde pero el workflow falla después, la baja ya está hecha y la solicitud muestra el aviso como pendiente para la administración. Una solicitud que hubiera quedado pendiente por un corte del servidor se completa en la conciliación diaria.

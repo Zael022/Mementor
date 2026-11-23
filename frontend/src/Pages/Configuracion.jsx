@@ -133,6 +133,10 @@ export default function Configuracion() {
             alCambiar={(valor) => cambiar({ practiceSize: Number(valor) })}
             opciones={[5, 10, 15].map((cantidad) => ({ valor: cantidad, texto: `${cantidad} preguntas` }))}
             ayuda="La racha se mantiene al completar la cantidad elegida. El cambio cuenta desde la práctica de mañana." />
+          <ul className="interruptores">
+            <Interruptor texto="Recordatorios por correo" ayuda="Un correo diario con tareas por vencer y la práctica pendiente. Apágalo si no quieres recibirlo."
+              activo={preferencias.emailReminders !== false} alCambiar={(valor) => cambiar({ emailReminders: valor })} />
+          </ul>
           <Campo etiqueta="Zona horaria" tipo="select" valor={preferencias.timeZone ?? ''}
             alCambiar={(valor) => cambiar({ timeZone: valor || null })}
             opciones={[{ valor: '', texto: 'Sin elegir' }, ...zonas.map((zona) => ({ valor: zona, texto: zona.replaceAll('_', ' ') }))]}

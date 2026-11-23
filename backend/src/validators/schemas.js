@@ -186,6 +186,7 @@ export const preferencesSchema = z.object({
   timeZone: timeZone.nullable().optional(),
   dailyGoalMinutes: z.number().int().min(10).max(240).nullable().optional(),
   practiceSize: z.union([z.literal(5), z.literal(10), z.literal(15)]).optional(),
+  emailReminders: z.boolean().optional(),
 }).strict().refine((data) => Object.keys(data).length > 0, 'No hay cambios.');
 
 export const selfReviewSchema = z.object({ grade: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]) });
@@ -204,6 +205,11 @@ export const studyPlanItemSchema = z.object({
 
 // Recuperación de contraseña.
 export const forgotPasswordSchema = z.object({ email: z.string().trim().toLowerCase().email('Correo no válido.').max(190) });
+// Resultado de los recordatorios que n8n intentó enviar en una página.
+export const reminderDeliveriesSchema = z.object({
+  day,
+  results: z.array(z.object({ userId: z.number().int().positive(), status: z.enum(['sent', 'failed']) })).min(1).max(500),
+}).strict();
 export const confirmEmailSchema = z.object({ token: z.string().regex(/^[a-f0-9]{64}$/, 'Enlace no válido.') });
 export const resetPasswordSchema = z.object({ token: z.string().regex(/^[a-f0-9]{64}$/, 'Enlace no válido.'), password: z.string().min(10).max(200) });
 

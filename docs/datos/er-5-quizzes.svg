@@ -42,7 +42,7 @@
 <text text-anchor="start" x="809.5" y="-1113.26" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
 </g>
 <!-- courses -->
-<g id="node16" class="node">
+<g id="node15" class="node">
 <title>courses</title>
 <path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M980,-1133.06C980,-1133.06 950,-1133.06 950,-1133.06 944,-1133.06 938,-1127.06 938,-1121.06 938,-1121.06 938,-1109.06 938,-1109.06 938,-1103.06 944,-1097.06 950,-1097.06 950,-1097.06 980,-1097.06 980,-1097.06 986,-1097.06 992,-1103.06 992,-1109.06 992,-1109.06 992,-1121.06 992,-1121.06 992,-1127.06 986,-1133.06 980,-1133.06"/>
 <text text-anchor="middle" x="965" y="-1112.26" font-family="Figtree" font-size="11.00" fill="#5b6280">courses</text>
@@ -59,7 +59,7 @@
 <polyline fill="none" stroke="#8a91b4" points="933.14,-1126.83 928.46,-1128.61 "/>
 </g>
 <!-- users -->
-<g id="node17" class="node">
+<g id="node16" class="node">
 <title>users</title>
 <path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M980,-1000.06C980,-1000.06 950,-1000.06 950,-1000.06 944,-1000.06 938,-994.06 938,-988.06 938,-988.06 938,-976.06 938,-976.06 938,-970.06 944,-964.06 950,-964.06 950,-964.06 980,-964.06 980,-964.06 986,-964.06 992,-970.06 992,-976.06 992,-976.06 992,-988.06 992,-988.06 992,-994.06 986,-1000.06 980,-1000.06"/>
 <text text-anchor="middle" x="965" y="-979.26" font-family="Figtree" font-size="11.00" fill="#5b6280">users</text>
@@ -483,8 +483,19 @@
 <text text-anchor="start" x="704.5" y="-62.26" font-family="Figtree" font-size="11.00">updated_at</text>
 <text text-anchor="start" x="797.5" y="-62.26" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
 </g>
+<!-- topic_mastery&#45;&gt;users -->
+<g id="edge25" class="edge">
+<title>topic_mastery&#45;&gt;users</title>
+<path fill="none" stroke="#8a91b4" d="M871.05,-226.39C871.72,-227.61 872.37,-228.83 873,-230.06 939.57,-360.38 959.17,-832.45 963.15,-953.58"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="866.59,-219.49 864.95,-208.65 863.88,-215.29 861.17,-211.09 861.17,-211.09 861.17,-211.09 863.88,-215.29 857.39,-213.53 866.59,-219.49 866.59,-219.49"/>
+<ellipse fill="none" stroke="#8a91b4" cx="868.76" cy="-222.85" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="968.45,-962.72 958.45,-963.04 958.39,-961.04 968.39,-960.72 968.45,-962.72"/>
+<polyline fill="none" stroke="#8a91b4" points="963.48,-963.88 963.32,-958.88 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="968.29,-957.72 958.29,-958.04 958.23,-956.04 968.23,-955.72 968.29,-957.72"/>
+<polyline fill="none" stroke="#8a91b4" points="963.32,-958.88 963.16,-953.88 "/>
+</g>
 <!-- topics -->
-<g id="node15" class="node">
+<g id="node17" class="node">
 <title>topics</title>
 <path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M980,-360.06C980,-360.06 950,-360.06 950,-360.06 944,-360.06 938,-354.06 938,-348.06 938,-348.06 938,-336.06 938,-336.06 938,-330.06 944,-324.06 950,-324.06 950,-324.06 980,-324.06 980,-324.06 986,-324.06 992,-330.06 992,-336.06 992,-336.06 992,-348.06 992,-348.06 992,-354.06 986,-360.06 980,-360.06"/>
 <text text-anchor="middle" x="965" y="-339.26" font-family="Figtree" font-size="11.00" fill="#5b6280">topics</text>
@@ -499,17 +510,6 @@
 <polyline fill="none" stroke="#8a91b4" points="950.56,-323.95 947.53,-319.97 "/>
 <polygon fill="#8a91b4" stroke="#8a91b4" points="950.91,-316.15 942.95,-322.2 941.74,-320.61 949.7,-314.56 950.91,-316.15"/>
 <polyline fill="none" stroke="#8a91b4" points="947.53,-319.97 944.51,-315.99 "/>
-</g>
-<!-- topic_mastery&#45;&gt;users -->
-<g id="edge25" class="edge">
-<title>topic_mastery&#45;&gt;users</title>
-<path fill="none" stroke="#8a91b4" d="M871.05,-226.39C871.72,-227.61 872.37,-228.83 873,-230.06 939.57,-360.38 959.17,-832.45 963.15,-953.58"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="866.59,-219.49 864.95,-208.65 863.88,-215.29 861.17,-211.09 861.17,-211.09 861.17,-211.09 863.88,-215.29 857.39,-213.53 866.59,-219.49 866.59,-219.49"/>
-<ellipse fill="none" stroke="#8a91b4" cx="868.76" cy="-222.85" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="968.45,-962.72 958.45,-963.04 958.39,-961.04 968.39,-960.72 968.45,-962.72"/>
-<polyline fill="none" stroke="#8a91b4" points="963.48,-963.88 963.32,-958.88 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="968.29,-957.72 958.29,-958.04 958.23,-956.04 968.23,-955.72 968.29,-957.72"/>
-<polyline fill="none" stroke="#8a91b4" points="963.32,-958.88 963.16,-953.88 "/>
 </g>
 <!-- learning_recommendations -->
 <g id="node10" class="node">
@@ -548,28 +548,6 @@
 <text text-anchor="start" x="713.5" y="-249.26" font-family="Figtree" font-size="11.00">updated_at</text>
 <text text-anchor="start" x="786.5" y="-249.26" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
 </g>
-<!-- learning_recommendations&#45;&gt;topics -->
-<g id="edge10" class="edge">
-<title>learning_recommendations&#45;&gt;topics</title>
-<path fill="none" stroke="#8a91b4" d="M870.16,-333.06C890.63,-333.1 910.99,-333.68 927.48,-334.81"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="862.05,-333.11 852.02,-328.68 857.05,-333.15 852.05,-333.18 852.05,-333.18 852.05,-333.18 857.05,-333.15 852.08,-337.68 862.05,-333.11 862.05,-333.11"/>
-<ellipse fill="none" stroke="#8a91b4" cx="866.05" cy="-333.09" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="937.13,-330.57 936.33,-340.54 934.34,-340.38 935.14,-330.41 937.13,-330.57"/>
-<polyline fill="none" stroke="#8a91b4" points="937.73,-335.63 932.74,-335.23 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="932.15,-330.17 931.34,-340.14 929.35,-339.98 930.15,-330.01 932.15,-330.17"/>
-<polyline fill="none" stroke="#8a91b4" points="932.74,-335.23 927.76,-334.83 "/>
-</g>
-<!-- learning_recommendations&#45;&gt;topics -->
-<g id="edge11" class="edge">
-<title>learning_recommendations&#45;&gt;topics</title>
-<path fill="none" stroke="#8a91b4" d="M870.16,-351.81C890.63,-351.77 910.99,-351.14 927.48,-349.92"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="862.05,-351.75 852.08,-347.19 857.05,-351.72 852.05,-351.69 852.05,-351.69 852.05,-351.69 857.05,-351.72 852.02,-356.19 862.05,-351.75 862.05,-351.75"/>
-<ellipse fill="none" stroke="#8a91b4" cx="866.05" cy="-351.78" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="936.3,-344.13 937.16,-354.09 935.17,-354.27 934.3,-344.3 936.3,-344.13"/>
-<polyline fill="none" stroke="#8a91b4" points="937.73,-349.02 932.74,-349.46 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="931.31,-344.56 932.18,-354.53 930.19,-354.7 929.32,-344.74 931.31,-344.56"/>
-<polyline fill="none" stroke="#8a91b4" points="932.74,-349.46 927.76,-349.89 "/>
-</g>
 <!-- learning_recommendations&#45;&gt;courses -->
 <g id="edge9" class="edge">
 <title>learning_recommendations&#45;&gt;courses</title>
@@ -591,6 +569,28 @@
 <polyline fill="none" stroke="#8a91b4" points="964.45,-963.6 964.49,-958.6 "/>
 <polygon fill="#8a91b4" stroke="#8a91b4" points="969.5,-957.65 959.5,-957.56 959.52,-955.56 969.52,-955.65 969.5,-957.65"/>
 <polyline fill="none" stroke="#8a91b4" points="964.49,-958.6 964.54,-953.6 "/>
+</g>
+<!-- learning_recommendations&#45;&gt;topics -->
+<g id="edge10" class="edge">
+<title>learning_recommendations&#45;&gt;topics</title>
+<path fill="none" stroke="#8a91b4" d="M870.16,-333.06C890.63,-333.1 910.99,-333.68 927.48,-334.81"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="862.05,-333.11 852.02,-328.68 857.05,-333.15 852.05,-333.18 852.05,-333.18 852.05,-333.18 857.05,-333.15 852.08,-337.68 862.05,-333.11 862.05,-333.11"/>
+<ellipse fill="none" stroke="#8a91b4" cx="866.05" cy="-333.09" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="937.13,-330.57 936.33,-340.54 934.34,-340.38 935.14,-330.41 937.13,-330.57"/>
+<polyline fill="none" stroke="#8a91b4" points="937.73,-335.63 932.74,-335.23 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="932.15,-330.17 931.34,-340.14 929.35,-339.98 930.15,-330.01 932.15,-330.17"/>
+<polyline fill="none" stroke="#8a91b4" points="932.74,-335.23 927.76,-334.83 "/>
+</g>
+<!-- learning_recommendations&#45;&gt;topics -->
+<g id="edge11" class="edge">
+<title>learning_recommendations&#45;&gt;topics</title>
+<path fill="none" stroke="#8a91b4" d="M870.16,-351.81C890.63,-351.77 910.99,-351.14 927.48,-349.92"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="862.05,-351.75 852.08,-347.19 857.05,-351.72 852.05,-351.69 852.05,-351.69 852.05,-351.69 857.05,-351.72 852.02,-356.19 862.05,-351.75 862.05,-351.75"/>
+<ellipse fill="none" stroke="#8a91b4" cx="866.05" cy="-351.78" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="936.3,-344.13 937.16,-354.09 935.17,-354.27 934.3,-344.3 936.3,-344.13"/>
+<polyline fill="none" stroke="#8a91b4" points="937.73,-349.02 932.74,-349.46 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="931.31,-344.56 932.18,-354.53 930.19,-354.7 929.32,-344.74 931.31,-344.56"/>
+<polyline fill="none" stroke="#8a91b4" points="932.74,-349.46 927.76,-349.89 "/>
 </g>
 <!-- topic_reviews -->
 <g id="node11" class="node">
@@ -641,17 +641,6 @@
 <text text-anchor="start" x="704.5" y="-472.26" font-family="Figtree" font-size="11.00">updated_at</text>
 <text text-anchor="start" x="797.5" y="-472.26" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
 </g>
-<!-- topic_reviews&#45;&gt;topics -->
-<g id="edge30" class="edge">
-<title>topic_reviews&#45;&gt;topics</title>
-<path fill="none" stroke="#8a91b4" d="M871.5,-467.17C899.31,-429.56 926.75,-392.44 944.43,-368.53"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="866.63,-473.76 857.06,-479.12 863.66,-477.78 860.68,-481.8 860.68,-481.8 860.68,-481.8 863.66,-477.78 864.3,-484.47 866.63,-473.76 866.63,-473.76"/>
-<ellipse fill="none" stroke="#8a91b4" cx="869.01" cy="-470.54" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="945.87,-358.17 953.91,-364.12 952.72,-365.73 944.68,-359.78 945.87,-358.17"/>
-<polyline fill="none" stroke="#8a91b4" points="950.48,-360.34 947.51,-364.36 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="942.9,-362.19 950.94,-368.14 949.75,-369.75 941.71,-363.8 942.9,-362.19"/>
-<polyline fill="none" stroke="#8a91b4" points="947.51,-364.36 944.54,-368.38 "/>
-</g>
 <!-- topic_reviews&#45;&gt;courses -->
 <g id="edge29" class="edge">
 <title>topic_reviews&#45;&gt;courses</title>
@@ -673,6 +662,17 @@
 <polyline fill="none" stroke="#8a91b4" points="958.46,-963.93 956.95,-959.16 "/>
 <polygon fill="#8a91b4" stroke="#8a91b4" points="961.41,-956.7 951.88,-959.72 951.28,-957.81 960.81,-954.79 961.41,-956.7"/>
 <polyline fill="none" stroke="#8a91b4" points="956.95,-959.16 955.44,-954.39 "/>
+</g>
+<!-- topic_reviews&#45;&gt;topics -->
+<g id="edge30" class="edge">
+<title>topic_reviews&#45;&gt;topics</title>
+<path fill="none" stroke="#8a91b4" d="M871.5,-467.17C899.31,-429.56 926.75,-392.44 944.43,-368.53"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="866.63,-473.76 857.06,-479.12 863.66,-477.78 860.68,-481.8 860.68,-481.8 860.68,-481.8 863.66,-477.78 864.3,-484.47 866.63,-473.76 866.63,-473.76"/>
+<ellipse fill="none" stroke="#8a91b4" cx="869.01" cy="-470.54" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="945.87,-358.17 953.91,-364.12 952.72,-365.73 944.68,-359.78 945.87,-358.17"/>
+<polyline fill="none" stroke="#8a91b4" points="950.48,-360.34 947.51,-364.36 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="942.9,-362.19 950.94,-368.14 949.75,-369.75 941.71,-363.8 942.9,-362.19"/>
+<polyline fill="none" stroke="#8a91b4" points="947.51,-364.36 944.54,-368.38 "/>
 </g>
 <!-- topic_review_logs -->
 <g id="node12" class="node">

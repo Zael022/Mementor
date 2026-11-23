@@ -37,3 +37,34 @@ test('una fuente citada sin afirmaciones que verificar no se considera contradic
   assert.equal(verifyAnswer('¿Quieres un ejemplo?', [fraccion]).ok, true);
   assert.equal(verifyAnswer('Algo', []).ok, false);
 });
+
+// Auditoría de producción H-01: una cita auténtica con cifras intercambiadas o con el sentido invertido.
+const reglamento = [{ sourceId: 'S1', text: 'Para aprobar el curso se necesita una nota mínima de 70 y una asistencia mínima del 80 por ciento.' }];
+
+test('acepta la regla tal como la dice la fuente y una paráfrasis con el número antes del sustantivo', () => {
+  assert.equal(verifyAnswer('Para aprobar el curso se necesita una nota mínima de 70 y una asistencia mínima del 80 por ciento. [S1]', reglamento).ok, true);
+  assert.equal(verifyAnswer('Para aprobar necesitas 70 de nota mínima y 80 por ciento de asistencia mínima [S1].', reglamento).ok, true);
+});
+
+test('rechaza cifras intercambiadas aunque todas estén en la fuente', () => {
+  const result = verifyAnswer('Para aprobar el curso se necesita una nota mínima de 80 y una asistencia mínima del 70 por ciento. [S1]', reglamento);
+  assert.equal(result.ok, false);
+  assert.equal(result.failures[0].reason, 'number_context_mismatch');
+});
+
+test('rechaza una negación de lo que afirma la fuente, y al revés', () => {
+  const negada = verifyAnswer('Para aprobar el curso no se necesita una nota mínima de 70 ni una asistencia mínima del 80 por ciento. [S1]', reglamento);
+  assert.equal(negada.ok, false);
+  assert.equal(negada.failures[0].reason, 'negation_mismatch');
+  assert.equal(verifyAnswer('Para aprobar el curso se necesita una nota mínima de 99 y una asistencia mínima del 80 por ciento. [S1]', reglamento).ok, false);
+
+  const entregas = [{ sourceId: 'S1', text: 'No se permite entregar tareas tarde después de la fecha límite.' }];
+  assert.equal(verifyAnswer('Se permite entregar tareas tarde después de la fecha límite [S1].', entregas).ok, false);
+  assert.equal(verifyAnswer('No puedes entregar tareas tarde después de la fecha límite [S1].', entregas).ok, true);
+});
+
+test('una negación que la fuente comparte, o sobre algo que la respuesta no afirma, no se rechaza', () => {
+  // La fuente dice «nunca es cero»; omitir esa parte no la contradice.
+  assert.equal(verifyAnswer('El denominador indica en cuántas partes se divide la unidad [S1].', [fraccion]).ok, true);
+  assert.equal(verifyAnswer('El denominador de una fracción nunca vale cero [S1].', [fraccion]).ok, true);
+});

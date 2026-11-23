@@ -27,7 +27,7 @@ export default function Privacidad() {
         <li><strong>Proveedor de inteligencia artificial:</strong> la institución elige Anthropic (Claude) u OpenAI y puede informarte cuál usa. Antes de enviar cualquier texto que escribe una persona, MENTOR AI reemplaza cédulas, teléfonos, correos y enlaces por etiquetas como «[correo oculto]». Nunca se envían el nombre ni el correo de tu cuenta. Aun así, no escribas datos personales de nadie en preguntas, entregas ni textos para los asistentes: los nombres propios no se pueden detectar de forma automática.</li>
         <li><strong>Google Cloud (si tu institución lo activa):</strong> guarda los archivos originales de los materiales y las fotos de perfil en un almacenamiento privado, guarda el material del curso para buscar las fuentes del tutor y, si se usa Google Drive, lee las carpetas que la institución autoriza.</li>
         <li><strong>Ministerio de Hacienda (tipo de cambio) y Nager.Date (feriados):</strong> solo se consultan datos públicos; no se envía ningún dato tuyo.</li>
-        <li><strong>n8n (automatizaciones):</strong> recibe tu correo únicamente para enviarte avisos (recordatorios o confirmación de baja).</li>
+        <li><strong>n8n (automatizaciones):</strong> recibe tu correo únicamente para enviarte avisos (recordatorios o confirmación de baja). Puedes apagar los recordatorios en Configuración; se guarda qué día se envió cada uno para no repetirlo.</li>
         <li><strong>Proveedores de alojamiento</strong> del sitio, la API y la base de datos, con acceso cifrado y restringido.</li>
       </ul>
       <p>Qué recibe el proveedor de IA en cada asistente:</p>
@@ -61,7 +61,7 @@ export default function Privacidad() {
 
       <h2>6. Tus derechos</h2>
       <ul>
-        <li><strong>Acceso:</strong> en Configuración → Privacidad y datos puedes descargar una copia de tus datos.</li>
+        <li><strong>Acceso:</strong> en Configuración → Privacidad y datos puedes descargar una copia de tu perfil, tus aceptaciones y tus datos de aprendizaje (cursos, evaluaciones, entregas, calificaciones, progreso, planes, repasos, prácticas, comentarios y conversaciones con el tutor). La bitácora de seguridad y los registros técnicos se piden a la administración de tu institución.</li>
         <li><strong>Rectificación:</strong> puedes corregir tu perfil cuando quieras; para el correo o el rol, pide el cambio a tu institución.</li>
         <li><strong>Supresión:</strong> en Configuración → Privacidad y datos puedes solicitar la eliminación de tu cuenta. Confirmamos tu identidad con tu contraseña, borramos o anonimizamos tus datos personales y te avisamos por correo al terminar. Se conservan, sin tu nombre ni tu correo, las calificaciones y entregas que la institución debe mantener como historial académico, y la evidencia de tus aceptaciones como respaldo legal.</li>
         <li><strong>Reclamos:</strong> puedes dirigirte a la Agencia de Protección de Datos de los Habitantes (PRODHAB).</li>

@@ -9,6 +9,7 @@ export const PREFERENCIAS_BASE = {
   timeZone: null,
   dailyGoalMinutes: null,
   practiceSize: 5,
+  emailReminders: true,
 };
 
 const CLAVE = 'mentor.preferencias';
