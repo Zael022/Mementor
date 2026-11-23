@@ -85,9 +85,9 @@ code { background: var(--cielo); padding: 1px 6px; border-radius: 6px; font-size
 .cabecera { background: var(--panel); display: flex; align-items: center; gap: 30px; padding: 12px clamp(16px, 5vw, 56px); border-bottom: 1px solid var(--linea); position: sticky; top: 0; z-index: 20; flex-wrap: wrap; }
 .marca { display: inline-flex; align-items: center; margin: 0; line-height: 0; text-decoration: none; flex: none; }
 /* El logo oficial se muestra tal cual; solo se ajusta su alto. */
-.marca img { display: block; width: auto; height: 52px; }
-.portada .marca img { height: 58px; }
-@media (max-width: 560px) { .marca img { height: 44px; } }
+.marca img { display: block; width: auto; height: 44px; }
+.portada .marca img { height: 50px; }
+@media (max-width: 560px) { .marca img { height: 36px; } }
 /* Íconos de línea con un tono suave de relleno. */
 .icono { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .icono .icono-tono { fill: currentColor; fill-opacity: 0.16; stroke: none; }

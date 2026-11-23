@@ -23,7 +23,7 @@ function useTemaOscuro() {
   return oscuro;
 }
 
-const MEDIDAS = { horizontal: [1371, 400], vertical: [1037, 830] };
+const MEDIDAS = { horizontal: [912, 214], vertical: [1037, 830] };
 
 // Logo oficial de MENTOR AI (archivos SVG en public/marca, sin redibujar); usa la versión para fondo oscuro cuando corresponde.
 export default function Logo({ como = 'span', className = '', variante = 'horizontal', ...props }) {
