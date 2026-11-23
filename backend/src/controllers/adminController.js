@@ -23,7 +23,7 @@ export async function inviteInstitutionAdmin(req, res) {
 
 // --- Usuarios (administrador de institución) ---
 export async function listUsers(req, res) {
-  res.json(await userService.listUsers(req.user, { role: req.query.role, pagination: readPagination(req.query) }));
+  res.json(await userService.listUsers(req.user, { role: req.query.role, q: req.query.q, pagination: readPagination(req.query) }));
 }
 
 export async function inviteUser(req, res) {

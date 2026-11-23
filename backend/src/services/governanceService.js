@@ -140,11 +140,12 @@ export async function listDeletionRequests(user) {
 
 // Resumen de aceptación por documento y versión, sin datos de cada persona.
 export async function consentSummary(user) {
-  const institution = user.role === 'platform_admin' ? '' : 'WHERE u.institution_id = :institutionId';
+  // Consulta fija con parámetros: ningún fragmento de SQL se arma con texto.
   const [rows] = await sequelize.query(
-    `SELECT c.document, c.version, COUNT(*) AS total FROM consent_records c JOIN users u ON u.id = c.user_id ${institution}
+    `SELECT c.document, c.version, COUNT(*) AS total FROM consent_records c JOIN users u ON u.id = c.user_id
+      WHERE (:all = 1 OR u.institution_id = :institutionId)
       GROUP BY c.document, c.version ORDER BY c.document, c.version DESC`,
-    { replacements: { institutionId: user.institutionId } },
+    { replacements: { all: user.role === 'platform_admin' ? 1 : 0, institutionId: user.institutionId ?? 0 } },
   );
   return { current: POLICY_VERSIONS, accepted: rows.map((row) => ({ ...row, total: Number(row.total) })) };
 }

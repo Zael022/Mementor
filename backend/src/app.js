@@ -5,14 +5,14 @@ import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import routes from './routes/index.js';
 import { readTrustProxy } from './config/proxy.js';
+import { corsOptions, readAllowedOrigins } from './config/cors.js';
 import { requestId } from './middlewares/common.js';
 import { csrfProtection, loadSession } from './middlewares/auth.js';
 import { requireCurrentConsents } from './middlewares/consent.js';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 
 // Orígenes del frontend autorizados a usar la API.
-const allowedOrigins = (process.env.FRONTEND_ORIGIN || 'http://127.0.0.1:5173,http://localhost:5173')
-  .split(',').map((origin) => origin.trim()).filter(Boolean);
+const allowedOrigins = readAllowedOrigins();
 
 // Configura la API y sus rutas.
 const app = express();
@@ -22,7 +22,7 @@ const trustProxy = readTrustProxy();
 if (trustProxy !== null) app.set('trust proxy', trustProxy);
 app.use(requestId);
 app.use(helmet());
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(cors(corsOptions(allowedOrigins)));
 app.use(express.json({ limit: '256kb' }));
 app.use(cookieParser());
 app.use(loadSession);

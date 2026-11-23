@@ -157,12 +157,12 @@ Recorrido: el docente crea un quiz en *Quizzes*, le agrega preguntas y lo public
 ## 5. Pruebas
 
 ```powershell
-# Backend: 149 pruebas en mentor_ai_test (crean y borran sus datos). Google Cloud, la IA y las APIs externas son dobles.
+# Backend: 156 pruebas en mentor_ai_test (crean y borran sus datos). Google Cloud, la IA y las APIs externas son dobles.
 cd backend
 npm run lint
 npm test
 
-# Frontend: lint, 53 pruebas de componentes y hooks (Vitest + jsdom) y compilación
+# Frontend: lint, 54 pruebas de componentes y hooks (Vitest + jsdom) y compilación
 cd ..\frontend
 npm run lint
 npm test
@@ -179,7 +179,7 @@ cd frontend
 npx playwright install chromium
 npm run test:e2e
 ```
-Son 36 pruebas, incluidas 12 revisiones automáticas de accesibilidad con axe-core (WCAG 2.2 AA) en tres anchos. Usan los datos de conexión de `backend/.env`.
+Son 38 pruebas, incluidas 12 revisiones automáticas de accesibilidad con axe-core (WCAG 2.2 AA) en tres anchos. Usan los datos de conexión de `backend/.env`.
 
 Las capturas de los mockups (escritorio y móvil) se generan con `npx playwright test -c playwright.capturas.config.js` sobre la misma base `_e2e` y quedan en `frontend/capturas/salida/` (no se versionan; las optimizadas están en `docs/mockups/`). Para cambiar puertos o base: `E2E_DB_NAME`, `E2E_API_PORT` (3101), `E2E_WEB_PORT` (5174) y `E2E_FAKE_AI_PORT` (4599).
 
@@ -201,6 +201,7 @@ Despliegue paso a paso (TiDB Cloud, Render, Vercel y n8n) en `docs/despliegue.md
 - **Originales duraderos.** Con `STORAGE_DRIVER=gcs` los materiales y fotos de perfil se copian a un bucket privado de Cloud Storage (ADC) y el disco solo se usa como paso temporal; `materials.content_sha256` guarda la huella y la descarga la envía en `X-Content-SHA256`. Una carga se registra con su auditoría en una sola transacción: si algo falla antes de confirmar, el original se descarta y no queda fila huérfana; si falla la indexación, el material queda guardado y la fuente se reintenta. Guía en `docs/despliegue.md` (sección 2).
 - **Consentimiento.** Con términos o privacidad pendientes, el servidor rechaza cualquier operación nueva (`403 CONSENT_REQUIRED`) salvo aceptar, cerrar sesión, leer y pedir la baja; la interfaz vuelve a mostrar el diálogo.
 - **Notas emitidas.** El puntaje máximo de una tarea con entregas calificadas no se puede cambiar (`409 GRADED_MAX_LOCKED`).
+- **Seguridad web.** Inyección SQL, XSS (CSP en `frontend/vercel.json`), CSRF y CORS estricto (`403 ORIGIN_NOT_ALLOWED`): medidas, investigación, laboratorio y evidencias en `docs/seguridad/`.
 - **Archivos.** Además de la extensión y el tipo, se revisan los primeros bytes de cada archivo (PDF, DOCX/PPTX/XLSX, PNG, JPEG y texto UTF-8). Un archivo renombrado se rechaza.
 - **Retención.** Una vez al día se borra el texto de versiones antiguas que ninguna respuesta cita, se resume por mes el consumo con más de 90 días, se borra el registro detallado de los asistentes con más de 90 días y se borran las conversaciones sin actividad por más de 365 días. Los plazos se cambian en `backend/.env` (0 = no borrar).
 - **Monitoreo.** `GET /api/v1/health` informa si MySQL responde y si el tutor y Google Cloud están configurados, sin exponer claves, proyectos ni proveedores.
@@ -215,6 +216,7 @@ Despliegue paso a paso (TiDB Cloud, Render, Vercel y n8n) en `docs/despliegue.md
 | frontend | `npm run dev` · `npm run build` · `npm test` | Desarrollo, compilación y pruebas de componentes |
 | frontend | `npm run test:e2e` | Pruebas en navegador con Playwright (base `_e2e`) |
 | ambas | `npm run lint` | Revisión de estilo |
+| backend | `npm run lab:sqli` | Laboratorio local de inyección SQL (vulnerable frente a protegida) en una base `_lab` efímera; ver `docs/seguridad/README.md` |
 | raíz | `scripts/empaquetar.sh` | ZIP de entrega con solo los archivos versionados (sin `.env`, `node_modules` ni archivos subidos); imprime commit y fecha |
 
 ## Estructura

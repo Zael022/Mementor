@@ -1,6 +1,21 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-23. Correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+**Última actualización** — 2026-11-23. Asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+
+## Sesión 2026-11-23 (tarde) · Asignación de seguridad: SQL, XSS, CSRF y CORS
+Rama `feature/seguridad-web` (sobre `fix/auditoria`). Todo en `docs/seguridad/`.
+
+| Paso | Cambio | Prueba o evidencia |
+| --- | --- | --- |
+| SQL | Búsqueda de Usuarios (`GET /users?q=`) con `Op.like` y comodines escapados; `consentSummary` sin fragmentos de SQL; interfaz con buscador | `webSecurity.test.js`, `e2e/seguridad.spec.js` |
+| XSS | CSP estricta en `vercel.json` (también en `vite preview`); prueba de `Markdown` con etiquetas | `Markdown.test.jsx`, `frontend/scripts/verificar-csp.mjs`, `evidencias/csp.txt` |
+| CSRF | Sin cambios de código (token por sesión, SameSite=Lax, Origin); pruebas nuevas | `webSecurity.test.js`, `evidencias/csrf-cors.txt` |
+| CORS | `config/cors.js`: lista de orígenes, 403 `ORIGIN_NOT_ALLOWED`, métodos y encabezados limitados | `webSecurity.test.js` |
+| Investigación | `investigacion-inyeccion-sql.md` con fuentes | — |
+| Simulación | `backend/laboratorio/inyeccion-sql/` (`npm run lab:sqli`): solo 127.0.0.1, base `_lab`, datos efímeros; versión vulnerable solo ahí | Capturas 01–07 y `demostracion-inyeccion-sql.mp4` |
+| Presentación | `Presentacion_Seguridad_MENTOR_AI.pptx` (23 diapositivas con notas del orador, estilo de la clase, IBM Plex) | Validada y revisada visualmente |
+
+Ejecutado el 2026-11-23: backend 156/156 y lint, frontend lint + 54/54 + build, Playwright 38/38.
 
 ## Sesión 2026-11-23 (tarde) · Correcciones de la auditoría técnica
 La auditoría externa (`Auditoria_tecnica_MENTOR_AI.pdf`) se atendió en la rama `fix/auditoria`. Decisiones en `docs/adr/0006-correcciones-auditoria.md`.
