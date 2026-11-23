@@ -2127,6 +2127,16 @@
      "fk": null
     },
     {
+     "name": "content_sha256",
+     "type": "char(64)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Huella SHA-256 del archivo original para comprobar que una descarga o restauración es idéntica.",
+     "fk": null
+    },
+    {
      "name": "uploaded_by",
      "type": "bigint unsigned",
      "null": false,
@@ -7155,5 +7165,5 @@
   ]
  },
  "tables": 62,
- "columns": 578
+ "columns": 579
 }

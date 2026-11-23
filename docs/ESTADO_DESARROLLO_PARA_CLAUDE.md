@@ -1,6 +1,33 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-23. Logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+**Última actualización** — 2026-11-23. Correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+
+## Sesión 2026-11-23 (tarde) · Correcciones de la auditoría técnica
+La auditoría externa (`Auditoria_tecnica_MENTOR_AI.pdf`) se atendió en la rama `fix/auditoria`. Decisiones en `docs/adr/0006-correcciones-auditoria.md`.
+
+| Hallazgo | Cambio | Prueba |
+| --- | --- | --- |
+| M01 originales en disco temporal | `services/fileStore.js` (`STORAGE_DRIVER=local\|gcs`), materiales y avatares en Cloud Storage, `materials.content_sha256` (migración `20261123000100`), descarga con `X-Content-SHA256`; guía en `docs/despliegue.md` §2 | `storage.test.js`: original binario, borrado del disco y descarga con la misma huella |
+| M02 migrador ausente en producción | `sequelize-cli` en `dependencies` | `NODE_ENV=production npm ci` en directorio limpio: `sequelize-cli --version` responde |
+| M03 fila con archivo borrado | Carga en tres pasos; fila y auditoría en una transacción; la indexación fallida no borra | `storage.test.js`: bitácora caída → 0 filas y 0 objetos; indexación fallida → material descargable |
+| M04 notas infladas | Máximo bloqueado con entregas calificadas (409), cambio auditado, bloqueo al calificar, tope de 100 % por entrega | `classroom.test.js` |
+| M05 falsedad con cita real | Texto retenido hasta validar (`progress` en lugar de `delta`); `utils/claimCheck.js` compara números y términos por oración | `claimCheck.test.js`, `stream.test.js`, `useChatTutor.test.jsx`, `MensajeTutor.test.jsx` |
+| M06 datos hacia la IA | `utils/personalData.js` oculta cédulas, teléfonos, correos y enlaces en tutor, entregas, cumplimiento y anuncios; aviso de privacidad 2026-11-23 con tabla por asistente | `agents.test.js` |
+| M07 aceptación solo en la interfaz | `middlewares/consent.js`: escrituras con documentos pendientes → 403 `CONSENT_REQUIRED`; la interfaz reabre el diálogo | `governance.test.js`, `api.test.js` |
+| M08 tokens no atómicos | Recuperación y activación con bloqueo y actualización condicionada | `security.test.js`: dos peticiones simultáneas, una gana |
+| M10 `agent_runs` sin purga | `purgeOldAgentRuns` a los 90 días | `coordination.test.js` |
+| M12 Node/jsdom | `engines` `^22.22.2 \|\| >=24.15.0`; Node 22.22.2 en Render y CI | — |
+| M13 citas S0/S01 | IDs exactos; todo descartado → `no_evidence` (cuenta para la cuota) | `agents.test.js` |
+| M14 401 distinto en SSE | `errorDeRespuesta` compartido; error de proxy → «El servicio no está disponible» | `api.test.js` |
+| M16 objetivo táctil | `.enlace-tactil` (24 px) en acceso y recuperación; logo móvil a 38 px (≥ 160 px de ancho) | `e2e/accesibilidad.spec.js` con axe-core en 390, 768 y 1280 |
+| M18 residuos en el ZIP | `scripts/empaquetar.sh` (solo archivos versionados) | — |
+| M19 teardown ruidoso | `stream.test.js` cierra solo lo que abrió | — |
+
+Documentación: portadas con grupo 67, Rossman Rivera y Erian Fallas, profesor Steven Ledezma; sin la nota de «Actualizar campo». Mockups (92) regenerados, modelo de datos (62 tablas, 579 columnas, 123 FK), plan de producción (Cloud Storage, P-11) y riesgos R29–R32.
+
+Ejecutado el 2026-11-23 con Node 22.23.4 y MySQL 8.0: backend 149/149, frontend lint + 53/53 + build, Playwright 36/36, capturas 10/10.
+
+Pendiente: M09 (OOXML), M11 (paginación de recordatorios), M15 (sinónimos y números en la búsqueda local), M17 (`uuid` de Sequelize), restauración conjunta con acta, lectores de pantalla, pruebas con usuarios y validación con la institución.
 
 ## Sesión 2026-11-23 · Logo «M con birrete»
 - La cabecera usa la opción 1: la «M» con birrete oficial ocupa el lugar de la M de «MENTOR» (sin órbita ni estrella). Archivos en `frontend/public/marca/logo-horizontal-*.svg`; las cuatro opciones y la nota de cómo se rellenaron los huecos de la órbita están en `docs/marca/m-birrete/`.

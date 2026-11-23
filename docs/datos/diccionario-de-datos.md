@@ -1,6 +1,6 @@
 # Diccionario de datos de MENTOR AI
 
-Generado desde las migraciones de Sequelize (62 tablas, 578 columnas, 123 llaves foráneas). Motor: MySQL 8 (utf8mb4).
+Generado desde las migraciones de Sequelize (62 tablas, 579 columnas, 123 llaves foráneas). Motor: MySQL 8 (utf8mb4).
 
 Convenciones: PK = llave primaria, FK = llave foránea, UQ = valor único. Todas las tablas tienen `created_at` y `updated_at` salvo las indicadas.
 
@@ -373,6 +373,7 @@ Materiales del curso (archivos o enlaces).
 | `stored_name` | `varchar(120)` | Sí |  | Nombre interno del archivo guardado. |
 | `mime_type` | `varchar(120)` | Sí |  | Tipo de archivo (MIME). |
 | `size_bytes` | `int` | Sí |  | Tamaño en bytes. |
+| `content_sha256` | `char(64)` | Sí |  | Huella SHA-256 del archivo original para comprobar que una descarga o restauración es idéntica. |
 | `uploaded_by` | `bigint unsigned` | No | FK → users.id | Referencia a users.id (llave foránea). |
 | `created_at` | `datetime` | No |  | Fecha y hora de creación. |
 | `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
