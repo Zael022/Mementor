@@ -1,6 +1,12 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-20. GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+**Última actualización** — 2026-11-23. Logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+
+## Sesión 2026-11-23 · Logo «M con birrete»
+- La cabecera usa la opción 1: la «M» con birrete oficial ocupa el lugar de la M de «MENTOR» (sin órbita ni estrella). Archivos en `frontend/public/marca/logo-horizontal-*.svg`; las cuatro opciones y la nota de cómo se rellenaron los huecos de la órbita están en `docs/marca/m-birrete/`.
+- Alto del logo: 44 px (50 px en la portada, 36 px en móvil).
+- Ejecutado: lint limpio, 50/50 pruebas de frontend, build correcto y captura de `/login` en tema claro y oscuro. No se volvieron a correr las e2e.
+- Pendiente: regenerar capturas de `docs/mockups` y documentos que muestran el logo anterior.
 
 ## Sesión 2026-11-20 · GSAP, microinteracciones y accesibilidad
 
