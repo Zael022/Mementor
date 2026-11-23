@@ -33,7 +33,7 @@ export default function AdminDrive() {
         <form className="fila-formulario" onSubmit={habilitar}>
           <Campo etiqueta="Identificador de la carpeta" valor={folderId} alCambiar={setFolderId} required minLength={10} maxLength={128} pattern="[A-Za-z0-9_-]+" />
           <Campo etiqueta="Nombre para mostrar" valor={label} alCambiar={setLabel} required minLength={2} maxLength={180} />
-          <button type="submit" className="boton" disabled={enviando}>{enviando ? 'Comprobando…' : 'Habilitar carpeta'}</button>
+          <button type="submit" className="boton" disabled={enviando} aria-busy={enviando}>{enviando ? 'Comprobando…' : 'Habilitar carpeta'}</button>
         </form>
         <MensajeError error={error} />
       </section>

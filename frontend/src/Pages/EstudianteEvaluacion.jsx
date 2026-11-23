@@ -75,7 +75,7 @@ export default function EstudianteEvaluacion() {
                 ¿Enviar el intento? No podrás cambiar las respuestas después.
               </p>
               <div className="acciones">
-                <button type="button" className="boton" disabled={enviando} onClick={enviar}>{enviando ? 'Enviando…' : 'Sí, enviar'}</button>
+                <button type="button" className="boton" disabled={enviando} aria-busy={enviando} onClick={enviar}>{enviando ? 'Enviando…' : 'Sí, enviar'}</button>
                 <button type="button" className="boton secundario" onClick={() => setConfirmando(false)}>Seguir revisando</button>
               </div>
             </section>

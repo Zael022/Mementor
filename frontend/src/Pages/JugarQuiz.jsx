@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Cargando, MensajeError } from '../Componentes/Estados.jsx';
-import OpcionesQuiz from '../Componentes/OpcionesQuiz.jsx';
+import OpcionesQuiz, { useRetroalimentacion } from '../Componentes/OpcionesQuiz.jsx';
 import { useDatos } from '../hooks/useDatos.js';
 import { useEnvio } from '../hooks/useEnvio.js';
 import { api } from '../services/api.js';
@@ -109,6 +109,8 @@ export default function JugarQuiz() {
 
   const restante = useTemporizador(pregunta?.secondsLeft ?? 0, fase === 'pregunta', () => responder(null));
 
+  const botonSeguir = useRetroalimentacion(respuesta, pregunta?.question?.options);
+
   if (quizzes.cargando && !quizzes.datos) return <Cargando />;
   if (quizzes.error) return <MensajeError error={quizzes.error} />;
   if (!quiz) return <MensajeError error={new Error('Este quiz no está disponible.')} />;
@@ -185,10 +187,10 @@ export default function JugarQuiz() {
         correcta={respuesta?.correctOptionId ?? null} bloqueada={enviando || fase !== 'pregunta'} />
 
       {respuesta && (
-        <div className={`quiz-retro ${respuesta.isCorrect ? 'bien' : 'mal'}`} role="status">
+        <div className={`quiz-retro ${respuesta.isCorrect ? 'bien' : 'mal'}`}>
           <strong>{respuesta.isCorrect ? '¡Correcto!' : respuesta.timedOut ? 'Se acabó el tiempo' : 'Incorrecto'}</strong>
           {respuesta.isCorrect && <span className="puntos-ganados">+{respuesta.points}</span>}
-          <button type="button" className="boton" disabled={enviando}
+          <button type="button" className="boton" disabled={enviando} ref={botonSeguir}
             onClick={() => (respuesta.isLast ? terminar(partida.playId) : siguiente(partida.playId))}>
             {respuesta.isLast ? 'Ver resultados' : 'Siguiente'}
           </button>

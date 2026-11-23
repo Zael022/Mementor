@@ -1,10 +1,11 @@
-import { lazy, Suspense, useEffect } from 'react';
-import { Revelar } from './Animaciones.jsx';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { prefiereMenosMovimiento } from '../hooks/useMovimiento.js';
 import Ilustracion from './Ilustracion.jsx';
 import Logo from './Logo.jsx';
 
-// La cuadrícula decorativa se descarga aparte: el formulario funciona mientras llega.
+// La cuadrícula decorativa y la rejilla animada se descargan aparte: el formulario funciona mientras llegan.
 const ShapeGrid = lazy(() => import('./ShapeGrid.jsx'));
+const RejillaRasgos = lazy(() => import('./RejillaRasgos.jsx'));
 
 // Parámetros de Shape Grid ajustados a la paleta de MENTOR (azul de estructura, cielo para el brillo de entrada).
 // Sin velocidad ni dirección: la cuadrícula aparece con una onda breve y queda quieta.
@@ -33,9 +34,35 @@ const RASGOS = [
   { titulo: 'Tutor IA con fuentes', dibujo: 'chat', texto: 'Responde con el material publicado del curso y cita de dónde lo tomó.' },
 ];
 
+// Tarjeta de una característica de la plataforma.
+function TarjetaRasgo({ rasgo }) {
+  return (
+    <article className="tarjeta rasgo">
+      <Ilustracion tipo={rasgo.dibujo} />
+      <h3>{rasgo.titulo}</h3>
+      <p className="tenue">{rasgo.texto}</p>
+    </article>
+  );
+}
+
 // Portada pública para ingresar y activar la cuenta, con una cuadrícula discreta detrás del título.
 export default function Portada({ titulo, children }) {
   useEffect(() => { document.title = `${titulo} · MENTOR AI`; }, [titulo]);
+  const detalles = useRef(null);
+  const [animar, setAnimar] = useState(false);
+
+  // La versión animada (y GSAP) solo se descarga cuando la sección se acerca a la pantalla.
+  useEffect(() => {
+    const seccion = detalles.current;
+    if (!seccion || prefiereMenosMovimiento() || !('IntersectionObserver' in window)) return undefined;
+    const observador = new IntersectionObserver(([entrada]) => {
+      if (entrada.isIntersecting) { setAnimar(true); observador.disconnect(); }
+    });
+    observador.observe(seccion);
+    return () => observador.disconnect();
+  }, []);
+
+  const rejillaFija = <div className="rejilla">{RASGOS.map((rasgo) => <TarjetaRasgo key={rasgo.titulo} rasgo={rasgo} />)}</div>;
 
   return (
     <div className="portada">
@@ -61,19 +88,12 @@ export default function Portada({ titulo, children }) {
         <a className="flecha-abajo" href="#detalles" aria-label="Ver más sobre la plataforma">↓</a>
       </section>
 
-      <section className="portada-detalles" id="detalles">
+      <section className="portada-detalles" id="detalles" ref={detalles}>
         <h2>Lo que encuentras al entrar</h2>
-        <div className="rejilla">
-          {RASGOS.map((rasgo, indice) => (
-            <Revelar key={rasgo.titulo} retraso={indice * 0.1}>
-              <article className="tarjeta rasgo">
-                <Ilustracion tipo={rasgo.dibujo} />
-                <h3>{rasgo.titulo}</h3>
-                <p className="tenue">{rasgo.texto}</p>
-              </article>
-            </Revelar>
-          ))}
-        </div>
+        {/* Mientras llega la versión animada (o con menos movimiento) se muestra la misma rejilla sin movimiento. */}
+        {animar
+          ? <Suspense fallback={rejillaFija}><RejillaRasgos rasgos={RASGOS} tarjeta={TarjetaRasgo} /></Suspense>
+          : rejillaFija}
       </section>
     </div>
   );
