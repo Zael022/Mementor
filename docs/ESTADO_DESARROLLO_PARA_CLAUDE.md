@@ -12,7 +12,8 @@
 | APIs externas (tipo de cambio de Hacienda, feriados de Nager.Date) y endpoints para 3 workflows de n8n (PR #4) | `services/external/`, `integrationService`, `n8n/*.json` | `integrations.test.js` con respuestas simuladas |
 | Configuración de despliegue: Render (Virginia), Vercel con reescritura `/api`, TiDB Cloud con TLS (PR #5) | `render.yaml`, `frontend/vercel.json`, `docs/despliegue.md` | Revisión; **no desplegado todavía** |
 | Catálogo `roles` con FK desde `users.role` (PR #6) | migración `20261121000500` | Migraciones up/down/up; suite completa |
-| Nuevo logotipo (burbuja azul con «m» de dos arcos y chispa lima), favicon y set de íconos propios (PR #8) | `Logo.jsx`, `Iconos.jsx`, `public/` | Vitest y Playwright |
+| Set de íconos propios y primer logotipo (PR #8; el logotipo lo reemplaza el logo oficial) | `Logo.jsx`, `Iconos.jsx`, `public/` | Vitest y Playwright |
+| Logo oficial (entregado por la estudiante en SVG, sin redibujar): «M» con birrete, órbita y estrella; versiones horizontal y vertical, claro y oscuro; favicon e ícono de app. Colores de la interfaz alineados: `#181B3E`, `#3452E1`, `#C5EF6A` (y `#6F86FF` para la órbita en fondo oscuro) | `Logo.jsx`, `public/marca/`, `favicon.png`, `icono-192.png`, `apple-touch-icon.png`, `icono-512.png`, `docs/marca/oficial/`, libro de marca | Vitest 46/46, Playwright 24/24, capturas en escritorio y móvil |
 | Modelo de datos (ER general y 6 por módulo, diccionario), mockups de 46 pantallas en escritorio y móvil, libro de marca, anteproyecto, plan de producción en Word y PDF | `docs/datos/`, `docs/mockups/`, `docs/marca/`, `docs/produccion/`, `docs/entregables/`, `frontend/capturas/` | PDF renderizados y revisados página por página |
 
 ### Resultados

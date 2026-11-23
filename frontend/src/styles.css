@@ -2,13 +2,13 @@
    Azul: estructura y navegación. Naranja: solo la acción principal.
    Lima: avance y cosas completadas. Tinta: texto. */
 :root {
-  --tinta: #14193d;
-  --azul: #3451e1;
+  --tinta: #181b3e;
+  --azul: #3452e1;
   --azul-hondo: #2338b0;
   --cielo: #eaeeff;
   --naranja: #f0591a;
   --naranja-hondo: #d2480f;
-  --lima: #c8f169;
+  --lima: #c5ef6a;
   --lima-hondo: #3f6a06;
   --fondo: #f4f6fc;
   --panel: #ffffff;
@@ -16,9 +16,9 @@
   --tenue: #5a6384;
   --error: #b8241c;
   /* Superficies que siguen oscuras en ambos temas y texto sobre fondos claros fijos. */
-  --oscuro: #14193d;
-  --sobre-claro: #14193d;
-  --enlace: #3451e1;
+  --oscuro: #181b3e;
+  --sobre-claro: #181b3e;
+  --enlace: #3452e1;
   --linea-fuerte: #c5cffb;
   --campo-borde: #c3cbe6;
   --suave-error: #fde7e5;
@@ -83,9 +83,11 @@ code { background: var(--cielo); padding: 1px 6px; border-radius: 6px; font-size
 /* ===== Estructura ===== */
 .app { min-height: 100vh; display: flex; flex-direction: column; }
 .cabecera { background: var(--panel); display: flex; align-items: center; gap: 30px; padding: 12px clamp(16px, 5vw, 56px); border-bottom: 1px solid var(--linea); position: sticky; top: 0; z-index: 20; flex-wrap: wrap; }
-.marca { display: inline-flex; align-items: center; gap: 10px; font-family: var(--titulos); font-weight: 800; font-size: 1.3rem; line-height: 1; letter-spacing: -0.035em; color: var(--tinta); margin: 0; text-decoration: none; white-space: nowrap; }
-.marca .isotipo { flex: none; width: 1.45em; height: 1.45em; }
-.marca-ai { display: inline-block; margin-left: 0.08em; padding: 0.07em 0.22em 0.11em; border-radius: 0.24em; background: var(--azul); color: #fff; font-size: 0.82em; letter-spacing: 0; vertical-align: 0.06em; }
+.marca { display: inline-flex; align-items: center; margin: 0; line-height: 0; text-decoration: none; flex: none; }
+/* El logo oficial se muestra tal cual; solo se ajusta su alto. */
+.marca img { display: block; width: auto; height: 44px; }
+.portada .marca img { height: 50px; }
+@media (max-width: 560px) { .marca img { height: 36px; } }
 /* Íconos de línea con un tono suave de relleno. */
 .icono { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .icono .icono-tono { fill: currentColor; fill-opacity: 0.16; stroke: none; }
