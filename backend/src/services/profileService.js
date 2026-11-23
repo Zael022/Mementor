@@ -1,4 +1,3 @@
-import { unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { Op } from 'sequelize';
 import { User, UserSession, sequelize } from '../models/index.js';
@@ -7,6 +6,7 @@ import { conflict, invalid, notFound } from '../utils/AppError.js';
 import { matchesSignature } from '../utils/fileSignature.js';
 import { hashPassword } from '../utils/security.js';
 import { recordAudit } from './auditService.js';
+import { discardUpload, persistUpload, readStored, removeStored } from './fileStore.js';
 import { assertStrongPassword, avatarUrl, confirmPassword } from './authService.js';
 
 const AVATAR_NAME = /^[0-9a-f]{32}\.(png|jpe?g|webp)$/;
@@ -75,7 +75,7 @@ export async function changeEmail(user, { currentPassword, newEmail }) {
 }
 
 async function removeAvatarFile(name) {
-  if (name && AVATAR_NAME.test(name)) await unlink(path.join(avatarDir(), name)).catch(() => {});
+  if (name && AVATAR_NAME.test(name)) await removeStored('avatars', name).catch(() => {});
 }
 
 // Guarda la foto nueva si su contenido es realmente una imagen permitida; borra la anterior.
@@ -83,15 +83,16 @@ export async function setAvatar(user, file) {
   if (!file) throw invalid('Elige una imagen PNG, JPG o WebP de hasta 2 MB.');
   const filePath = path.join(avatarDir(), file.filename);
   if (!(await matchesSignature(filePath, path.extname(file.filename)))) {
-    await unlink(filePath).catch(() => {});
+    await discardUpload('avatars', file.filename);
     throw invalid('El archivo no es una imagen PNG, JPG o WebP válida.');
   }
   const row = await User.findByPk(user.id);
   const previous = row.avatarFile;
   try {
+    await persistUpload('avatars', file.filename);
     await row.update({ avatarFile: file.filename, avatarUpdatedAt: nowToSecond() });
   } catch (error) {
-    await unlink(filePath).catch(() => {});
+    await discardUpload('avatars', file.filename);
     throw error;
   }
   await removeAvatarFile(previous);
@@ -114,5 +115,5 @@ export async function getAvatarFile(viewer, userId) {
   if (!target || !target.avatarFile || !AVATAR_NAME.test(target.avatarFile) || (target.id !== viewer.id && !sameInstitution)) {
     throw notFound('Foto no encontrada.');
   }
-  return { filePath: path.join(avatarDir(), target.avatarFile), contentType: avatarContentType(target.avatarFile) };
+  return { buffer: await readStored('avatars', target.avatarFile), contentType: avatarContentType(target.avatarFile) };
 }

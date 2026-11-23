@@ -1,6 +1,5 @@
-import { unlink } from 'node:fs/promises';
 import path from 'node:path';
-import { avatarDir } from '../middlewares/upload.js';
+import { removeStored } from './fileStore.js';
 import {
   ConsentRecord, DataDeletionRequest, PasswordReset, User, UserSession, sequelize,
 } from '../models/index.js';
@@ -96,7 +95,7 @@ export async function processDeletion(requestId, via, { notify = true } = {}) {
     return row;
   });
 
-  if (avatarFile) await unlink(path.join(avatarDir(), path.basename(avatarFile))).catch(() => {});
+  if (avatarFile) await removeStored('avatars', path.basename(avatarFile)).catch(() => {});
   if (originalEmail && notify) await notifyCompletion(request, originalEmail, displayName);
   return deletionDto(request);
 }

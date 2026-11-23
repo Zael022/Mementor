@@ -89,7 +89,7 @@ code { background: var(--cielo); padding: 1px 6px; border-radius: 6px; font-size
 /* El logo oficial se muestra tal cual; solo se ajusta su alto. */
 .marca img { display: block; width: auto; height: 44px; }
 .portada .marca img { height: 50px; }
-@media (max-width: 560px) { .marca img { height: 36px; } }
+@media (max-width: 560px) { .marca img { height: 38px; } }
 /* Íconos de línea con un tono suave de relleno. */
 .icono { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .icono .icono-tono { fill: currentColor; fill-opacity: 0.16; stroke: none; }
@@ -428,6 +428,8 @@ html[data-movimiento="reducido"] .confeti { display: none; }
 .estado-borrador { font-weight: 500; color: var(--tenue); font-size: 0.85rem; }
 .boton-texto { background: none; border: 0; padding: 4px 0; min-height: 24px; min-width: 24px; margin-top: 2px; color: var(--enlace); font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .boton-texto:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; border-radius: 4px; }
+/* Enlaces sueltos que se tocan con el dedo: al menos 24 px de alto efectivo (WCAG 2.5.8). */
+.enlace-tactil { display: inline-flex; align-items: center; min-height: 24px; padding: 4px 0; }
 .citas-resto { overflow: hidden; margin: 2px 0 0; padding-left: 18px; }
 
 /* Carga de archivos (adaptación de File Upload de Aceternity UI) */

@@ -9,7 +9,7 @@ import { sequelize } from '../src/config/database.js';
 import { holdLease, releaseLease } from '../src/services/coordination.js';
 import { MysqlRateLimitStore, purgeExpiredRateLimits } from '../src/services/rateLimitStore.js';
 import { limiter } from '../src/middlewares/common.js';
-import { purgeOldConversations, purgeUncitedVersionText, rollupUsage } from '../src/services/retentionService.js';
+import { purgeOldAgentRuns, purgeOldConversations, purgeUncitedVersionText, rollupUsage } from '../src/services/retentionService.js';
 
 // Coordinación entre instancias y retención, sobre la base de pruebas.
 before(prepareDatabase);
@@ -87,4 +87,15 @@ test('la retención resume el consumo antiguo y borra chats y textos vencidos si
   assert.equal(await AiMessage.count({ where: { threadId: thread } }), 0);
   // Sin la cita, la primera versión ya puede liberar su texto.
   assert.equal(await purgeUncitedVersionText(), 1);
+
+  // M10: el registro detallado de los asistentes también vence a los 90 días.
+  const contar = async () => Number((await sequelize.query('SELECT COUNT(*) AS n FROM agent_runs WHERE course_id = :course', { replacements: { course: course.courseId }, type: 'SELECT' }))[0].n);
+  const antes = await contar();
+  await sequelize.query("INSERT INTO agent_runs (institution_id, user_id, course_id, agent, input_chars, status, created_at, updated_at) VALUES (:inst, :user, :course, 'study_coach', 10, 'completed', NOW() - INTERVAL 100 DAY, NOW() - INTERVAL 100 DAY), (:inst, :user, :course, 'study_coach', 10, 'completed', NOW(), NOW())", {
+    replacements: { inst: org.institutionId, user: student.id, course: course.courseId },
+  });
+  assert.equal(await contar(), antes + 2);
+  assert.equal(await purgeOldAgentRuns(), 1);
+  assert.equal(await contar(), antes + 1);
 });
+

@@ -75,7 +75,6 @@ export function useChatTutor(courseId, hilos, alCrearHilo) {
     const vigente = () => miTurno === turno.current;
     const borradorId = `borrador-${miTurno}`;
     const preguntaId = `pregunta-${miTurno}`;
-    let textoRecibido = '';
     let actualizacion = null;
     let iniciado = false;
     controlador.current?.abort();
@@ -95,7 +94,7 @@ export function useChatTutor(courseId, hilos, alCrearHilo) {
       }
       iniciado = true;
       setMensajes((previos) => [...previos, { id: preguntaId, role: 'user', content: contenido }]);
-      setBorrador({ id: borradorId, role: 'assistant', estado: 'escribiendo', content: '', citations: [] });
+      setBorrador({ id: borradorId, role: 'assistant', estado: 'escribiendo', content: '', progreso: 0, citations: [] });
       // El indicador «Buscando…» ya se anuncia por sí mismo; aquí solo se limpia el aviso anterior.
       setAnuncio('');
       let final = null;
@@ -103,13 +102,13 @@ export function useChatTutor(courseId, hilos, alCrearHilo) {
         signal: propio.signal,
         onEvento: (evento, datos) => {
           if (!vigente()) return;
-          if (evento === 'delta') {
-            textoRecibido += datos.text;
-            // Agrupa los deltas y actualiza únicamente el mensaje en curso.
+          // El servidor retiene el texto hasta validarlo: mientras tanto solo informa cuánto lleva escrito.
+          if (evento === 'progress') {
+            const caracteres = datos.characters;
             if (actualizacion === null) actualizacion = setTimeout(() => {
               actualizacion = null;
-              if (vigente() && !propio.signal.aborted) setBorrador((previo) => previo && { ...previo, content: textoRecibido });
-            }, 32);
+              if (vigente() && !propio.signal.aborted) setBorrador((previo) => previo && { ...previo, progreso: caracteres });
+            }, 120);
           }
           if (evento === 'final') final = datos;
           if (evento === 'error') throw new ApiError(502, datos.code, datos.message);
@@ -131,9 +130,9 @@ export function useChatTutor(courseId, hilos, alCrearHilo) {
     } catch (fallo) {
       if (!vigente()) return false;
       const cancelado = fallo.name === 'AbortError';
-      // Un flujo interrumpido nunca se presenta como respuesta completa.
+      // Un flujo interrumpido no muestra texto: nada de lo escrito llegó a validarse.
       if (iniciado) setMensajes((previos) => [...previos, {
-        id: borradorId, role: 'assistant', content: textoRecibido, citations: [], estado: 'interrumpido',
+        id: borradorId, role: 'assistant', content: '', citations: [], estado: 'interrumpido',
       }]);
       setBorrador(null);
       setAnuncio(cancelado ? 'Respuesta detenida.' : 'La respuesta se interrumpió.');

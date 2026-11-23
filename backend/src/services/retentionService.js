@@ -60,11 +60,21 @@ export async function purgeOldConversations() {
   return result?.affectedRows ?? 0;
 }
 
+// Borra el registro detallado de los asistentes de IA (quién, curso, modelo y tokens) pasado el mismo plazo
+// del detalle de consumo. Las cuotas solo miran las últimas 24 horas, así que no se ven afectadas.
+export async function purgeOldAgentRuns() {
+  const keepDays = days('AI_USAGE_DETAIL_DAYS', 90);
+  if (!keepDays) return 0;
+  const [result] = await sequelize.query('DELETE FROM agent_runs WHERE created_at < NOW() - INTERVAL :keepDays DAY', { replacements: { keepDays } });
+  return result?.affectedRows ?? 0;
+}
+
 // Ejecuta todas las reglas de retención y devuelve cuántas filas tocó cada una.
 export async function runRetention() {
   return {
     versionTexts: await purgeUncitedVersionText(),
     usageRows: await rollupUsage(),
     conversations: await purgeOldConversations(),
+    agentRuns: await purgeOldAgentRuns(),
   };
 }

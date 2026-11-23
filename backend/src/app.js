@@ -7,6 +7,7 @@ import routes from './routes/index.js';
 import { readTrustProxy } from './config/proxy.js';
 import { requestId } from './middlewares/common.js';
 import { csrfProtection, loadSession } from './middlewares/auth.js';
+import { requireCurrentConsents } from './middlewares/consent.js';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 
 // Orígenes del frontend autorizados a usar la API.
@@ -26,6 +27,7 @@ app.use(express.json({ limit: '256kb' }));
 app.use(cookieParser());
 app.use(loadSession);
 app.use(csrfProtection(allowedOrigins));
+app.use(requireCurrentConsents);
 app.use(compression({
   filter: (req, res) => !String(res.getHeader('Content-Type') || '').startsWith('text/event-stream') && compression.filter(req, res),
 }));

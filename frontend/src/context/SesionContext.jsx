@@ -58,6 +58,16 @@ export function SesionProvider({ children }) {
     return () => window.removeEventListener('mentor:sesion-vencida', alVencer);
   }, []);
 
+  // El servidor rechazó una operación por documentos pendientes: se vuelve a pedir la aceptación.
+  useEffect(() => {
+    const alFaltarConsentimiento = (evento) => {
+      const lista = Array.isArray(evento.detail) ? evento.detail.filter((item) => item?.document) : [];
+      if (lista.length) setPendientes(lista);
+    };
+    window.addEventListener('mentor:consentimiento-pendiente', alFaltarConsentimiento);
+    return () => window.removeEventListener('mentor:consentimiento-pendiente', alFaltarConsentimiento);
+  }, []);
+
   const iniciarSesion = useCallback(async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
     setCsrfToken(data.csrfToken);

@@ -16,6 +16,9 @@ export async function sesion(email, password = CLAVE) {
     if (!r.ok) throw new Error(`${method} ${ruta} → ${r.status} ${JSON.stringify(json)}`);
     return json?.data;
   };
+  // Como haría la persona en el diálogo: acepta los documentos pendientes (cuenta creada por consola).
+  const pendientes = body.data.pendingConsents || [];
+  if (pendientes.length) await llamar('POST', '/me/consents', { documents: pendientes.map((item) => item.document) });
   return { usuario: body.data.user, post: (r, d = {}) => llamar('POST', r, d), patch: (r, d) => llamar('PATCH', r, d), get: (r) => llamar('GET', r) };
 }
 

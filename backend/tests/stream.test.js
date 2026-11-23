@@ -67,7 +67,7 @@ async function readEvents(response, { stopAfterDeltas = Infinity } = {}) {
       const event = part.match(/^event: (.+)$/m)?.[1];
       const data = JSON.parse(part.match(/^data: (.+)$/m)?.[1] || 'null');
       events.push({ event, data });
-      if (event === 'delta') deltas += 1;
+      if (event === 'progress') deltas += 1;
     }
     if (deltas >= stopAfterDeltas) {
       await reader.cancel();
@@ -92,8 +92,9 @@ before(async () => {
 });
 after(async () => {
   setAiProviderForTests(null);
-  ctx.server.close();
-  await closeDatabase();
+  // Si la preparación falló antes de abrir el servidor, no hay nada que cerrar: se conserva el primer error.
+  if (ctx.server) ctx.server.close();
+  await closeDatabase().catch(() => {});
 });
 
 test('sin credenciales el streaming informa AI_NOT_CONFIGURED antes de abrir el flujo', async () => {
@@ -102,7 +103,7 @@ test('sin credenciales el streaming informa AI_NOT_CONFIGURED antes de abrir el 
   assert.equal((await response.json()).error.code, 'AI_NOT_CONFIGURED');
 });
 
-test('el streaming distingue el texto en curso de la respuesta final con citas validadas', async () => {
+test('el streaming solo informa avance y entrega el texto cuando las citas están validadas', async () => {
   setAiProviderForTests(doubles);
   const response = await openStream(ctx.session, ctx.thread, '¿Qué es una fracción?');
   assert.equal(response.status, 200);
@@ -110,7 +111,9 @@ test('el streaming distingue el texto en curso de la respuesta final con citas v
   assert.equal(response.headers.get('content-encoding'), null);
   const events = await readEvents(response);
   assert.equal(events[0].event, 'start');
-  assert.ok(events.filter((item) => item.event === 'delta').length > 3);
+  assert.ok(events.filter((item) => item.event === 'progress').length > 3);
+  // M05: ningún evento lleva texto sin validar antes del final.
+  assert.ok(events.slice(0, -1).every((item) => item.data?.text === undefined && item.data?.answer === undefined));
   const final = events.at(-1);
   assert.equal(final.event, 'final');
   assert.equal(final.data.status, 'answer');

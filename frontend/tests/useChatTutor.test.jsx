@@ -32,13 +32,15 @@ async function openChat() {
   return hook;
 }
 
-it('los deltas actualizan el borrador sin cambiar el historial y las citas llegan al finalizar', async () => {
+it('el avance no muestra texto sin validar; el texto y las citas llegan juntos al finalizar', async () => {
   const { result } = await openChat();
   let request;
   act(() => { request = result.current.preguntar('¿Qué es la IA?'); });
   const history = result.current.mensajes;
-  act(() => { events('delta', { text: 'Una explicación' }); events('delta', { text: ' con fuente.' }); });
-  await waitFor(() => expect(result.current.borrador.content).toBe('Una explicación con fuente.'));
+  // Un «delta» antiguo con texto se ignora: solo cuenta el avance.
+  act(() => { events('delta', { text: 'Dos más dos son nueve' }); events('progress', { characters: 27 }); });
+  await waitFor(() => expect(result.current.borrador.progreso).toBe(27));
+  expect(result.current.borrador.content).toBe('');
   expect(result.current.mensajes).toBe(history);
   expect(history[0]).toBe(saved);
   expect(result.current.borrador.citations).toEqual([]);
@@ -67,15 +69,15 @@ it('nueva conversación cancela el turno y descarta una respuesta tardía del hi
   expect(result.current.borrador).toBeNull();
 });
 
-it('detener conserva todo el texto recibido como interrumpido y sin citas', async () => {
+it('detener marca el turno como interrumpido sin mostrar texto sin validar', async () => {
   const { result } = await openChat();
   let request;
   act(() => { request = result.current.preguntar('¿Qué es la IA?'); });
-  act(() => { events('delta', { text: 'Texto aún en curso' }); result.current.detener(); });
+  act(() => { events('progress', { characters: 18 }); result.current.detener(); });
   await act(async () => { finish(); await request; });
   expect(streamSignal.aborted).toBe(true);
   expect(result.current.borrador).toBeNull();
-  expect(result.current.mensajes.at(-1)).toMatchObject({ content: 'Texto aún en curso', estado: 'interrumpido', citations: [] });
+  expect(result.current.mensajes.at(-1)).toMatchObject({ content: '', estado: 'interrumpido', citations: [] });
 });
 
 it('salir del curso cancela la petición activa', async () => {
@@ -94,8 +96,8 @@ it('anuncia solo el resultado final para lectores de pantalla, no cada trozo', a
   act(() => { pending = hook.result.current.preguntar('¿Qué es una fracción?'); });
   await waitFor(() => expect(events).toBeTypeOf('function'));
   act(() => {
-    events('delta', { text: 'Una fracción ' });
-    events('delta', { text: 'representa partes [S1]' });
+    events('progress', { characters: 13 });
+    events('progress', { characters: 35 });
   });
   expect(hook.result.current.anuncio).toBe('');
   await act(async () => {
