@@ -43,7 +43,7 @@ export default function EstudianteInicio() {
   const { usuario } = useSesion();
   const inicio = useDatos('/me/home');
 
-  if (inicio.cargando && !inicio.datos) return <Cargando />;
+  if (inicio.cargando && !inicio.datos) return <Cargando texto="Cargando tu página principal…" forma="tarjetas" />;
   if (inicio.error) return <MensajeError error={inicio.error} />;
   const { courses: cursos, sessions: sesiones, assignments: tareas, announcements: anuncios } = inicio.datos;
   const [proxima, ...otras] = sesiones;

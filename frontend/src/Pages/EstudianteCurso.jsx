@@ -2,6 +2,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom';
 import Anuncios from '../Componentes/Anuncios.jsx';
 import { TarjetaSesion } from '../Componentes/ClasesEnVivo.jsx';
 import EstadoVacio from '../Componentes/EstadoVacio.jsx';
+import { anunciar } from '../Componentes/Anunciador.jsx';
 import { Cargando, MensajeError } from '../Componentes/Estados.jsx';
 import ListaPersonas from '../Componentes/ListaPersonas.jsx';
 import { ListaMateriales } from '../Componentes/Materiales.jsx';
@@ -82,7 +83,7 @@ export default function EstudianteCurso() {
   const nota = useDatos(seccion === 'calificaciones' || seccion === 'quizzes' ? `/courses/${id}/my-grade` : null);
   const trabajoClase = useDatos(seccion === 'calificaciones' ? `/courses/${id}/class-work` : null);
 
-  if (curso.cargando && !curso.datos) return <Cargando />;
+  if (curso.cargando && !curso.datos) return <Cargando texto="Cargando la clase…" />;
   if (curso.error) return <MensajeError error={curso.error} />;
   const datos = curso.datos;
   const lecciones = datos.modules.flatMap((modulo) => modulo.topics.flatMap((tema) => tema.lessons));
@@ -94,6 +95,8 @@ export default function EstudianteCurso() {
 
   function irA(nueva, extra = {}) {
     setParametros({ seccion: nueva, ...extra }, { replace: true });
+    const nombre = PESTANAS.find((opcion) => opcion.id === nueva)?.texto;
+    if (nombre && nueva !== seccion) anunciar(`Sección ${nombre}`);
   }
 
   return (
@@ -126,6 +129,8 @@ export default function EstudianteCurso() {
         ))}
       </nav>
 
+      {/* El panel entra suave al cambiar de sección para que se note el cambio. */}
+      <div key={seccion} className="panel-seccion">
       {seccion === 'novedades' && (
         <div className="novedades">
           <Proximas tareas={tareas.datos} cursoId={id} />
@@ -232,7 +237,7 @@ export default function EstudianteCurso() {
           {practica.datos && !practica.datos.available && <p className="tenue">La práctica diaria se activa cuando tu docente publique el primer quiz.</p>}
           <h2>Quizzes rápidos</h2>
           <MensajeError error={quizzes.error} />
-          {quizzes.cargando && !quizzes.datos && <Cargando />}
+          {quizzes.cargando && !quizzes.datos && <Cargando texto="Cargando los quizzes…" forma="lista" cantidad={2} />}
           {quizzes.datos?.length === 0 && <EstadoVacio ilustracion="tarea" titulo="No hay quizzes todavía" detalle="Cuando tu docente publique uno podrás jugarlo aquí." />}
           <div className="rejilla">
             {quizzes.datos?.map((quiz) => (
@@ -256,7 +261,7 @@ export default function EstudianteCurso() {
       {seccion === 'calificaciones' && (
         <>
           <MensajeError error={nota.error} />
-          {nota.cargando && !nota.datos && <Cargando />}
+          {nota.cargando && !nota.datos && <Cargando texto="Cargando tu nota…" forma="lista" cantidad={2} />}
           {nota.datos && <NotaCurso nota={nota.datos.grade} politica={nota.datos.policy} />}
           <h2>Trabajo en clase</h2>
           <MensajeError error={trabajoClase.error} />
@@ -278,6 +283,7 @@ export default function EstudianteCurso() {
       )}
 
       {seccion === 'personas' && <ListaPersonas cursoId={id} />}
+      </div>
     </>
   );
 }

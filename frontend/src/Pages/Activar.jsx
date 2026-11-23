@@ -52,7 +52,7 @@ export default function Activar() {
             <span>Leí y acepto la <Link to="/privacidad" target="_blank" rel="noopener">política de privacidad</Link>.</span>
           </label>
           <MensajeError error={errorLocal || error} />
-          <button type="submit" className="boton" disabled={enviando || !token || !aceptaTerminos || !aceptaPrivacidad}>{enviando ? 'Activando…' : 'Activar cuenta'}</button>
+          <button type="submit" className="boton" disabled={enviando || !token || !aceptaTerminos || !aceptaPrivacidad} aria-busy={enviando}>{enviando ? 'Activando…' : 'Activar cuenta'}</button>
         </form>
       )}
     </Portada>

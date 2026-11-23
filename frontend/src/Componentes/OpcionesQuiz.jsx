@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+import { anunciar } from './Anunciador.jsx';
 // Figuras y colores de cada opción, para distinguirlas también sin depender del color.
 const FIGURAS = [
   { nombre: 'triángulo', clase: 'rojo', d: 'M12 3l10 18H2z' },
@@ -29,4 +31,17 @@ export default function OpcionesQuiz({ opciones, alElegir, elegida = null, corre
       })}
     </div>
   );
+}
+
+// Anuncia si la respuesta fue correcta (y cuál era la correcta) y lleva el foco al botón para seguir.
+export function useRetroalimentacion(respuesta, opciones) {
+  const boton = useRef(null);
+  useEffect(() => {
+    if (!respuesta) return;
+    const correcta = opciones?.find((opcion) => opcion.id === respuesta.correctOptionId)?.body;
+    const inicio = respuesta.isCorrect ? 'Correcto.' : respuesta.timedOut ? 'Se acabó el tiempo.' : 'Incorrecto.';
+    anunciar(respuesta.isCorrect || !correcta ? inicio : `${inicio} La respuesta correcta era: ${correcta}.`);
+    boton.current?.focus();
+  }, [respuesta, opciones]);
+  return boton;
 }

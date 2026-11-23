@@ -45,7 +45,7 @@ function FormularioPolitica({ cursoId, politica, alGuardar }) {
         <Campo etiqueta="Tope del bono" tipo="number" min={0} max={10} step={0.01} valor={valores.bonusCap} alCambiar={cambiar('bonusCap')} required />
       </div>
       <p className="tenue pequeno">Un cambio en el valor del bono aplica a lo que se gane desde ahora; lo ya ganado conserva su valor. El tope se aplica siempre.</p>
-      <button type="submit" className="boton" disabled={enviando || suma !== 100}>Guardar configuración</button>
+      <button type="submit" className="boton" disabled={enviando || suma !== 100} aria-busy={enviando}>{enviando ? 'Guardando…' : 'Guardar configuración'}</button>
       {guardado && <Aviso tipo="exito">Configuración guardada.</Aviso>}
       <MensajeError error={error} />
     </form>
@@ -92,7 +92,7 @@ function CalificarActividad({ actividad, estudiantes, alGuardar }) {
         <thead><tr><th scope="col">Estudiante</th><th scope="col">Puntos (de {actividad.maxPoints})</th><th scope="col">Comentario</th></tr></thead>
         <tbody>
           {estudiantes.map((estudiante) => (
-            <tr key={estudiante.studentId}>
+            <tr key={estudiante.studentId} className={guardado ? 'fila-nueva' : undefined}>
               <th scope="row">{estudiante.displayName}</th>
               <td>
                 <input type="number" min={0} max={actividad.maxPoints} step={0.01} value={notas[estudiante.studentId]?.points ?? ''}
@@ -107,7 +107,7 @@ function CalificarActividad({ actividad, estudiantes, alGuardar }) {
         </tbody>
       </table>
       <p className="tenue pequeno">Deja vacío el campo de puntos para quitar una calificación.</p>
-      <button type="submit" className="boton" disabled={enviando}>Guardar calificaciones</button>
+      <button type="submit" className="boton" disabled={enviando} aria-busy={enviando}>{enviando ? 'Guardando…' : 'Guardar calificaciones'}</button>
       {guardado && <Aviso tipo="exito">Calificaciones guardadas.</Aviso>}
       <MensajeError error={error} />
     </form>
@@ -125,7 +125,7 @@ export default function CursoCalificaciones() {
   const [nueva, setNueva] = useState({ title: '', maxPoints: 100, workDate: '' });
   const { enviando, error, ejecutar } = useEnvio();
 
-  if ((curso.cargando && !curso.datos) || (notas.cargando && !notas.datos)) return <Cargando />;
+  if ((curso.cargando && !curso.datos) || (notas.cargando && !notas.datos)) return <Cargando texto="Cargando las calificaciones…" forma="lista" />;
   if (curso.error) return <MensajeError error={curso.error} />;
   if (notas.error) return <MensajeError error={notas.error} />;
 
@@ -201,7 +201,7 @@ export default function CursoCalificaciones() {
             <Campo etiqueta="Puntos máximos" tipo="number" min={1} max={1000} valor={nueva.maxPoints} alCambiar={(valor) => setNueva({ ...nueva, maxPoints: valor })} required />
             <Campo etiqueta="Fecha (opcional)" tipo="date" valor={nueva.workDate} alCambiar={(valor) => setNueva({ ...nueva, workDate: valor })} />
           </div>
-          <button type="submit" className="boton" disabled={enviando}>Crear actividad</button>
+          <button type="submit" className="boton" disabled={enviando} aria-busy={enviando}>{enviando ? 'Creando…' : 'Crear actividad'}</button>
         </form>
       </Desplegable>
       <MensajeError error={error || actividades.error} />

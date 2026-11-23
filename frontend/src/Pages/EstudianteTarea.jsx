@@ -72,7 +72,7 @@ export default function EstudianteTarea() {
             <Campo etiqueta="Enlace a tu trabajo (opcional, https://…)" tipo="url" valor={enlace} alCambiar={setEnlace} placeholder="https://" />
             <MensajeError error={error} />
             {guardada && <Aviso tipo="exito">Entrega guardada. Puedes corregirla mientras no esté calificada.</Aviso>}
-            <button type="submit" className="boton" disabled={enviando}>{entrega ? 'Actualizar entrega' : 'Entregar tarea'}</button>
+            <button type="submit" className="boton" disabled={enviando} aria-busy={enviando}>{enviando ? 'Entregando…' : entrega ? 'Actualizar entrega' : 'Entregar tarea'}</button>
           </form>
         )}
       </section>

@@ -18,6 +18,7 @@ export default defineConfig({
           if (/\/node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(id)) return 'vendor-react';
           if (/\/node_modules\/(motion|motion-dom|motion-utils|framer-motion)\//.test(id)) return 'vendor-motion';
           if (id.includes('/node_modules/@react-spring/')) return 'vendor-spring';
+          if (/\/node_modules\/(gsap|@gsap)\//.test(id)) return 'vendor-gsap';
         },
       },
     },
@@ -26,5 +27,6 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     include: ['tests/**/*.test.{js,jsx}'],
+    setupFiles: ['tests/setup.js'],
   },
 });
