@@ -6,7 +6,7 @@
 - La cabecera usa la opción 1: la «M» con birrete oficial ocupa el lugar de la M de «MENTOR» (sin órbita ni estrella). Archivos en `frontend/public/marca/logo-horizontal-*.svg`; las cuatro opciones y la nota de cómo se rellenaron los huecos de la órbita están en `docs/marca/m-birrete/`.
 - Alto del logo: 44 px (50 px en la portada, 36 px en móvil).
 - Ejecutado: lint limpio, 50/50 pruebas de frontend, build correcto y captura de `/login` en tema claro y oscuro. No se volvieron a correr las e2e.
-- Pendiente: regenerar capturas de `docs/mockups` y documentos que muestran el logo anterior.
+- Documentación actualizada: 46 mockups en escritorio y 46 en móvil regenerados (`npx playwright test -c playwright.capturas.config.js`, 10/10), láminas de marca, paleta con el naranja botón `#C2410C`, libro de marca, anteproyecto, modelo de datos y plan de producción en Word y PDF (portada con el logo nuevo y fila del cronograma del 23/11).
 
 ## Sesión 2026-11-20 · GSAP, microinteracciones y accesibilidad
 
@@ -30,7 +30,6 @@
 - Backend: `npm run lint` sin errores; `npm test` **139 de 139** (sin cambios en el backend).
 
 ### Pendiente
-- Regenerar las capturas de `docs/mockups` y los documentos: cambian el naranja de los botones y los estados de carga.
 - Probar con NVDA o VoiceOver los anuncios del anunciador global (se revisaron en el árbol de accesibilidad, no con un lector real).
 - Revisar en un navegador real la vista 390 × 844 y 1280 × 900 en modo oscuro y alto contraste.
 
