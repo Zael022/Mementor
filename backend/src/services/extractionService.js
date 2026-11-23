@@ -1,5 +1,6 @@
 import mammoth from 'mammoth';
 import { extractText, getDocumentProxy } from 'unpdf';
+import { inspectOoxml } from '../utils/ooxml.js';
 
 // Extrae el texto de los formatos que el tutor puede consultar.
 
@@ -49,6 +50,8 @@ export async function extractDocument(buffer, mimeType) {
 
   let text;
   if (kind === 'docx') {
+    // Antes de descomprimir con mammoth (también para archivos que llegan desde Drive).
+    if (!inspectOoxml(buffer, 'docx').ok) throw new ExtractionError('DOCX_UNREADABLE', 'El archivo no es un documento de Word válido.');
     try {
       ({ value: text } = await mammoth.extractRawText({ buffer }));
     } catch {

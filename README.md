@@ -5,7 +5,7 @@ Plataforma educativa adaptativa: cursos, lecciones, cuestionarios con correcció
 **Stack:** React + Vite (JSX) · Node.js + Express · MySQL 8 + Sequelize (migraciones) · Google Cloud RAG Engine (opcional) · Anthropic u OpenAI para generar respuestas.
 **Sin datos precargados:** después de migrar, la base queda vacía (solo el catálogo de roles). No hay seeds, cuentas demo ni IA simulada.
 
-**En producción:** frontend https://mentor-ai.vercel.app · API https://mentor-api.onrender.com/api/v1 (se confirman al desplegar; ver `docs/despliegue.md`).
+**Despliegue:** pendiente de verificar. Las direcciones previstas son https://mentor-ai.vercel.app (frontend) y https://mentor-api.onrender.com/api/v1 (API), pero no cuentan como publicadas hasta completar el registro de aceptación de `docs/despliegue.md` (sección 6) sobre la URL pública.
 
 ## Entregables del Proyecto Final (FWD Costa Rica)
 | Documento | Word y PDF |
@@ -157,12 +157,12 @@ Recorrido: el docente crea un quiz en *Quizzes*, le agrega preguntas y lo public
 ## 5. Pruebas
 
 ```powershell
-# Backend: 156 pruebas en mentor_ai_test (crean y borran sus datos). Google Cloud, la IA y las APIs externas son dobles.
+# Backend: 167 pruebas en mentor_ai_test (crean y borran sus datos). Google Cloud, la IA y las APIs externas son dobles.
 cd backend
 npm run lint
 npm test
 
-# Frontend: lint, 54 pruebas de componentes y hooks (Vitest + jsdom) y compilación
+# Frontend: lint, 56 pruebas de componentes y hooks (Vitest + jsdom) y compilación
 cd ..\frontend
 npm run lint
 npm test
@@ -202,7 +202,9 @@ Despliegue paso a paso (TiDB Cloud, Render, Vercel y n8n) en `docs/despliegue.md
 - **Consentimiento.** Con términos o privacidad pendientes, el servidor rechaza cualquier operación nueva (`403 CONSENT_REQUIRED`) salvo aceptar, cerrar sesión, leer y pedir la baja; la interfaz vuelve a mostrar el diálogo.
 - **Notas emitidas.** El puntaje máximo de una tarea con entregas calificadas no se puede cambiar (`409 GRADED_MAX_LOCKED`).
 - **Seguridad web.** Inyección SQL, XSS (CSP en `frontend/vercel.json`), CSRF y CORS estricto (`403 ORIGIN_NOT_ALLOWED`): medidas, investigación, laboratorio y evidencias en `docs/seguridad/`.
-- **Archivos.** Además de la extensión y el tipo, se revisan los primeros bytes de cada archivo (PDF, DOCX/PPTX/XLSX, PNG, JPEG y texto UTF-8). Un archivo renombrado se rechaza.
+- **Archivos.** Además de la extensión y el tipo, se revisan los primeros bytes de cada archivo (PDF, PNG, JPEG y texto UTF-8). Los DOCX/PPTX/XLSX se abren como ZIP y se revisa su estructura antes de extraer texto: partes obligatorias, rutas seguras, sin cifrado, sin archivos anidados y con límites de entradas, tamaño descomprimido y razón de compresión. Un archivo renombrado, truncado o una «bomba ZIP» se rechazan.
+- **Cambio de correo.** El correo de acceso solo cambia al abrir el enlace enviado a la nueva dirección (60 minutos, un solo uso); la dirección anterior recibe un aviso al pedirlo y al confirmarlo. Requiere SMTP configurado.
+- **Fechas.** Las fechas `AAAA-MM-DD` se validan contra el calendario (un 31 de febrero se rechaza con 422).
 - **Retención.** Una vez al día se borra el texto de versiones antiguas que ninguna respuesta cita, se resume por mes el consumo con más de 90 días, se borra el registro detallado de los asistentes con más de 90 días y se borran las conversaciones sin actividad por más de 365 días. Los plazos se cambian en `backend/.env` (0 = no borrar).
 - **Monitoreo.** `GET /api/v1/health` informa si MySQL responde y si el tutor y Google Cloud están configurados, sin exponer claves, proyectos ni proveedores.
 

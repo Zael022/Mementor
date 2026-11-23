@@ -1,4 +1,5 @@
 import * as authService from '../services/authService.js';
+import * as emailChangeService from '../services/emailChangeService.js';
 import * as passwordResetService from '../services/passwordResetService.js';
 import { pendingConsents } from '../services/consentService.js';
 import { SESSION_COOKIE } from '../middlewares/auth.js';
@@ -50,4 +51,9 @@ export async function resetPassword(req, res) {
   await passwordResetService.resetPassword(req.body);
   res.clearCookie(SESSION_COOKIE, { path: '/' });
   res.json({ data: { ok: true } });
+}
+
+// Confirma el nuevo correo con el enlace enviado a esa dirección.
+export async function confirmEmail(req, res) {
+  res.json({ data: await emailChangeService.confirmEmailChange(req.body) });
 }

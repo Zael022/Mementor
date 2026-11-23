@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { removeStored } from './fileStore.js';
 import {
-  ConsentRecord, DataDeletionRequest, PasswordReset, User, UserSession, sequelize,
+  ConsentRecord, DataDeletionRequest, EmailChange, PasswordReset, User, UserSession, sequelize,
 } from '../models/index.js';
 import { POLICY_VERSIONS, pendingConsents } from './consentService.js';
 import { conflict, forbidden, notFound } from '../utils/AppError.js';
@@ -88,6 +88,7 @@ export async function processDeletion(requestId, via, { notify = true } = {}) {
     }, { transaction });
     await UserSession.update({ revokedAt: new Date() }, { where: { userId: user.id, revokedAt: null }, transaction });
     await PasswordReset.destroy({ where: { userId: user.id }, transaction });
+    await EmailChange.destroy({ where: { userId: user.id }, transaction });
     // Conversaciones con el tutor (sus mensajes y citas se borran en cascada) y preferencias personales.
     await sequelize.query('DELETE FROM ai_threads WHERE user_id = :id', { replacements: { id: user.id }, transaction });
     await sequelize.query('DELETE FROM user_preferences WHERE user_id = :id', { replacements: { id: user.id }, transaction });

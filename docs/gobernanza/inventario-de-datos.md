@@ -27,6 +27,7 @@
 | Auditoría | MySQL `audit_logs` | MENTOR | Administración y rol auditor (solo lectura) | Sin contenido de documentos | Administración de la institución |
 | Catálogo de roles | MySQL `roles` (FK desde `users.role`) | Migración (dato de referencia) | Nadie lo edita desde la interfaz | Permanente | Operador |
 | Restablecimiento de contraseña (hash del token) | MySQL `password_resets` | La propia persona al pedirlo | Nadie desde la interfaz | Vence a los 60 minutos y sirve una vez | Operador |
+| Cambio de correo pendiente (nuevo correo y hash del token) | MySQL `email_changes` | La propia persona al pedirlo | Nadie desde la interfaz | Vence a los 60 minutos y sirve una vez; se borra con la baja de la cuenta | Operador |
 | Aceptación de términos y privacidad (versión, fecha) | MySQL `consent_records` | La propia persona al activar la cuenta o reaceptar | La persona; administración y auditoría de su institución | Se conserva como evidencia aun después de la baja | Administración de la institución |
 | Solicitudes de baja y qué se conservó | MySQL `data_deletion_requests` | La propia persona (confirmando su contraseña) | Administración y auditoría | Permanente, sin datos personales tras anonimizar | Administración de la institución |
 | Ejecuciones de agentes de IA (agente, resultado, modelo, tokens, latencia; sin contenido) | MySQL `agent_runs` | MENTOR | La persona (su historial); administración y auditoría | Mientras exista la institución | Operador |

@@ -142,6 +142,19 @@ test('redactor, coach y resumen responden con su formato; una respuesta mal form
   const coach = await ctx.org.student.post('/agents/study_coach/run', { courseId: ctx.course.courseId, minutes: 30 });
   assert.equal(coach.status, 200, JSON.stringify(coach.body));
   assert.equal(JSON.stringify(calls[0]).includes(ctx.org.student.user.displayName), false);
+  assert.deepEqual([coach.body.data.result.totalMinutes, coach.body.data.result.adjusted], [15, false]);
+
+  // P2 de la revisión: con 30 minutos disponibles, un plan de 100 minutos se recorta a 30.
+  fakeProvider(JSON.stringify({ plan: [
+    { minutes: 40, activity: 'Repasar fracciones', why: 'Menor dominio' },
+    { minutes: 40, activity: 'Tarea 1', why: 'Entrega cercana' },
+    { minutes: 20, activity: 'Práctica diaria', why: 'Racha' },
+  ], motivation: '¡Tú puedes!' }));
+  const largo = await ctx.org.student.post('/agents/study_coach/run', { courseId: ctx.course.courseId, minutes: 30 });
+  const plan = largo.body.data.result;
+  assert.equal(plan.plan.reduce((total, paso) => total + paso.minutes, 0), 30);
+  assert.deepEqual([plan.totalMinutes, plan.budgetMinutes, plan.adjusted], [30, 30, true]);
+  assert.deepEqual(plan.plan.map((paso) => paso.activity), ['Repasar fracciones']);
 
   fakeProvider(JSON.stringify({ summary: 'Las fracciones son partes de un entero.', keyPoints: ['Numerador', 'Denominador'], selfCheck: [{ question: '¿Puede el denominador ser cero?', answer: 'No' }] }));
   const resumen = await ctx.org.student.post('/agents/lesson_summarizer/run', { lessonId: ctx.lessonId });

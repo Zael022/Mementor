@@ -1,6 +1,21 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-23. Asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+**Última actualización** — 2026-11-23. Correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+
+## Sesión 2026-11-23 (noche) · Correcciones de la revisión independiente
+Rama `fix/revision-independiente` (sobre `feature/seguridad-web`). Decisiones en `docs/adr/0007-revision-independiente.md`.
+
+| Hallazgo | Cambio | Prueba |
+| --- | --- | --- |
+| P1 OOXML | `utils/ooxml.js`: directorio central, partes obligatorias, rutas seguras, sin cifrado ni anidados, límites de entradas, tamaño y razón; usado en `fileSignature.js` y antes de `mammoth` | `ooxml.test.js` (válidos reales, ZIP renombrado, truncado, bomba de 30 MB, anidado, `..`, tamaño falsificado) |
+| P2 fechas | `utils/dates.js` en esquemas, tipo de cambio, feriados y `clock.addDays` | `dates.test.js` |
+| P2 Coach | `fitPlanToBudget` recorta el plan al presupuesto; la interfaz muestra el total | `agents.test.js` |
+| P2 tareas de fondo | `runExclusive` con renovación del turno y cancelación; un turno por tarea | `coordination.test.js` (tarea lenta, turno perdido) |
+| P2 despliegue | README «Despliegue: pendiente de verificar»; registro de aceptación en `docs/despliegue.md` §6 | — |
+| P3 correo | `email_changes` (migración `20261123000200`), `emailChangeService.js`, `POST /auth/email/confirm`, página `/confirmar-correo`, avisos a la dirección anterior | `profile.test.js` (pendiente hasta confirmar, enlace reemplazado, usado, vencido, dirección tomada), `Perfil.test.jsx` |
+
+Ejecutado el 2026-11-23: backend lint + 167/167, frontend lint + 56/56 + build, Playwright 38/38.
+Pendiente: despliegue real con su registro de aceptación, pruebas con docentes y estudiantes, mejoras de experiencia (código del curso, inicio con tres acciones, recorrido guiado, explicación de recomendaciones), lector de pantalla y validación institucional de datos de menores.
 
 ## Sesión 2026-11-23 (tarde) · Asignación de seguridad: SQL, XSS, CSRF y CORS
 Rama `feature/seguridad-web` (sobre `fix/auditoria`). Todo en `docs/seguridad/`.

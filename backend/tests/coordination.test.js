@@ -6,7 +6,7 @@ import { prepareDatabase, closeDatabase, createPlatformAdmin, loginAs, setupInst
 import { AiMessage, AiUsageEvent, SourceVersion, User } from '../src/models/index.js';
 import { askTutor } from '../src/services/tutorService.js';
 import { sequelize } from '../src/config/database.js';
-import { holdLease, releaseLease } from '../src/services/coordination.js';
+import { holdLease, releaseLease, runExclusive } from '../src/services/coordination.js';
 import { MysqlRateLimitStore, purgeExpiredRateLimits } from '../src/services/rateLimitStore.js';
 import { limiter } from '../src/middlewares/common.js';
 import { purgeOldAgentRuns, purgeOldConversations, purgeUncitedVersionText, rollupUsage } from '../src/services/retentionService.js';
@@ -24,6 +24,52 @@ test('solo una instancia tiene el turno de tareas; otra lo toma al liberarse o v
   // Un turno vencido lo puede tomar otra instancia.
   await sequelize.query("UPDATE job_leases SET expires_at = NOW(3) - INTERVAL 1 SECOND WHERE name = 'prueba'");
   assert.equal(await holdLease('prueba', 60000, 'instancia-a'), true);
+});
+
+// P2 de la revisión: una tarea más larga que el vencimiento del turno no se duplica en otra instancia.
+test('el latido renueva el turno mientras una tarea lenta corre', async () => {
+  const espera = (ms) => new Promise((listo) => setTimeout(listo, ms));
+  const ttl = 900;
+  let ejecuciones = 0;
+  let simultaneas = 0;
+  let maximo = 0;
+  const lenta = async () => {
+    ejecuciones += 1;
+    simultaneas += 1;
+    maximo = Math.max(maximo, simultaneas);
+    await espera(ttl * 3);
+    simultaneas -= 1;
+  };
+  const a = runExclusive('tarea:lenta', ttl, lenta, { owner: 'instancia-a' });
+  await espera(50);
+  // La instancia B intenta varias veces durante la ejecución, incluso después de que el turno habría vencido.
+  const intentos = [];
+  for (let i = 0; i < 5; i += 1) {
+    await espera(ttl / 2);
+    intentos.push((await runExclusive('tarea:lenta', ttl, lenta, { owner: 'instancia-b' })).ran);
+  }
+  assert.deepEqual(await a, { ran: true, lostLease: false });
+  assert.deepEqual(intentos, [false, false, false, false, false]);
+  assert.equal(maximo, 1);
+  // Al terminar se libera: la otra instancia puede ejecutar la siguiente vez sin esperar.
+  assert.equal((await runExclusive('tarea:lenta', ttl, async () => {}, { owner: 'instancia-b' })).ran, true);
+  assert.equal(ejecuciones, 1);
+});
+
+test('si otra instancia toma el turno, la tarea recibe la señal de detenerse', async () => {
+  const ttl = 900;
+  let senal;
+  const tarea = runExclusive('tarea:perdida', ttl, async (signal) => {
+    senal = signal;
+    // Se simula una pausa larga de la instancia: el turno vence y otra lo toma.
+    await sequelize.query("UPDATE job_leases SET owner = 'instancia-b', expires_at = NOW(3) + INTERVAL 60 SECOND WHERE name = 'tarea:perdida'");
+    await new Promise((listo) => setTimeout(listo, ttl));
+  }, { owner: 'instancia-a' });
+  assert.deepEqual(await tarea, { ran: true, lostLease: true });
+  assert.equal(senal.aborted, true);
+  // No libera un turno que ya no es suyo.
+  const [fila] = await sequelize.query("SELECT owner FROM job_leases WHERE name = 'tarea:perdida'", { type: 'SELECT' });
+  assert.equal(fila.owner, 'instancia-b');
 });
 
 test('dos instancias con RATE_LIMIT_STORE=mysql comparten el mismo conteo', async () => {

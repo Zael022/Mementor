@@ -1,11 +1,10 @@
-import { open } from 'node:fs/promises';
+import { open, readFile } from 'node:fs/promises';
+import { inspectOoxml } from './ooxml.js';
 
 // Firmas de los formatos permitidos: el contenido debe coincidir con la extensión declarada.
+// DOCX, PPTX y XLSX no se juzgan por la firma: se revisa su estructura completa (utils/ooxml.js).
 const SIGNATURES = {
   '.pdf': [Buffer.from('%PDF-')],
-  '.docx': [Buffer.from([0x50, 0x4b, 0x03, 0x04])],
-  '.pptx': [Buffer.from([0x50, 0x4b, 0x03, 0x04])],
-  '.xlsx': [Buffer.from([0x50, 0x4b, 0x03, 0x04])],
   '.png': [Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])],
   '.jpg': [Buffer.from([0xff, 0xd8, 0xff])],
   '.jpeg': [Buffer.from([0xff, 0xd8, 0xff])],
@@ -40,6 +39,7 @@ function looksLikeText(sample) {
 // Indica si el contenido real del archivo corresponde a su extensión.
 export async function matchesSignature(filePath, extension) {
   const ext = String(extension || '').toLowerCase();
+  if (['.docx', '.pptx', '.xlsx'].includes(ext)) return inspectOoxml(await readFile(filePath), ext.slice(1)).ok;
   if (ext === '.txt') return looksLikeText(await readStart(filePath, TEXT_SAMPLE_BYTES));
   // WebP: «RIFF», 4 bytes de tamaño y luego «WEBP».
   if (ext === '.webp') {

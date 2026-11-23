@@ -220,11 +220,13 @@ export const AGENTS = {
       };
     },
     system: 'Eres un coach de estudio amable y concreto. Priorizas temas con menor dominio y entregas cercanas, y respetas el tiempo disponible.',
-    prompt: ({ data }) => `<dato>${asData(JSON.stringify(data))}</dato>\nFormato: {"plan":[{"minutes":10,"activity":"...","why":"..."}],"motivation":"..."}`,
+    prompt: ({ data }) => `<dato>${asData(JSON.stringify(data))}</dato>\nLa suma de los minutos del plan no puede superar ${data.minutes}.\nFormato: {"plan":[{"minutes":10,"activity":"...","why":"..."}],"motivation":"..."}`,
     outputSchema: z.object({
       plan: z.array(z.object({ minutes: z.number().int().min(1).max(240), activity: z.string().max(300), why: z.string().max(300) })).min(1).max(8),
       motivation: z.string().max(500),
     }),
+    // El modelo puede pasarse del tiempo disponible: el servidor recorta el plan para que la suma nunca lo supere.
+    finalize: (result, { data }) => fitPlanToBudget(result, data.minutes),
   },
 
   // 8. Resumen de lección con preguntas de autoevaluación.
@@ -256,3 +258,23 @@ export const AGENTS = {
 };
 
 export { detectPersonalData };
+
+// Recorta un plan de estudio al tiempo disponible: conserva el orden propuesto, acorta la actividad que
+// cruza el límite si le quedan al menos 5 minutos y descarta el resto. Informa si hubo ajuste.
+export function fitPlanToBudget(result, budget) {
+  const plan = [];
+  let used = 0;
+  for (const item of result.plan) {
+    const left = budget - used;
+    if (left <= 0) break;
+    if (item.minutes <= left) {
+      plan.push(item);
+      used += item.minutes;
+    } else if (left >= 5 || plan.length === 0) {
+      plan.push({ ...item, minutes: left });
+      used += left;
+    }
+  }
+  const proposed = result.plan.reduce((total, item) => total + item.minutes, 0);
+  return { ...result, plan, totalMinutes: used, budgetMinutes: budget, adjusted: proposed > budget };
+}

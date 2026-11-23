@@ -56,6 +56,23 @@ Sin Google Cloud, la alternativa es un plan de Render con disco persistente (`ST
 - Los tres workflows aparecen como ejecutados en n8n y en la tabla `integration_runs`.
 - `/privacidad`, `/terminos` y la baja de cuenta están disponibles.
 - En DevTools → Application no hay tokens en localStorage: la sesión va en una cookie httpOnly.
+- Con SMTP configurado: «¿Olvidaste tu contraseña?» y el cambio de correo del perfil envían su enlace, y el correo de acceso solo cambia al confirmarlo desde la nueva dirección.
+- Un DOCX renombrado desde un ZIP cualquiera se rechaza al subirlo.
+- Las tareas periódicas aparecen una sola vez por turno en los registros aunque haya dos instancias.
+
+### Registro de aceptación
+El README solo debe decir que la plataforma está publicada cuando esta tabla esté completa. Cada fila se marca sobre la URL pública, con fecha, quién lo comprobó y una evidencia (captura o enlace).
+
+| Comprobación | Fecha | Responsable | Evidencia | Resultado |
+| --- | --- | --- | --- | --- |
+| Frontend y API responden por HTTPS | | | | |
+| `GET /api/v1/health` responde `ok` | | | | |
+| Inicio de sesión de cada rol y 403 en rutas ajenas | | | | |
+| Tutor responde con citas (o error claro sin clave) | | | | |
+| Material sobrevive a un reinicio de Render (misma `X-Content-SHA256`) | | | | |
+| Correos de recuperación y de cambio de correo llegan | | | | |
+| Workflows de n8n registrados en `integration_runs` | | | | |
+| Respaldo restaurado y verificado (sección 8) | | | | |
 
 ## 7. Reversión
 - **Render:** *Events → Rollback* a la versión anterior. Si una migración nueva causó el problema, `npm run db:migrate:undo` en el *Shell* antes del rollback.

@@ -13,6 +13,7 @@ const CuentaEliminada = lazy(() => import('../Pages/CuentaEliminada.jsx'));
 const Gobernanza = lazy(() => import('../Pages/Gobernanza.jsx'));
 const Asistentes = lazy(() => import('../Pages/Asistentes.jsx'));
 const RestablecerClave = lazy(() => import('../Pages/RestablecerClave.jsx'));
+const ConfirmarCorreo = lazy(() => import('../Pages/ConfirmarCorreo.jsx'));
 const PlataformaInstituciones = lazy(() => import('../Pages/PlataformaInstituciones.jsx'));
 const AdminUsuarios = lazy(() => import('../Pages/AdminUsuarios.jsx'));
 const AdminAuditoria = lazy(() => import('../Pages/AdminAuditoria.jsx'));
@@ -77,6 +78,7 @@ export default function Rutas() {
       <Route path="/activar" element={<Suspense fallback={<Cargando />}><Activar /></Suspense>} />
       <Route path="/recuperar" element={<Suspense fallback={<Cargando />}><RecuperarClave /></Suspense>} />
       <Route path="/restablecer" element={<Suspense fallback={<Cargando />}><RestablecerClave /></Suspense>} />
+      <Route path="/confirmar-correo" element={<Suspense fallback={<Cargando />}><ConfirmarCorreo /></Suspense>} />
       {/* Documentos legales: públicos, se leen sin iniciar sesión. */}
       <Route path="/terminos" element={<Suspense fallback={<Cargando />}><Terminos /></Suspense>} />
       <Route path="/privacidad" element={<Suspense fallback={<Cargando />}><Privacidad /></Suspense>} />

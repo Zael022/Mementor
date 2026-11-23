@@ -37,3 +37,6 @@
 | R30 | Notas alteradas al editar una tarea ya calificada | A | El puntaje máximo queda bloqueado con entregas calificadas; ninguna entrega supera el 100 % | — | Docente |
 | R31 | Operaciones sin aceptar la política vigente | M | El servidor rechaza escrituras con documentos pendientes (`CONSENT_REQUIRED`) | Validar el tratamiento de datos de menores con la institución | Administración |
 | R32 | Despliegue que no arranca | M | `sequelize-cli` en dependencias de producción; Node fijado en 22.22.2 en Render, CI y `engines` | Confirmar en el primer despliegue real que `/health` responde | Operador |
+| R33 | Archivos de Office falsos o «bombas ZIP» | M | Estructura OOXML revisada antes de aceptar o extraer: partes obligatorias, rutas seguras, sin cifrado ni anidados, límites de entradas, tamaño y razón de compresión (ADR 0007) | Repetir con archivos reales de la institución | Desarrollo |
+| R34 | Robo de cuenta cambiando el correo de acceso | M | El correo solo cambia al confirmar desde la nueva dirección (token de un uso, 60 min); aviso a la dirección anterior al pedir y al confirmar | — | Desarrollo |
+| R35 | Tareas periódicas duplicadas entre instancias | B | Turno por tarea en `job_leases` renovado mientras corre; la instancia que lo pierde cancela su tarea (ADR 0007) | Comprobar en el despliegue real con dos instancias | Operador |

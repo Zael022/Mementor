@@ -2,7 +2,7 @@ import path from 'node:path';
 import { Op } from 'sequelize';
 import { User, UserSession, sequelize } from '../models/index.js';
 import { avatarContentType, avatarDir } from '../middlewares/upload.js';
-import { conflict, invalid, notFound } from '../utils/AppError.js';
+import { invalid, notFound } from '../utils/AppError.js';
 import { matchesSignature } from '../utils/fileSignature.js';
 import { hashPassword } from '../utils/security.js';
 import { recordAudit } from './auditService.js';
@@ -61,18 +61,8 @@ export async function changePassword(user, session, { currentPassword, newPasswo
   return { otherSessionsClosed: closed };
 }
 
-// Cambia el correo de acceso confirmando con la contraseña.
-export async function changeEmail(user, { currentPassword, newEmail }) {
-  const row = await confirmPassword(user.id, currentPassword);
-  if (newEmail === row.email) throw invalid('Ese ya es tu correo.');
-  if (await User.findOne({ where: { email: newEmail } })) throw conflict('EMAIL_IN_USE', 'Ese correo ya está registrado.');
-  await sequelize.transaction(async (transaction) => {
-    await row.update({ email: newEmail }, { transaction });
-    // Sin guardar los correos en la auditoría: basta con saber que cambió.
-    await recordAudit({ actor: user, action: 'user.email_changed', resourceType: 'user', resourceId: user.id, transaction });
-  });
-  return profileDto(row);
-}
+// El cambio de correo se confirma desde la nueva dirección (ver emailChangeService).
+export { requestEmailChange as changeEmail } from './emailChangeService.js';
 
 async function removeAvatarFile(name) {
   if (name && AVATAR_NAME.test(name)) await removeStored('avatars', name).catch(() => {});

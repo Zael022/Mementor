@@ -2,6 +2,7 @@ import { ExchangeRate } from '../../models/index.js';
 import { AppError } from '../../utils/AppError.js';
 import { dayKey } from '../../utils/clock.js';
 import { getJson } from './httpClient.js';
+import { isCalendarDate } from '../../utils/dates.js';
 
 // API pública del Ministerio de Hacienda que republica el tipo de cambio de referencia del BCCR.
 const HACIENDA_URL = () => process.env.EXCHANGE_RATE_URL || 'https://api.hacienda.go.cr/indicadores/tc/dolar';
@@ -12,7 +13,7 @@ export function parseHacienda(json) {
   const buy = Number(dolar?.compra?.valor);
   const sell = Number(dolar?.venta?.valor);
   const date = String(dolar?.venta?.fecha || dolar?.compra?.fecha || '').slice(0, 10);
-  if (!(buy > 0) || !(sell > 0) || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+  if (!(buy > 0) || !(sell > 0) || !isCalendarDate(date)) {
     throw new AppError(502, 'EXTERNAL_FORMAT', 'La respuesta del tipo de cambio cambió de formato.');
   }
   return { date, buy, sell };
