@@ -1,5 +1,7 @@
 # Modelo de datos conceptual (MySQL)
 
+> Avance parcial de seguimiento institucional: la migración `20261124000100` agrega `platform_crm_accounts` (una por institución, responsable, estado de incorporación, necesidades, próxima revisión y versión) y `platform_crm_contacts` (cuenta, contacto profesional, actor y clave de reintento). Son distintas de las tablas `crm_*` de admisiones. La conservación y el resto del módulo siguen pendientes; consultar ADR 0007.
+
 **Implementar con modelos, asociaciones y migraciones Sequelize** en `backend/src/models/` y `backend/database/migrations/`. Esta lista es conceptual: no insertar filas predefinidas durante migraciones. No usar `sequelize.sync({force: true})` en entornos persistentes.
 
 ## Núcleo

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import crmRoutes from './crmRoutes.js';
+import platformCrmRoutes from './platformCrmRoutes.js';
 import healthRoutes from './healthRoutes.js';
 import authRoutes from './authRoutes.js';
 import adminRoutes from './adminRoutes.js';
@@ -34,4 +35,5 @@ router.use(integrationRoutes);
 router.use(personalizationRoutes);
 router.use(profileRoutes);
 router.use(crmRoutes);
+router.use(platformCrmRoutes);
 export default router;

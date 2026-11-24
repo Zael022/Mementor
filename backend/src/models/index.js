@@ -1,4 +1,5 @@
 import { sequelize } from '../config/database.js';
+import { PlatformCrmAccount, PlatformCrmContact } from './PlatformCrm.js';
 import { CrmCycle, CrmProspect, CrmApplication, CrmStageEvent, CrmFollowup, CrmDraft, CrmConsent, CrmPrivacyCase } from './Crm.js';
 import { Institution } from './Institution.js';
 import { Role, User } from './User.js';
@@ -24,6 +25,9 @@ import {
 import { UserPreference, TopicReview, TopicReviewLog, StudyPlan, StudyPlanItem } from './Personalization.js';
 
 // Define las relaciones entre los modelos.
+Institution.hasOne(PlatformCrmAccount, { foreignKey: 'institutionId', as: 'platformCrmAccount' });
+PlatformCrmAccount.belongsTo(Institution, { foreignKey: 'institutionId', as: 'institution' });
+PlatformCrmAccount.hasMany(PlatformCrmContact, { foreignKey: 'accountId', as: 'contacts' });
 CrmApplication.belongsTo(CrmProspect, { foreignKey: 'prospectId', as: 'prospect' });
 CrmApplication.belongsTo(CrmCycle, { foreignKey: 'cycleId', as: 'cycle' });
 CrmApplication.belongsTo(User, { foreignKey: 'responsibleId', as: 'responsible' });
@@ -124,6 +128,7 @@ StudyPlanItem.belongsTo(StudyPlan, { foreignKey: 'studyPlanId', as: 'plan' });
 StudyPlanItem.belongsTo(Topic, { foreignKey: 'topicId', as: 'topic' });
 
 export {
+  PlatformCrmAccount, PlatformCrmContact,
   CrmCycle, CrmProspect, CrmApplication, CrmStageEvent, CrmFollowup, CrmDraft, CrmConsent, CrmPrivacyCase,
   UserPreference, TopicReview, TopicReviewLog, StudyPlan, StudyPlanItem,
   CourseRagCorpus, KnowledgeSource, SourceVersion, AiMessageSource, InstitutionDriveFolder, CourseDriveLink, AiUsageEvent,

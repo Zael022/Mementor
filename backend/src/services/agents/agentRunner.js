@@ -55,8 +55,8 @@ async function reserve(user, agent, courseId, inputChars) {
 
 // Ejecuta un agente: permisos, cuota, contexto autorizado, llamada al modelo, validación y bitácora.
 export async function runAgent(user, key, rawInput, { workflow = false } = {}) {
-  const agent = AGENTS[key];
-  if (!agent || agent.external) throw notFound('Asistente no encontrado.');
+  const agent = Object.hasOwn(AGENTS, key) ? AGENTS[key] : null;
+  if (!agent || agent.external || !Array.isArray(agent.roles) || !agent.inputSchema || typeof agent.buildContext !== 'function') throw notFound('Asistente no encontrado.');
   if (agent.workflowOnly && !workflow) throw invalid('Abre una solicitud de admisiones para generar y guardar un borrador revisable.');
   if (!agent.roles.includes(user.role)) throw forbidden('Tu rol no puede usar este asistente.');
   const parsed = agent.inputSchema.safeParse(rawInput ?? {});

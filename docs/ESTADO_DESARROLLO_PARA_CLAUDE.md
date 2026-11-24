@@ -1,5 +1,23 @@
 # Estado de desarrollo — mantener actualizado
 
+## Sesión 2026-11-24 · CRM de instituciones de plataforma, avance parcial
+
+Se añadió una ficha separada del CRM de admisiones: lista de instituciones con búsqueda y paginación, creación explícita idempotente de ficha, edición versionada y registro de contactos con clave de reintento. Acceso y auditoría son de plataforma. Se agregaron la migración aditiva `20261124000100`, modelos, servicio, rutas, pantalla y pruebas. No se ha migrado la base de uso. La implementación sigue incompleta: faltan tareas, casos, actividades, pasos verificables, panel, edición/supresión de contactos y conservación; no introducir contactos reales mientras falten controles de privacidad. Detalles en `docs/adr/0007-crm-instituciones.md`.
+
+Verificación: lint de ambos proyectos; frontend 53 pruebas y build correctos. Suite backend completa: 170 pruebas correctas con MySQL local y base temporal descartable (`NODE_ENV=test node --test --test-concurrency=1 tests/**/*.test.js`), incluidas las pruebas de admisiones y del nuevo módulo. Navegador: `playwright test e2e/platform-crm.spec.js`, 2 pruebas correctas en escritorio y móvil, con base descartable. La primera corrida del módulo usó un esquema anterior porque la migración se editó durante esa ejecución; la repetición aislada con esquema definitivo pasó. Las primeras corridas de navegador fallaron por el consentimiento inicial de la cuenta temporal y se corrigió su preparación; la repetición pasó. No se ejecutaron todas las pruebas de navegador ni comparación visual de capturas.
+
+## Sesión 2026-11-24 · Seguridad Express complementaria, avance parcial
+
+Se revisó la presentación de 27 diapositivas y el estado actual. Se exige vencimiento, sujeto e identificador en JWT; el login de cuenta inexistente verifica un hash ficticio representativo; bcrypt no acepta costes menores a 10 fuera de test (valor inválido vuelve a 12). Lint en ambos proyectos, tres pruebas unitarias nuevas, 51 pruebas frontend y build pasaron. La matriz y sus pendientes están en `docs/seguridad/SEGURIDAD_EXPRESS_COMPLEMENTARIA.md`. MFA, validación de correo y política de contraseñas del encargo siguen pendientes. No se cambió el diseño ni se añadieron migraciones.
+
+Suite completa backend: 166 pruebas correctas con MySQL local en base temporal creada y eliminada para esta corrida. Playwright `e2e/acceso.spec.js`: 3 pruebas correctas con otra base temporal eliminada y proveedores dobles; no se ejecutó toda la suite e2e.
+
+## Sesión 2026-11-24 · Seguridad OWASP, avance parcial
+
+Se añadieron bloqueos transaccionales a recuperación y activación, límite de 72 bytes UTF-8 para nuevas contraseñas y rechazo de propiedades heredadas como agentes. El scrypt largo no se migra automáticamente a bcrypt. La revisión, riesgos pendientes y resultados de auditoría están en `docs/seguridad/REVISION_OWASP_2025.md`. No se cambiaron estilos ni navegación. La revisión de las diez categorías no está terminada; Drive y OOXML requieren atención prioritaria.
+
+Verificación: lint backend y frontend correctos; suite backend MySQL 162 pruebas correctas (incluye recuperación concurrente); frontend 51 pruebas y build correctos; Playwright `e2e/acceso.spec.js` 3 pruebas correctas en escritorio/móvil con servicios locales y base `_e2e`. No se ejecutó toda la suite e2e ni se probó Google real. La prueba de activación concurrente se agregó después de iniciar la suite completa y pasó en una ejecución separada de `tests/security.test.js` (9 pruebas).
+
 **Última actualización** — 2026-11-20. Requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
 
 ## Sesión 2026-11-20 · CRM de admisiones y mejoras obligatorias

@@ -8,6 +8,7 @@ import Icono from './Iconos.jsx';
 const GENERAL = {
   platform_admin: [
     { to: '/plataforma/instituciones', texto: 'Instituciones', icono: 'instituciones' },
+    { to: '/plataforma/crm-instituciones', texto: 'Seguimiento institucional', icono: 'instituciones' },
     { to: '/admin/auditoria', texto: 'Auditoría', icono: 'bitacora' },
     { to: '/admin/gobernanza', texto: 'Gobernanza', icono: 'gobernanza' },
   ],

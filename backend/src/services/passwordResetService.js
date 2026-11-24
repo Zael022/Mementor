@@ -33,13 +33,15 @@ export async function requestReset(email) {
 // Cambia la contraseña con un token vigente y cierra todas las sesiones abiertas.
 export async function resetPassword({ token, password }) {
   assertStrongPassword(password);
-  const reset = await PasswordReset.findOne({
-    where: { tokenHash: hashToken(token), usedAt: null, expiresAt: { [Op.gt]: new Date() } },
-  });
-  const user = reset ? await User.findByPk(reset.userId) : null;
-  if (!user || user.status !== 'active') throw invalid('El enlace no es válido o ya venció. Solicita uno nuevo.');
+  const passwordHash = await hashPassword(password);
   await sequelize.transaction(async (transaction) => {
-    await user.update({ passwordHash: await hashPassword(password), failedLoginCount: 0, lockedUntil: null }, { transaction });
+    const reset = await PasswordReset.findOne({
+      where: { tokenHash: hashToken(token), usedAt: null, expiresAt: { [Op.gt]: new Date() } },
+      transaction, lock: transaction.LOCK.UPDATE,
+    });
+    const user = reset ? await User.findByPk(reset.userId, { transaction, lock: transaction.LOCK.UPDATE }) : null;
+    if (!user || user.status !== 'active') throw invalid('El enlace no es válido o ya venció. Solicita uno nuevo.');
+    await user.update({ passwordHash, failedLoginCount: 0, lockedUntil: null }, { transaction });
     await reset.update({ usedAt: new Date() }, { transaction });
     // Invalida otros enlaces pendientes y las sesiones, por si alguien más tenía acceso.
     await PasswordReset.update({ usedAt: new Date() }, { where: { userId: user.id, usedAt: null }, transaction });

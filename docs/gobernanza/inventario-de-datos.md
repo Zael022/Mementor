@@ -54,5 +54,8 @@ Exportación propia ampliada: incluye categorías CRM vinculadas y datos propios
 ## Qué no se registra
 El registro técnico (`ai_usage_events` y la línea `tutor.consulta` del servidor) no guarda credenciales, preguntas, respuestas ni contenido de documentos. Las claves viven en `.env` (no versionado) o en ADC.
 
+## Seguimiento institucional de plataforma (parcial)
+`platform_crm_accounts` contiene necesidades y datos de seguimiento; `platform_crm_contacts` contiene nombre y datos profesionales. Finalidad: relación de servicio de MENTOR con instituciones existentes; origen: captura manual del operador de plataforma; acceso exclusivo de `platform_admin`. La política de conservación, corrección y supresión aún no está implementada ni aprobada. No ingresar contactos reales hasta completar esos controles.
+
 ## Retención automática
 Una vez al día (`RETENTION_INTERVAL_MINUTES`), la instancia con el turno de tareas aplica las reglas anteriores. Con `0` en un plazo, esa regla no borra nada. Borrar una conversación también quita sus citas, así que el contador «usada en respuestas» del docente baja en consecuencia.

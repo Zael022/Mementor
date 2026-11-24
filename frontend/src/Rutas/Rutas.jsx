@@ -19,6 +19,7 @@ const Gobernanza = lazy(() => import('../Pages/Gobernanza.jsx'));
 const Asistentes = lazy(() => import('../Pages/Asistentes.jsx'));
 const RestablecerClave = lazy(() => import('../Pages/RestablecerClave.jsx'));
 const PlataformaInstituciones = lazy(() => import('../Pages/PlataformaInstituciones.jsx'));
+const PlataformaCrm = lazy(() => import('../Pages/PlataformaCrm.jsx'));
 const AdminUsuarios = lazy(() => import('../Pages/AdminUsuarios.jsx'));
 const AdminAuditoria = lazy(() => import('../Pages/AdminAuditoria.jsx'));
 const CursosGestion = lazy(() => import('../Pages/CursosGestion.jsx'));
@@ -114,6 +115,8 @@ export default function Rutas() {
 
           <Route element={<RutaProtegida roles={['platform_admin']} />}>
             <Route path="/plataforma/instituciones" element={<PlataformaInstituciones />} />
+            <Route path="/plataforma/crm-instituciones" element={<PlataformaCrm />} />
+            <Route path="/plataforma/crm-instituciones/:id" element={<PlataformaCrm />} />
           </Route>
 
           <Route element={<RutaProtegida roles={['institution_admin', 'platform_admin']} />}>

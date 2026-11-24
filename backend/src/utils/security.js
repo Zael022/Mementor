@@ -7,8 +7,15 @@ const scryptAsync = promisify(scrypt);
 // Costo de bcrypt: 12 en uso normal; las pruebas usan uno bajo para ir rápido.
 function bcryptRounds() {
   const configured = Number(process.env.BCRYPT_ROUNDS);
-  if (Number.isInteger(configured) && configured >= 4 && configured <= 15) return configured;
+  const minimum = process.env.NODE_ENV === 'test' ? 4 : 10;
+  if (Number.isInteger(configured) && configured >= minimum && configured <= 15) return configured;
   return process.env.NODE_ENV === 'test' ? 4 : 12;
+}
+
+let dummyHashPromise;
+export async function verifyDummyPassword(password) {
+  dummyHashPromise ||= hashPassword('valor-de-comparacion-no-utilizable');
+  await verifyPassword(password, await dummyHashPromise);
 }
 
 // Genera el hash de una contraseña con bcrypt (incluye su propia sal).
