@@ -24,8 +24,9 @@ export function errorHandler(error, req, res, next) {
   if (error?.name === 'SequelizeForeignKeyConstraintError') {
     return res.status(409).json({ error: { code: 'IN_USE', message: 'No se puede eliminar porque tiene registros relacionados.' }, requestId: req.requestId });
   }
+  if (error?.name === 'SequelizeUniqueConstraintError') return res.status(409).json({ error: { code: 'DUPLICATE', message: 'El registro ya existe o el contacto no está disponible. Actualiza la ficha antes de reintentar.' }, requestId: req.requestId });
   const dbDown = String(error?.name || '').startsWith('SequelizeConnection');
-  if (process.env.NODE_ENV !== 'test') console.error(JSON.stringify({ evento: 'error', requestId: req.requestId, tipo: error?.name, mensaje: error?.message }));
+  if (process.env.NODE_ENV !== 'test') console.error(`[${req.requestId}]`, error?.name);
   return res.status(dbDown ? 503 : 500).json({
     error: { code: dbDown ? 'SERVICE_UNAVAILABLE' : 'INTERNAL_ERROR', message: 'No se pudo completar la solicitud.' },
     requestId: req.requestId,

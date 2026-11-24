@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
-import { AgentRun, User, sequelize } from '../../models/index.js';
+import { AgentRun, Institution, User, sequelize } from '../../models/index.js';
+import { clock } from '../../utils/clock.js';
 import { AppError, forbidden, invalid, notFound } from '../../utils/AppError.js';
 import { assertAiConfigured, completeWithProvider } from '../aiProvider.js';
 import { AGENTS } from './agentRegistry.js';
@@ -38,21 +39,26 @@ export function parseJson(text, schema) {
 // Reserva un turno respetando el límite diario por persona (bloqueo para que dos pedidos no lo superen).
 async function reserve(user, agent, courseId, inputChars) {
   return sequelize.transaction(async (transaction) => {
+    if (user.institutionId) await Institution.findByPk(user.institutionId, { lock: transaction.LOCK.UPDATE, transaction });
     await User.findByPk(user.id, { lock: transaction.LOCK.UPDATE, transaction });
+    const since = new Date(clock.now() - DAY_MS);
     const used = await AgentRun.count({
       // Cuentan las ejecuciones que llamaron al modelo, aunque su resultado se descartara por falta de respaldo.
-      where: { userId: user.id, [Op.or]: [{ status: { [Op.ne]: 'no_evidence' } }, { model: { [Op.ne]: null } }], createdAt: { [Op.gte]: new Date(Date.now() - DAY_MS) } },
+      where: { userId: user.id, agent: { [Op.ne]: 'tutor' }, [Op.or]: [{ status: { [Op.ne]: 'no_evidence' } }, { model: { [Op.ne]: null } }], createdAt: { [Op.gte]: since } },
       transaction,
     });
     if (used >= dailyLimit()) throw new AppError(429, 'RATE_LIMITED', 'Alcanzaste el límite diario de uso de los asistentes de IA.');
+    const shared = await AgentRun.count({ where: { institutionId: user.institutionId, agent: { [Op.ne]: 'tutor' }, [Op.or]: [{ status: { [Op.ne]: 'no_evidence' } }, { model: { [Op.ne]: null } }], createdAt: { [Op.gte]: since } }, transaction });
+    if (shared >= Number(process.env.AGENT_DAILY_LIMIT_PER_INSTITUTION || 500)) throw new AppError(429, 'INSTITUTION_QUOTA', 'La institución alcanzó su límite diario de asistentes de IA.');
     return AgentRun.create({ institutionId: user.institutionId, userId: user.id, courseId, agent, inputChars }, { transaction });
   });
 }
 
 // Ejecuta un agente: permisos, cuota, contexto autorizado, llamada al modelo, validación y bitácora.
-export async function runAgent(user, key, rawInput) {
-  const agent = AGENTS[key];
-  if (!agent || agent.external) throw notFound('Asistente no encontrado.');
+export async function runAgent(user, key, rawInput, { workflow = false } = {}) {
+  const agent = Object.hasOwn(AGENTS, key) ? AGENTS[key] : null;
+  if (!agent || agent.external || !Array.isArray(agent.roles) || !agent.inputSchema || typeof agent.buildContext !== 'function') throw notFound('Asistente no encontrado.');
+  if (agent.workflowOnly && !workflow) throw invalid('Abre una solicitud de admisiones para generar y guardar un borrador revisable.');
   if (!agent.roles.includes(user.role)) throw forbidden('Tu rol no puede usar este asistente.');
   const parsed = agent.inputSchema.safeParse(rawInput ?? {});
   if (!parsed.success) {
@@ -63,6 +69,7 @@ export async function runAgent(user, key, rawInput) {
   // El contexto se arma antes de llamar al modelo y aplica los permisos del curso o del recurso.
   const context = await agent.buildContext(user, input);
   const inputChars = JSON.stringify(context.data ?? {}).length;
+  if (inputChars > 50000) throw invalid('El contexto supera el tamaño permitido para este asistente.');
   if (context.noEvidence) {
     const run = await AgentRun.create({
       institutionId: user.institutionId, userId: user.id, courseId: context.courseId ?? null, agent: key, inputChars, status: 'no_evidence',

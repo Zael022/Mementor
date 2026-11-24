@@ -1,5 +1,32 @@
 # Estado de desarrollo — mantener actualizado
 
+## Integración de auditoría de main en feature-CRM
+
+Se integraron los cambios de seguridad y producción con admisiones y el CRM de plataforma. La copia de datos mantiene la información de admisiones y excluye respuestas de evaluaciones pendientes; se conserva la anonimización y la retención de CRM. El diccionario y los diagramas se regeneraron a partir de una base MySQL temporal migrada (74 tablas), que se eliminó después. Frontend: lint y build correctos; 65 pruebas correctas al repetir con dos procesos tras agotarse tiempos en una primera ejecución bajo carga. Backend: lint correcto y 57 pruebas específicas de agentes, admisiones, gobernanza, integraciones, seguridad y CRM de plataforma correctas con MySQL temporal. El Node local es 24.14.0, inferior al mínimo 24.15.0 indicado por la versión integrada. No se ejecutó la suite completa del backend ni pruebas en navegador y no se aplicaron migraciones a la base de uso.
+
+## Integración de main en feature-CRM
+
+Se conservaron los antecedentes de ambas ramas y se combinaron los estilos accesibles del CRM con los colores de marca, GSAP y animaciones limitadas de `main`. Frontend: `npm run lint`, `npm test` (57 pruebas) y `npm run build` correctos. La prueba de navegador no se ejecutó: la revisión automática de permisos no pudo completarse por el límite de uso. El servidor frontend volvió a iniciarse.
+
+## Sesión 2026-11-24 · CRM de instituciones de plataforma, avance parcial
+
+Se añadió una ficha separada del CRM de admisiones: lista de instituciones con búsqueda y paginación, creación explícita idempotente de ficha, edición versionada y registro de contactos con clave de reintento. Acceso y auditoría son de plataforma. Se agregaron la migración aditiva `20261124000100`, modelos, servicio, rutas, pantalla y pruebas. No se ha migrado la base de uso. La implementación sigue incompleta: faltan tareas, casos, actividades, pasos verificables, panel, edición/supresión de contactos y conservación; no introducir contactos reales mientras falten controles de privacidad. Detalles en `docs/adr/0007-crm-instituciones.md`.
+
+Verificación: lint de ambos proyectos; frontend 53 pruebas y build correctos. Suite backend completa: 170 pruebas correctas con MySQL local y base temporal descartable (`NODE_ENV=test node --test --test-concurrency=1 tests/**/*.test.js`), incluidas las pruebas de admisiones y del nuevo módulo. Navegador: `playwright test e2e/platform-crm.spec.js`, 2 pruebas correctas en escritorio y móvil, con base descartable. La primera corrida del módulo usó un esquema anterior porque la migración se editó durante esa ejecución; la repetición aislada con esquema definitivo pasó. Las primeras corridas de navegador fallaron por el consentimiento inicial de la cuenta temporal y se corrigió su preparación; la repetición pasó. No se ejecutaron todas las pruebas de navegador ni comparación visual de capturas.
+
+## Sesión 2026-11-24 · Seguridad Express complementaria, avance parcial
+
+Se revisó la presentación de 27 diapositivas y el estado actual. Se exige vencimiento, sujeto e identificador en JWT; el login de cuenta inexistente verifica un hash ficticio representativo; bcrypt no acepta costes menores a 10 fuera de test (valor inválido vuelve a 12). Lint en ambos proyectos, tres pruebas unitarias nuevas, 51 pruebas frontend y build pasaron. La matriz y sus pendientes están en `docs/seguridad/SEGURIDAD_EXPRESS_COMPLEMENTARIA.md`. MFA, validación de correo y política de contraseñas del encargo siguen pendientes. No se cambió el diseño ni se añadieron migraciones.
+
+Suite completa backend: 166 pruebas correctas con MySQL local en base temporal creada y eliminada para esta corrida. Playwright `e2e/acceso.spec.js`: 3 pruebas correctas con otra base temporal eliminada y proveedores dobles; no se ejecutó toda la suite e2e.
+
+## Sesión 2026-11-24 · Seguridad OWASP, avance parcial
+
+Se añadieron bloqueos transaccionales a recuperación y activación, límite de 72 bytes UTF-8 para nuevas contraseñas y rechazo de propiedades heredadas como agentes. El scrypt largo no se migra automáticamente a bcrypt. La revisión, riesgos pendientes y resultados de auditoría están en `docs/seguridad/REVISION_OWASP_2025.md`. No se cambiaron estilos ni navegación. La revisión de las diez categorías no está terminada; Drive y OOXML requieren atención prioritaria.
+
+Verificación: lint backend y frontend correctos; suite backend MySQL 162 pruebas correctas (incluye recuperación concurrente); frontend 51 pruebas y build correctos; Playwright `e2e/acceso.spec.js` 3 pruebas correctas en escritorio/móvil con servicios locales y base `_e2e`. No se ejecutó toda la suite e2e ni se probó Google real. La prueba de activación concurrente se agregó después de iniciar la suite completa y pasó en una ejecución separada de `tests/security.test.js` (9 pruebas).
+
+**Antecedentes** — 2026-11-23. Logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
 **Última actualización** — 2026-11-23. Correcciones de la auditoría de salida a producción (rama `fix/auditoria-produccion`); antes, correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
 
 ## Sesión 2026-11-23 (noche) · Auditoría de salida a producción
@@ -107,6 +134,45 @@ Pendiente: M09 (OOXML), M11 (paginación de recordatorios), M15 (sinónimos y n�
 ### Pendiente
 - Probar con NVDA o VoiceOver los anuncios del anunciador global (se revisaron en el árbol de accesibilidad, no con un lector real).
 - Revisar en un navegador real la vista 390 × 844 y 1280 × 900 en modo oscuro y alto contraste.
+
+## Sesión 2026-11-20 · CRM de admisiones y mejoras obligatorias
+
+Encargo contrastado con `PROMPT_CODEX_CRM_Y_MEJORAS_MENTOR_AI.md` y texto del taller original. Implementación local; guía, contratos, supuestos, matriz de requisitos y backlog en [CRM.md](CRM.md). No se publicaron cambios, enviaron mensajes reales ni cargaron registros de evaluación en bases compartidas.
+
+| Cambio | Archivos relevantes | Evidencia |
+| --- | --- | --- |
+| Convocatorias por curso, fichas mínimas, solicitudes independientes y nueve etapas | `models/Crm.js`, migraciones `20261122000100`/`20261122000200`, `crmSchemas`, `crmService`, `crmAccessService` | Permisos cruzados, correspondencia prospecto/solicitud, duplicados, versiones concurrentes, requisitos/retrocesos y fechas futuras |
+| Ficha, historial, tablero/lista, filtros, atención, responsables y seguimientos | `Pages/Crm*`, `Componentes/Crm/*`, `crmRoutes`, `crmController` | Integración, componentes y navegador escritorio/móvil; historial y listas paginados, sin búsqueda personal persistida en la dirección |
+| Embudo histórico y cohorte madura | `crmMetricsService`, snapshots de configuración/procedencia, ADR 0006 | Prueba 120/26; ventanas completas, cero/última etapa, cortes y configuración histórica; cerrar convocatoria no cambia la versión métrica |
+| Matrícula atómica | `crmConversionService`, `enrollmentMutationService`, `userService`, `courseService` | Nueva/invitada/compatible/inhabilitada/otra institución/rol, vinculación, reintegro, doble petición simultánea y rollback con fallo de evento |
+| Redactor de admisiones y revisión humana | `agents/admissionsAgent`, registro/runner, `crmDraftService`, `crmContextService` | Contexto sin contactos, JSON validado, sin clave/caído/inválido, edición/aprobación/contexto obsoleto, cuota simultánea. Solo doble de proveedor |
+| Consentimientos, derechos y conservación | `crmPrivacyService`, `governanceService`, retención por leases, casos de verificación | Copia/corrección/supresión sin cuenta, exportación propia y anonimización de cuenta vinculada, cierre independiente y excepción de conservación |
+| Privacidad efectiva y costos | `personalData`, compliance checker, `agentRunner`, `usageService`, `costService` | Payload enmascarado antes del proveedor; límites persona/institución con reservas y orden institución→usuario; tutor excluido de cuota de asistentes; tarifas por modelo y desconocidos nulos |
+| Formularios e invitaciones | `useEnvio`, `useDatos`, `Campo`, `AdminUsuarios`, `EnlaceInvitacion` | Bloqueo sincrónico de dobles clics, cancelación/respuestas obsoletas, errores ligados al control, enlaces vencidos/renovación explícita, texto preservado ante conflicto |
+| Accesibilidad | `styles.css`, diálogos nativos, lista/columna móvil | 12 estados medidos por dispositivo: botón mínimo 5,178:1, campo 3,929:1, texto seleccionado 8,584:1, indicador 4,792:1, foco 5,660:1; teclado, retorno de foco y reflujo a 360px/200 % |
+| Regresión de práctica diaria | `streakService`, `gamification.test` | La segunda lectura tras bloquear matrícula ahora es una lectura actual; REPEATABLE READ conservaba una ausencia inicial en aperturas simultáneas. No cambió la fórmula de notas ni bonos |
+| Documentación y fuentes generadas | `CRM.md`, contratos, ADR, agentes, APIs, inventario/riesgos, `docs/datos`, `docs/mockups` | Modelo desde esquema aislado: **70 tablas, 689 columnas, 148 FKs**. Capturas inspeccionadas, SVG/PNG de CRM y general generados |
+
+### Validación real de la sesión
+
+- Entorno: Windows, Node **24.14.0**, MySQL local **8.0**, Vite 7, Chromium de Playwright. No se cambió el stack.
+- Backend: `npm run lint` sin errores; `npm test` **159/159**. Incluye **18 pruebas CRM** y una prueba de migraciones que crea/elimina una base descartable, verifica esquema sin contenido, preserva un registro previo y ejecuta down/up. Repetición final focalizada: **18/18** CRM.
+- Frontend: `npm run lint` sin errores; `npm test` **51/51**; `npm run build` compila.
+- Navegador: `npm run test:e2e` **28/28** en escritorio/móvil, con backend/MySQL reales aislados y proveedores falsos. Subconjunto CRM tras la mejora de conservación de texto en conflictos: **4/4**; lint, 51 pruebas de componentes y compilación repetidos con éxito.
+- Escenario CRM40: **40** solicitudes con distribución actual **6/5/5/5/5/4/4/3/3**; agenda→asiste **24/29 = 82,7586 %**, brecha frente a meta de prueba 75 % **−7,7586 pp**, **3 matrículas nuevas**. Reloj simulado, todas las escrituras por la API, limpieza al terminar; no es dataset entregado para producción.
+- Bases separadas de `mentor`; limpieza de registros de integración y navegador al terminar. El catálogo `roles` y `SequelizeMeta` se preservan. La prueba de migraciones elimina exclusivamente su base recién creada.
+- MySQL local `mentor`: se aplicaron las dos migraciones aditivas, **8 tablas CRM y 0 filas CRM**. API reiniciada y `/api/v1/health` confirmó conexión. Frontend local devuelve HTTP 200 en `127.0.0.1:5173`.
+- IA, SMTP, Hacienda, feriados y nube se prueban con dobles; **ningún proveedor real de pago o correo real fue usado**. IA local sigue sin configurar. Configuración/conectividad se distinguen en Consumo.
+- Advertencias observadas: jsdom informa `scrollTo` no implementado en pruebas existentes; una conexión cancelada produjo aviso de express-rate-limit por IP no disponible, sin fallar la prueba. No se ocultan como pruebas fallidas ni se confunden con conectividad de servicios reales.
+
+### Pendiente comprobado
+
+- Word/PDF de `docs/entregables`: fuentes actualizadas, **binarios sin regenerar**. No hay Python instalado (`py -0p`), LibreOffice ni cargador de dependencias de documentos accesible para el renderer. Alcance exacto y pasos de render/inspección en `entregables/ACTUALIZACION_CRM.md`.
+- Evaluación manual con NVDA/VoiceOver y auditoría integral de accesibilidad; no se afirma conformidad integral WCAG ni cumplimiento legal certificado.
+- Verificación con proveedor IA real y MySQL 8.4, activación de integraciones, revisión institucional de políticas/plazos, respaldos/exportaciones y tarifas; no forman parte de las llamadas automáticas de prueba.
+- Formulario público, campañas/gastos/atribución, bonus social, WhatsApp, publicación y automatizaciones externas/programas multicurso permanecen en el backlog opcional descrito en `CRM.md`.
+
+El acceso de plataforma se mantiene operativo sin acceso automático al CRM personal. Para usar Admisiones, crear una institución e invitar a su administración mediante el flujo habitual. No se crearon cuentas ficticias ni contenido académico en desarrollo.
 
 ## Sesión 2026-11-20 · Requisitos FWD y entregables
 

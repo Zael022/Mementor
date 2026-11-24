@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { admissionsAgent } from './admissionsAgent.js';
 import {
   Assignment, AssignmentSubmission, CourseStreak, Lesson, Topic, TopicMastery,
 } from '../../models/index.js';
@@ -30,6 +31,7 @@ export const validCitations = (citations, passages) => {
 };
 
 export const AGENTS = {
+  admissions_writer: admissionsAgent,
   // 1. Tutor conversacional con RAG: ya existe con su propia pantalla y bitácora de consumo.
   tutor: {
     key: 'tutor',

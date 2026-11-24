@@ -88,7 +88,8 @@ export async function getTodayPractice(user, courseId) {
     if (!practice) {
       // Bloquea la matrícula para que dos pestañas no elijan preguntas distintas a la vez.
       await Enrollment.findOne({ where: { courseId: course.id, studentId: user.id }, lock: transaction.LOCK.UPDATE, transaction });
-      practice = await DailyPractice.findOne({ where: { courseId: course.id, studentId: user.id, practiceDay: today }, transaction });
+      // Lectura actual tras el bloqueo: REPEATABLE READ podría conservar la ausencia inicial.
+      practice = await DailyPractice.findOne({ where: { courseId: course.id, studentId: user.id, practiceDay: today }, transaction, lock: transaction.LOCK.UPDATE });
       if (!practice) {
         // El tamaño elegido se aplica al abrir la práctica del día; si se cambia, cuenta desde la siguiente.
         const { practiceSize } = await getPreferences(user, { transaction });

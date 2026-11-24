@@ -20,6 +20,7 @@ const mismoDia = (a, b) => a.toDateString() === b.toDateString();
 
 // Enlace de cada evento según el rol.
 function enlaceDe(item, rol) {
+  if (item.type === 'admission') return `/admisiones/solicitudes/${item.applicationId}`;
   if (item.type === 'assignment') return rol === 'student' ? `/estudiante/tareas/${item.id}` : `${rol === 'teacher' ? '/docente' : '/admin'}/cursos/${item.courseId}/tareas`;
   return rol === 'student' ? `/estudiante/cursos/${item.courseId}?seccion=trabajo&ver=clases` : `${rol === 'teacher' ? '/docente' : '/admin'}/cursos/${item.courseId}/clases`;
 }

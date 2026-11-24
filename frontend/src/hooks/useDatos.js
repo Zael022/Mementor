@@ -9,11 +9,12 @@ export function useDatos(ruta) {
   useEffect(() => {
     if (!ruta) return undefined;
     let vigente = true;
+    const controller = new AbortController();
     setEstado((previo) => ({ ...previo, cargando: true, error: null }));
-    api.get(ruta)
+    api.get(ruta, { signal: controller.signal })
       .then((respuesta) => vigente && setEstado({ datos: respuesta.data, meta: respuesta.meta || null, cargando: false, error: null }))
       .catch((error) => vigente && setEstado({ datos: null, meta: null, cargando: false, error }));
-    return () => { vigente = false; };
+    return () => { vigente = false; controller.abort(); };
   }, [ruta, version]);
 
   const recargar = useCallback(() => setVersion((actual) => actual + 1), []);

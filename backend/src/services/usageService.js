@@ -2,6 +2,7 @@ import { Op } from 'sequelize';
 import { AgentRun, AiUsageEvent, Institution, User, sequelize } from '../models/index.js';
 import { AppError } from '../utils/AppError.js';
 import { pageMeta } from '../utils/http.js';
+import { readAiConfig } from './aiProvider.js';
 
 // Cuota de consultas al tutor y registro técnico de consumo (sin contenido).
 
@@ -76,6 +77,8 @@ export async function institutionUsage(user, { days = 30 } = {}) {
   });
   const institution = await Institution.findByPk(user.institutionId);
   const today = await AiUsageEvent.count({ where: { institutionId: user.institutionId, outcome: COUNTED, createdAt: { [Op.gte]: new Date(Date.now() - DAY_MS) } } });
+  const assistants = await AgentRun.count({ where: { institutionId: user.institutionId, agent: { [Op.ne]: 'tutor' }, status: { [Op.ne]: 'no_evidence' }, createdAt: { [Op.gte]: new Date(Date.now() - DAY_MS) } } });
+  const config = readAiConfig();
   return {
     days,
     dailyLimit: institution?.aiDailyQuestionLimit ?? institutionDefault(),
@@ -87,6 +90,9 @@ export async function institutionUsage(user, { days = 30 } = {}) {
     })),
     byOutcome: Object.fromEntries(byOutcome.map((row) => [row.outcome, Number(row.count)])),
     costs: null,
+    providerState: config.configured ? 'Configurado, conectividad sin verificar' : 'Sin configurar',
+    configuredModel: config.configured ? config.model : null,
+    assistants: { usedLast24h: assistants, perUserDailyLimit: Number(process.env.AGENT_DAILY_LIMIT_PER_USER || 30), institutionDailyLimit: Number(process.env.AGENT_DAILY_LIMIT_PER_INSTITUTION || 500) },
   };
 }
 
