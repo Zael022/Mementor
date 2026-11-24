@@ -56,6 +56,15 @@ services:
         sync: false
       - key: AI_API_KEY
         sync: false
+      # Router de modelos (opcional): si quedan vacíos se usa AI_MODEL. Ver docs/adr/0009-capas-ia.md.
+      - key: AI_MODEL_RAPIDO
+        sync: false
+      - key: AI_MODEL_AVANZADO
+        sync: false
+      - key: AI_RESPONSE_CACHE
+        value: "on"
+      - key: AI_PROMPT_CACHE
+        value: "off"
       - key: N8N_INTEGRATION_KEY
         generateValue: true
       - key: SMTP_HOST

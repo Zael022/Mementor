@@ -1,6 +1,36 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-23. Correcciones de la auditoría de salida a producción (rama `fix/auditoria-produccion`); antes, correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+**Última actualización** — 2026-11-24. Las 8 capas de la IA (rama `feature/capas-ia`); antes, correcciones de la auditoría de salida a producción (rama `fix/auditoria-produccion`); antes, correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+
+## Sesión 2026-11-24 · Las 8 capas de la IA
+Rama `feature/capas-ia` (desde `main`). Decisiones en `docs/adr/0009-capas-ia.md`; guía en `docs/agentes-ia.md`.
+
+| Capa | Cambio (dónde) | Cómo se comprobó |
+| --- | --- | --- |
+| 1 Prompt | `src/prompts/` (tutor, comunes y 7 agentes) con `version`; `prompts.lock.json`; `npm run prompts:lock`; `prompt_version` en `agent_runs` y `ai_usage_events` (migración `20261124000100-ai-layers`) | `tests/evals/prompts.test.js` (huella por versión, textos usados por los agentes, reglas de seguridad) |
+| 2 RAG | Sin cambio de diseño; la consulta al buscador sale sin datos personales (`searchQuery`) | `tests/evals/agentes.test.js` (sin evidencia, cero llamadas; citas reales del curso; pregunta con datos encuentra la lección) |
+| 3 Herramientas | Sin tool use; contexto solo de `buildContext` | Evals por agente |
+| 4 Accesos | Sin cambios de código | Evals: otra institución (404), otro docente (403), compañero (403), curso sin matrícula (403/404), lección sin publicar (403), preguntas por datos ajenos |
+| 5 Guardrails | `src/utils/outputGuard.js`; guard por agente en `agentRegistry.js`; tutor con pista y bloqueo de clave de evaluación abierta; `claimCheck` más preciso en negaciones; lección enviada sin datos personales | `tests/evals/guardrails.test.js`, `agentes.test.js`, `drive.test.js` (inyección en material, Drive y entregas), `claimCheck.test.js` |
+| 6 Caché | `ai_response_cache` y `services/agents/responseCache.js` (solo el resumen de lección); invalidación en `contentService`; purga en retención; `AI_PROMPT_CACHE` con `cache_control` | `agentes.test.js` (segunda persona sin llamada, sin cuota, no entre instituciones, invalidación al editar, nunca el tutor), `router.test.js` |
+| 7 Router | `modelForTier`, `readAiConfig({ tier })`, `tierFor` con `AI_TIER_<AGENTE>`; `.env.example`, `render.yaml`, `docs/despliegue.md` | `router.test.js` y evals por agente (`model_tier` y `model` en la bitácora) |
+| 8 Observabilidad y evals | Columnas `model_tier`, `cache_hit`, `guard_outcome`, `cache_read_tokens` y `cache_write_tokens`; resultado `guard_blocked`; `tests/evals/` y `tests/evals-real/`; `npm run evals`; `.github/workflows/evals.yml` | Suite completa |
+
+Ejecutado el 2026-11-24:
+- Migraciones up, down y up en la base de pruebas.
+- Backend: lint y 209/209.
+- Frontend: lint, 58/58 y build.
+- Playwright: 38/38.
+- Prueba de la auditoría anterior: 4/4.
+
+Evals con modelo real: **no se ejecutaron**. El `.env` local apunta `AI_BASE_URL` al doble de Playwright (`127.0.0.1:4599`) y no tiene una clave real. El runner ahora lo detecta y omite los 13 casos.
+Entregables regenerados: modelo de datos con 65 tablas.
+
+Pendiente:
+- Correr `npm run evals` con una clave real.
+- Cargar los secretos y marcar la revisión requerida en GitHub.
+- Medir `cache_read_tokens` con `AI_PROMPT_CACHE=on`.
+- Validación docente de las respuestas del tutor.
 
 ## Sesión 2026-11-23 (noche) · Auditoría de salida a producción
 Rama `fix/auditoria-produccion` (sobre `fix/revision-independiente`). Decisiones en `docs/adr/0008-auditoria-produccion.md`.

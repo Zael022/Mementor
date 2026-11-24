@@ -1194,6 +1194,66 @@
      "extra": "DEFAULT_GENERATED",
      "purpose": "Fecha y hora de la última modificación.",
      "fk": null
+    },
+    {
+     "name": "prompt_version",
+     "type": "varchar(80)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Versión del prompt usada (por ejemplo tutor@1.0.0).",
+     "fk": null
+    },
+    {
+     "name": "model_tier",
+     "type": "varchar(20)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nivel de modelo elegido por el router (rapido o avanzado).",
+     "fk": null
+    },
+    {
+     "name": "cache_hit",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Si la respuesta vino de la caché de MENTOR.",
+     "fk": null
+    },
+    {
+     "name": "guard_outcome",
+     "type": "varchar(40)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Resultado de los guardrails de salida (pass, alert_… o blocked_…).",
+     "fk": null
+    },
+    {
+     "name": "cache_read_tokens",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tokens leídos de la caché del proveedor.",
+     "fk": null
+    },
+    {
+     "name": "cache_write_tokens",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tokens escritos en la caché del proveedor.",
+     "fk": null
     }
    ]
   },
@@ -5436,7 +5496,7 @@
     },
     {
      "name": "outcome",
-     "type": "enum('reserved','completed','no_evidence','no_citations','invalid_format','provider_error','retrieval_error','cancelled')",
+     "type": "enum('reserved','completed','no_evidence','no_citations','invalid_format','provider_error','retrieval_error','cancelled','guard_blocked')",
      "null": false,
      "key": "",
      "default": "reserved",
@@ -5492,6 +5552,66 @@
      "default": "CURRENT_TIMESTAMP",
      "extra": "DEFAULT_GENERATED",
      "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    },
+    {
+     "name": "prompt_version",
+     "type": "varchar(80)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Versión del prompt usada (por ejemplo tutor@1.0.0).",
+     "fk": null
+    },
+    {
+     "name": "model_tier",
+     "type": "varchar(20)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nivel de modelo elegido por el router (rapido o avanzado).",
+     "fk": null
+    },
+    {
+     "name": "cache_hit",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Si la respuesta vino de la caché de MENTOR.",
+     "fk": null
+    },
+    {
+     "name": "guard_outcome",
+     "type": "varchar(40)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Resultado de los guardrails de salida (pass, alert_… o blocked_…).",
+     "fk": null
+    },
+    {
+     "name": "cache_read_tokens",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tokens leídos de la caché del proveedor.",
+     "fk": null
+    },
+    {
+     "name": "cache_write_tokens",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tokens escritos en la caché del proveedor.",
      "fk": null
     }
    ]
@@ -5599,6 +5719,133 @@
      "default": "0",
      "extra": "",
      "purpose": "Latencia acumulada en milisegundos.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Tutor IA, fuentes e integraciones",
+   "table": "ai_response_cache",
+   "purpose": "Respuestas reutilizables de agentes con entrada no personal (hoy, resúmenes de lección) por institución.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "cache_key",
+     "type": "char(64)",
+     "null": false,
+     "key": "UNI",
+     "default": null,
+     "extra": "",
+     "purpose": "Huella de institución, agente, versión del prompt, modelo y entrada.",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "agent",
+     "type": "varchar(40)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Clave del agente de IA ejecutado.",
+     "fk": null
+    },
+    {
+     "name": "prompt_version",
+     "type": "varchar(80)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Versión del prompt usada (por ejemplo tutor@1.0.0).",
+     "fk": null
+    },
+    {
+     "name": "model",
+     "type": "varchar(120)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Modelo de IA utilizado.",
+     "fk": null
+    },
+    {
+     "name": "source_ref",
+     "type": "varchar(60)",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Fuente de la que salió la respuesta (por ejemplo lesson:12).",
+     "fk": null
+    },
+    {
+     "name": "output_json",
+     "type": "json",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Respuesta validada que se reutiliza.",
+     "fk": null
+    },
+    {
+     "name": "hits",
+     "type": "int unsigned",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Cantidad de solicitudes en la ventana.",
+     "fk": null
+    },
+    {
+     "name": "expires_at",
+     "type": "datetime",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha de vencimiento.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
      "fk": null
     }
    ]
@@ -6453,6 +6700,13 @@
    "table": "ai_messages",
    "column": "thread_id",
    "ref": "ai_threads",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "ai_response_cache",
+   "column": "institution_id",
+   "ref": "institutions",
    "refcol": "id",
    "card": "1:N"
   },
@@ -7347,6 +7601,7 @@
    "ai_message_sources",
    "ai_usage_events",
    "ai_usage_monthly",
+   "ai_response_cache",
    "knowledge_sources",
    "source_versions",
    "course_rag_corpora",
@@ -7354,6 +7609,6 @@
    "institution_drive_folders"
   ]
  },
- "tables": 64,
- "columns": 595
+ "tables": 65,
+ "columns": 619
 }

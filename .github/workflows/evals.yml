@@ -1,0 +1,88 @@
+# Evals con el modelo real. No corren en cada push (cuestan dinero):
+# - a mano, desde la pestaña Actions (workflow_dispatch);
+# - en cada pull request, pero solo llaman al modelo si el PR cambia backend/src/prompts/.
+# Para que sean obligatorias, marca «Evals con modelo real» como revisión requerida en la protección de la rama.
+# El trabajo siempre termina (en verde si no hay cambios de prompts), así la revisión requerida no queda esperando.
+name: Evals IA
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evals-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DB_HOST: 127.0.0.1
+  DB_PORT: 3306
+  DB_NAME: mentor_ai
+  DB_USER: root
+  DB_PASSWORD: raiz_solo_ci
+  TEST_DB_HOST: 127.0.0.1
+  TEST_DB_PORT: 3306
+  TEST_DB_NAME: mentor_ai_test
+  TEST_DB_USER: root
+  TEST_DB_PASSWORD: raiz_solo_ci
+
+jobs:
+  evals:
+    name: Evals con modelo real
+    runs-on: ubuntu-latest
+    env:
+      # Los secretos no se pueden leer en un «if»: se expone solo si existen.
+      AI_KEY_SET: ${{ secrets.AI_API_KEY != '' }}
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: raiz_solo_ci
+          MYSQL_DATABASE: mentor_ai_test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -praiz_solo_ci"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: ¿Cambiaron los prompts?
+        id: cambios
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "correr=si" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -q '^backend/src/prompts/'; then
+            echo "correr=si" >> "$GITHUB_OUTPUT"
+          else
+            echo "correr=no" >> "$GITHUB_OUTPUT"
+            echo "Este PR no cambia backend/src/prompts/: no se llama al modelo."
+          fi
+      - name: Falta la clave
+        if: steps.cambios.outputs.correr == 'si' && env.AI_KEY_SET != 'true'
+        run: |
+          echo "Los prompts cambiaron y no hay secreto AI_API_KEY en el repositorio (o el PR viene de un fork). Agrega los secretos AI_PROVIDER, AI_API_KEY y AI_MODEL (o AI_MODEL_RAPIDO y AI_MODEL_AVANZADO)."
+          exit 1
+      - uses: actions/setup-node@v5
+        if: steps.cambios.outputs.correr == 'si'
+        with:
+          node-version: 22.22.2
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+        if: steps.cambios.outputs.correr == 'si'
+      - name: npm run evals
+        if: steps.cambios.outputs.correr == 'si'
+        env:
+          AI_PROVIDER: ${{ secrets.AI_PROVIDER }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_MODEL: ${{ secrets.AI_MODEL }}
+          AI_MODEL_RAPIDO: ${{ secrets.AI_MODEL_RAPIDO }}
+          AI_MODEL_AVANZADO: ${{ secrets.AI_MODEL_AVANZADO }}
+          AI_PRICE_INPUT_USD_PER_MTOK: ${{ vars.AI_PRICE_INPUT_USD_PER_MTOK }}
+          AI_PRICE_OUTPUT_USD_PER_MTOK: ${{ vars.AI_PRICE_OUTPUT_USD_PER_MTOK }}
+        run: npm run evals

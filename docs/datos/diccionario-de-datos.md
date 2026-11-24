@@ -1,6 +1,6 @@
 # Diccionario de datos de MENTOR AI
 
-Generado desde las migraciones de Sequelize (64 tablas, 595 columnas, 125 llaves foráneas). Motor: MySQL 8 (utf8mb4).
+Generado desde las migraciones de Sequelize (65 tablas, 619 columnas, 126 llaves foráneas). Motor: MySQL 8 (utf8mb4).
 
 Convenciones: PK = llave primaria, FK = llave foránea, UQ = valor único. Todas las tablas tienen `created_at` y `updated_at` salvo las indicadas.
 
@@ -196,6 +196,12 @@ Bitácora de cada ejecución de un agente de IA (sin contenido).
 | `error_code` | `varchar(40)` | Sí |  | Código del error, si hubo. |
 | `created_at` | `datetime` | No |  | Fecha y hora de creación. |
 | `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+| `prompt_version` | `varchar(80)` | Sí |  | Versión del prompt usada (por ejemplo tutor@1.0.0). |
+| `model_tier` | `varchar(20)` | Sí |  | Nivel de modelo elegido por el router (rapido o avanzado). |
+| `cache_hit` | `tinyint(1)` | No |  | Si la respuesta vino de la caché de MENTOR. |
+| `guard_outcome` | `varchar(40)` | Sí |  | Resultado de los guardrails de salida (pass, alert_… o blocked_…). |
+| `cache_read_tokens` | `int` | Sí |  | Tokens leídos de la caché del proveedor. |
+| `cache_write_tokens` | `int` | Sí |  | Tokens escritos en la caché del proveedor. |
 
 ### `integration_runs`
 
@@ -924,12 +930,18 @@ Consumo técnico del tutor (cuota, tokens, latencia).
 | `model` | `varchar(120)` | Sí |  | Modelo de IA utilizado. |
 | `retrieval_mode` | `varchar(20)` | Sí |  | Modo de recuperación de pasajes. |
 | `streamed` | `tinyint(1)` | No |  | Indica si la respuesta se transmitió en vivo. |
-| `outcome` | `enum('reserved','completed','no_evidence','no_citations','invalid_format','provider_error','retrieval_error','cancelled')` | No |  | Resultado de la operación. |
+| `outcome` | `enum('reserved','completed','no_evidence','no_citations','invalid_format','provider_error','retrieval_error','cancelled','guard_blocked')` | No |  | Resultado de la operación. |
 | `latency_ms` | `int` | Sí |  | Duración en milisegundos. |
 | `input_tokens` | `int` | Sí |  | Tokens de entrada informados por el proveedor. |
 | `output_tokens` | `int` | Sí |  | Tokens de salida informados por el proveedor. |
 | `created_at` | `datetime` | No |  | Fecha y hora de creación. |
 | `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+| `prompt_version` | `varchar(80)` | Sí |  | Versión del prompt usada (por ejemplo tutor@1.0.0). |
+| `model_tier` | `varchar(20)` | Sí |  | Nivel de modelo elegido por el router (rapido o avanzado). |
+| `cache_hit` | `tinyint(1)` | No |  | Si la respuesta vino de la caché de MENTOR. |
+| `guard_outcome` | `varchar(40)` | Sí |  | Resultado de los guardrails de salida (pass, alert_… o blocked_…). |
+| `cache_read_tokens` | `int` | Sí |  | Tokens leídos de la caché del proveedor. |
+| `cache_write_tokens` | `int` | Sí |  | Tokens escritos en la caché del proveedor. |
 
 ### `ai_usage_monthly`
 
@@ -947,6 +959,25 @@ Resumen mensual del consumo de IA.
 | `input_tokens` | `bigint` | No |  | Tokens de entrada informados por el proveedor. |
 | `output_tokens` | `bigint` | No |  | Tokens de salida informados por el proveedor. |
 | `latency_ms_total` | `bigint` | No |  | Latencia acumulada en milisegundos. |
+
+### `ai_response_cache`
+
+Respuestas reutilizables de agentes con entrada no personal (hoy, resúmenes de lección) por institución.
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PK | Identificador único (llave primaria). |
+| `cache_key` | `char(64)` | No | UQ | Huella de institución, agente, versión del prompt, modelo y entrada. |
+| `institution_id` | `bigint unsigned` | No | FK → institutions.id | Referencia a institutions.id (llave foránea). |
+| `agent` | `varchar(40)` | No |  | Clave del agente de IA ejecutado. |
+| `prompt_version` | `varchar(80)` | No |  | Versión del prompt usada (por ejemplo tutor@1.0.0). |
+| `model` | `varchar(120)` | No |  | Modelo de IA utilizado. |
+| `source_ref` | `varchar(60)` | No |  | Fuente de la que salió la respuesta (por ejemplo lesson:12). |
+| `output_json` | `json` | No |  | Respuesta validada que se reutiliza. |
+| `hits` | `int unsigned` | No |  | Cantidad de solicitudes en la ventana. |
+| `expires_at` | `datetime` | No |  | Fecha de vencimiento. |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
 
 ### `knowledge_sources`
 

@@ -160,8 +160,11 @@ test('redactor, coach y resumen responden con su formato; una respuesta mal form
   const resumen = await ctx.org.student.post('/agents/lesson_summarizer/run', { lessonId: ctx.lessonId });
   assert.equal(resumen.body.data.result.keyPoints.length, 2);
 
+  // Con la caché activa, el mismo resumen se reutiliza sin llamar al modelo; para probar la falla se apaga.
+  process.env.AI_RESPONSE_CACHE = 'off';
   fakeProvider('esto no es JSON');
   const mala = await ctx.org.student.post('/agents/lesson_summarizer/run', { lessonId: ctx.lessonId });
+  delete process.env.AI_RESPONSE_CACHE;
   assert.equal(mala.status, 502);
   assert.equal(await AgentRun.count({ where: { agent: 'lesson_summarizer', status: 'failed', errorCode: 'AGENT_INVALID_OUTPUT' } }), 1);
   assert.equal((await ctx.org.student.post('/agents/lesson_summarizer/run', { lessonId: 'abc' })).status, 422);

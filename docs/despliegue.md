@@ -33,6 +33,9 @@ Sin Google Cloud, la alternativa es un plan de Render con disco persistente (`ST
    - `DB_HOST`, `DB_PORT=4000`, `DB_NAME=mentor_ai`, `DB_USER`, `DB_PASSWORD`.
    - `FRONTEND_ORIGIN=https://mentor-ai.vercel.app` y `APP_URL` con el mismo valor.
    - `AI_PROVIDER=anthropic`, `AI_MODEL`, `AI_API_KEY`.
+   - Router de modelos (opcional): `AI_MODEL_RAPIDO` para anuncios, resúmenes, Coach y analista, y `AI_MODEL_AVANZADO` para el tutor, la retroalimentación, el generador de preguntas y cumplimiento. Si quedan vacíos se usa `AI_MODEL`, así que un despliegue anterior sigue igual. Verifica en la consola del proveedor que los dos identificadores existen en tu cuenta.
+   - Caché: `AI_RESPONSE_CACHE=on` (resúmenes de lección por institución) y `AI_PROMPT_CACHE=off` hasta medir si el proveedor guarda los bloques (columna `cache_read_tokens` de `agent_runs`).
+   - Antes de cambiar un prompt o un modelo en producción, corre `npm run evals` con la clave real (ver `docs/agentes-ia.md`).
    - `SMTP_*` para recuperación de contraseña, recordatorios y avisos de baja.
 3. Al arrancar se ejecuta `npm run db:migrate` (crea o actualiza las tablas) y luego `npm start`. El estado se ve en `https://mentor-api.onrender.com/api/v1/health`.
    - En el plan gratuito no existe el paso previo al despliegue (`preDeployCommand` es solo para planes de pago), por eso la migración va en el arranque. En un plan de pago, muévela a `preDeployCommand: npm run db:migrate` y deja `startCommand: npm start`: así una migración fallida detiene el despliegue sin tumbar la versión que está en uso.

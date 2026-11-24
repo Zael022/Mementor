@@ -130,7 +130,9 @@ function misplacedNumbers(claimSentences, supportSentences) {
   return misplaced;
 }
 
-// Términos alcanzados por una negación y términos que aparecen sin ninguna negación cerca.
+// Lo que alcanza una negación (términos y números) y lo que aparece sin ninguna negación cerca.
+// Los números cuentan como «#valor» para que «nunca puede ser cero» se compare con «puede ser cero».
+const itemOf = (token) => (token.kind === 'term' ? token.term : token.kind === 'num' ? `#${token.value}` : null);
 function polarity(sentences) {
   const negated = [];
   const affirmed = new Set();
@@ -140,27 +142,34 @@ function polarity(sentences) {
       if (token.kind === 'neg') {
         const scope = [];
         for (let at = index + 1; at < tokens.length && scope.length < NEGATION_SCOPE; at += 1) {
-          if (tokens[at].kind === 'term') scope.push(tokens[at].term);
+          const item = itemOf(tokens[at]);
+          if (item) scope.push(item);
         }
-        if (scope.length) negated.push(scope);
+        // El sujeto: el término más cercano antes de la negación («el denominador nunca…»).
+        const subject = tokens.slice(Math.max(0, index - NEGATION_REACH), index).reverse().find((item) => item.kind === 'term')?.term ?? null;
+        if (scope.length) negated.push({ scope, subject });
       }
-      if (token.kind !== 'term') return;
+      const item = itemOf(token);
+      if (!item) return;
       const before = tokens.slice(Math.max(0, index - NEGATION_REACH), index);
-      if (before.some((item) => item.kind === 'neg')) seenNegated.add(token.term);
-      else affirmed.add(token.term);
+      if (before.some((previous) => previous.kind === 'neg')) seenNegated.add(item);
+      else affirmed.add(item);
     });
   }
   // Un término que alguna vez aparece negado no cuenta como afirmado: ante la duda, no se rechaza.
-  seenNegated.forEach((term) => affirmed.delete(term));
+  seenNegated.forEach((item) => affirmed.delete(item));
   return { negated, affirmed };
 }
 
-// Una negación contradice al otro texto si lo que niega aparece allí afirmado.
+// Una negación contradice al otro texto si lo que niega aparece allí afirmado. Lo primero que se niega
+// (casi siempre el verbo o el valor) tiene que estar afirmado, y además otra parte de lo negado o el sujeto.
+// Así «no se puede dividir un entero» no choca con «las fracciones son partes de un entero».
 function contradicts(from, to) {
-  return polarity(from).negated.some((scope) => {
-    const { affirmed } = polarity(to);
-    const found = scope.filter((term) => affirmed.has(term)).length;
-    return found >= Math.min(2, scope.length);
+  const { affirmed } = polarity(to);
+  return polarity(from).negated.some(({ scope, subject }) => {
+    if (!affirmed.has(scope[0])) return false;
+    const found = scope.filter((item) => affirmed.has(item)).length;
+    return found >= Math.min(2, scope.length) || (subject !== null && affirmed.has(subject));
   });
 }
 
@@ -175,18 +184,22 @@ export function checkClaim(sentence, supportText) {
   const misplaced = misplacedNumbers(claimTokens, supportTokens);
   if (misplaced.length) return { ok: false, reason: 'number_context_mismatch', misplacedNumbers: misplaced };
   const claimTerms = [...new Set(terms(clean))];
-  if (claimTerms.length < 3) return { ok: true };
-  const supportTerms = new Set(terms(supportText));
-  const covered = claimTerms.filter((term) => supportTerms.has(term) || [...supportTerms].some((other) => other.length > 4 && term.length > 4 && (other.startsWith(term.slice(0, 5)) || term.startsWith(other.slice(0, 5)))));
-  const coverage = covered.length / claimTerms.length;
-  if (coverage < MIN_COVERAGE) return { ok: false, reason: 'low_overlap', coverage };
   // Se compara contra la oración del pasaje que más se parece, para no mezclar el sentido de oraciones distintas.
+  // Va antes del mínimo de términos: «el denominador puede ser cero» es corta y contradice a la fuente.
   const claimSet = new Set(claimTerms);
   const closest = supportTokens
     .map((tokens) => ({ tokens, shared: overlap(new Set(tokens.filter((t) => t.kind === 'term').map((t) => t.term)), claimSet) }))
     .sort((a, b) => b.shared - a.shared);
   const top = closest.filter((item) => item.shared > 0 && item.shared >= closest[0].shared - 1).map((item) => item.tokens);
-  if (top.length && (contradicts(claimTokens, top) || contradicts(top, claimTokens))) return { ok: false, reason: 'negation_mismatch', coverage };
+  // Una pregunta («¿puede el denominador ser cero?») no afirma nada: no se revisa su sentido.
+  const isQuestion = /[¿?]/.test(clean);
+  const negationMismatch = !isQuestion && top.length > 0 && (contradicts(claimTokens, top) || contradicts(top, claimTokens));
+  if (claimTerms.length < 3) return negationMismatch ? { ok: false, reason: 'negation_mismatch' } : { ok: true };
+  const supportTerms = new Set(terms(supportText));
+  const covered = claimTerms.filter((term) => supportTerms.has(term) || [...supportTerms].some((other) => other.length > 4 && term.length > 4 && (other.startsWith(term.slice(0, 5)) || term.startsWith(other.slice(0, 5)))));
+  const coverage = covered.length / claimTerms.length;
+  if (coverage < MIN_COVERAGE) return { ok: false, reason: 'low_overlap', coverage };
+  if (negationMismatch) return { ok: false, reason: 'negation_mismatch', coverage };
   return { ok: true, coverage };
 }
 
