@@ -62,7 +62,7 @@ Para actualizar una instalación anterior, ejecuta `npm ci` en ambas carpetas y 
 - En modo Vertex, el backend solicita primero los identificadores autorizados y carga el texto completo de las versiones recuperadas. Comprueba el pasaje completo contra MySQL antes de entregarlo al modelo.
 - El chat actualiza un borrador independiente del historial y agrupa los deltas cada 32 ms. Cambiar de curso, elegir otra conversación o detener la respuesta cancela la petición activa. Las citas aparecen al validar la respuesta final.
 - El inicio del estudiante consulta su asistencia y calcula los totales de avance en MySQL. Las consultas de anuncios y materiales seleccionan las columnas utilizadas. La analítica agrupa respuestas y dominio por tema en consultas independientes para evitar multiplicar filas.
-- Las respuestas HTTP negocian compresión. Los eventos SSE se envían directamente. React, Motion y React Spring tienen archivos separados con nombres basados en su contenido. La activación de cuentas y las páginas privadas se cargan bajo demanda.
+- Las respuestas HTTP negocian compresión. Los eventos SSE se envían directamente. React, Motion, React Spring y GSAP (`vendor-gsap`) tienen archivos separados con nombres basados en su contenido; GSAP solo se descarga en las páginas que lo usan, no en la carga inicial del ingreso. La activación de cuentas y las páginas privadas se cargan bajo demanda.
 - El botón para entrar a clase se actualiza cada 15 segundos. Los relojes se detienen al ocultar la pestaña y se actualizan al volver. El fondo de acceso también responde a cambios de movimiento reducido.
 
 En una prueba en memoria con 100 documentos de unos 17.000 caracteres, la mediana de 15 búsquedas con la caché preparada pasó de **62,85 ms a 1,74 ms**. Esta medición cubre la selección local de fragmentos. El JavaScript inicial completo, sumando sus dependencias estáticas, mide **90,59 kB gzip antes y 90,71 kB después**. La separación de dependencias permite reutilizarlas al actualizar la aplicación. Los resultados de validación están en `docs/ESTADO_DESARROLLO_PARA_CLAUDE.md`.
@@ -165,7 +165,7 @@ cd backend
 npm run lint
 npm test
 
-# Frontend: lint, 46 pruebas de componentes y hooks (Vitest + jsdom) y compilación
+# Frontend: lint, 50 pruebas de componentes y hooks (Vitest + jsdom) y compilación
 cd ..\frontend
 npm run lint
 npm test

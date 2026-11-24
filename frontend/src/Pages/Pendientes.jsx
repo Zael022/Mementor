@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import EstadoVacio from '../Componentes/EstadoVacio.jsx';
+import { anunciar } from '../Componentes/Anunciador.jsx';
 import { Cargando, MensajeError } from '../Componentes/Estados.jsx';
 import TarjetaRacha from '../Componentes/TarjetaRacha.jsx';
 import { useSesion } from '../context/SesionContext.jsx';
@@ -37,7 +38,7 @@ export default function Pendientes() {
   const pendientes = useDatos('/me/todo');
   const [pestana, setPestana] = useState('assigned');
 
-  if (pendientes.cargando && !pendientes.datos) return <Cargando />;
+  if (pendientes.cargando && !pendientes.datos) return <Cargando texto="Cargando tus pendientes…" forma="lista" />;
   if (pendientes.error) return <MensajeError error={pendientes.error} />;
   if (usuario.role !== 'student') {
     return (
@@ -64,13 +65,13 @@ export default function Pendientes() {
       <nav className="pestanas" aria-label="Estado del trabajo">
         {PESTANAS.map((opcion) => (
           <a key={opcion.id} href={`#${opcion.id}`} className={pestana === opcion.id ? 'active' : ''} aria-current={pestana === opcion.id ? 'page' : undefined}
-            onClick={(evento) => { evento.preventDefault(); setPestana(opcion.id); }}>
+            onClick={(evento) => { evento.preventDefault(); setPestana(opcion.id); anunciar(`${opcion.texto}: ${datos[opcion.id].length}`); }}>
             {opcion.texto} <span className="contador">{datos[opcion.id].length}</span>
           </a>
         ))}
       </nav>
       {datos[pestana].length === 0 && <EstadoVacio ilustracion="tarea" titulo={actual.vacio} />}
-      <ul className="lista-trabajo">
+      <ul className="lista-trabajo panel-seccion" key={pestana}>
         {datos[pestana].map((tarea) => (
           <li key={tarea.id} style={{ '--color-clase': colorDeCurso(tarea.courseId) }}>
             <Link to={`/estudiante/tareas/${tarea.id}`}>{tarea.title}</Link>

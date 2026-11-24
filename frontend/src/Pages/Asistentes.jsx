@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Revelar } from '../Componentes/Animaciones.jsx';
+import { anunciar } from '../Componentes/Anunciador.jsx';
 import Campo from '../Componentes/Campo.jsx';
 import { Aviso, Cargando, Insignia, MensajeError } from '../Componentes/Estados.jsx';
 import { useSesion } from '../context/SesionContext.jsx';
@@ -136,10 +138,18 @@ function AccionBorrador({ agente, resultado, valores }) {
 
 // Presentación del resultado de cada agente.
 function Resultado({ agente, datos, valores }) {
+  const titulo = useRef(null);
+  // Lleva el foco al resultado nuevo y lo anuncia.
+  useEffect(() => {
+    if (datos.status === 'no_evidence') return;
+    titulo.current?.focus({ preventScroll: false });
+    anunciar('Resultado listo.');
+  }, [datos]);
   if (datos.status === 'no_evidence') return <Aviso tipo="error">{datos.message} (No se consultó al modelo.)</Aviso>;
   const r = datos.result;
   return (
-    <div className="resultado-agente" role="status">
+    <Revelar className="resultado-agente" inmediato>
+      <h3 ref={titulo} tabIndex={-1}>Resultado</h3>
       {agente === 'question_generator' && (
         <ol className="preguntas">
           {r.questions.map((pregunta) => (
@@ -197,7 +207,7 @@ function Resultado({ agente, datos, valores }) {
       {datos.sources?.length > 0 && <p className="tenue pequeno">Fuentes: {datos.sources.map((fuente) => `${fuente.id} ${fuente.title}`).join(' · ')}</p>}
       <p className="tenue pequeno">Generado por IA: revísalo antes de usarlo. Ejecución n.º {datos.runId}.</p>
       <AccionBorrador agente={agente} resultado={r} valores={valores} />
-    </div>
+    </Revelar>
   );
 }
 
@@ -212,7 +222,7 @@ export default function Asistentes() {
   const [resultado, setResultado] = useState(null);
   const { enviando, error, ejecutar } = useEnvio();
 
-  if (catalogo.cargando && !catalogo.datos) return <Cargando />;
+  if (catalogo.cargando && !catalogo.datos) return <Cargando texto="Cargando los asistentes…" forma="tarjetas" />;
   if (catalogo.error) return <MensajeError error={catalogo.error} />;
 
   function elegir(agente) {
@@ -256,10 +266,11 @@ export default function Asistentes() {
           <h2 id="titulo-agente">{agente.name}</h2>
           <form onSubmit={ejecutarAgente}>
             <Formulario agente={elegido} valores={valores} setValores={setValores} cursos={cursos.datos} />
-            <button type="submit" className="boton" disabled={enviando}>{enviando ? 'Generando…' : 'Generar'}</button>
+            <button type="submit" className="boton" disabled={enviando} aria-busy={enviando}>{enviando ? 'Generando…' : 'Generar'}</button>
           </form>
           <MensajeError error={error} />
-          {resultado && <Resultado agente={elegido} datos={resultado} valores={valores} />}
+          {enviando && <Cargando texto="Generando el resultado…" forma="resultado" cantidad={2} />}
+          {!enviando && resultado && <Resultado agente={elegido} datos={resultado} valores={valores} />}
         </section>
       )}
 

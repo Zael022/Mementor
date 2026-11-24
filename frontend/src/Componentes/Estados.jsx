@@ -1,5 +1,16 @@
-// Indica que los datos se están cargando.
-export function Cargando({ texto = 'Cargando…' }) {
+import { useEffect, useRef } from 'react';
+import { anunciar } from './Anunciador.jsx';
+
+// Indica que los datos se están cargando; con «forma» muestra un esqueleto parecido al contenido.
+export function Cargando({ texto = 'Cargando…', forma, cantidad = 3 }) {
+  if (forma) {
+    return (
+      <div className={`esqueleto ${forma}`} role="status">
+        <span className="solo-lector">{texto}</span>
+        {Array.from({ length: cantidad }, (_, indice) => <div key={indice} className="esqueleto-bloque" aria-hidden="true" />)}
+      </div>
+    );
+  }
   return (
     <p className="cargando" role="status">
       <span className="puntos" aria-hidden="true"><i /><i /><i /></span>
@@ -14,10 +25,18 @@ export function MensajeError({ error }) {
   return <p className="aviso error" role="alert">{error.message || String(error)}</p>;
 }
 
-// Muestra un aviso informativo o de éxito.
+// Muestra un aviso informativo o de éxito y lo anuncia en la región viva global.
 export function Aviso({ tipo = 'info', children }) {
+  const referencia = useRef(null);
+  const texto = typeof children === 'string' ? children : null;
+
+  useEffect(() => {
+    const contenido = referencia.current?.textContent;
+    if (contenido) anunciar(contenido);
+  }, [texto, children]);
+
   if (!children) return null;
-  return <p className={`aviso ${tipo}`} role="status">{children}</p>;
+  return <p ref={referencia} className={`aviso ${tipo}`}>{children}</p>;
 }
 
 // Etiqueta de estado con texto legible.

@@ -41,7 +41,7 @@ export default function CursosGestion() {
         </form>
       </Desplegable>
       <MensajeError error={cursos.error} />
-      {cursos.cargando && <Cargando />}
+      {cursos.cargando && <Cargando texto="Cargando los cursos…" forma="tarjetas" />}
       {cursos.datos?.length === 0 && <EstadoVacio ilustracion="libro" titulo="No hay cursos todavía" detalle="Crea el primer curso con el formulario de arriba." />}
       <div className="rejilla">
         {cursos.datos?.map((curso) => (

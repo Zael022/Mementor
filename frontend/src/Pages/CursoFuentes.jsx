@@ -112,7 +112,7 @@ export default function CursoFuentes() {
         {datos?.notIndexed.length > 0 && (
           <div className="aviso info">
             <p>Hay {datos.notIndexed.length} lecciones o archivos que existían antes y aún no son fuentes del tutor.</p>
-            <button type="button" className="boton" disabled={enviando} onClick={indexarExistentes}>{enviando ? 'Indexando…' : 'Indexar ahora'}</button>
+            <button type="button" className="boton" disabled={enviando} aria-busy={enviando} onClick={indexarExistentes}>{enviando ? 'Indexando…' : 'Indexar ahora'}</button>
           </div>
         )}
         <MensajeError error={error || fuentes.error} />

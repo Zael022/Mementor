@@ -23,6 +23,7 @@ export default function AdminUsuarios() {
   const usuarios = useDatos(`/users?page=${pagina}&limit=20`);
   const [formulario, setFormulario] = useState({ email: '', displayName: '', role: 'student' });
   const [invitacion, setInvitacion] = useState(null);
+  const [recienInvitado, setRecienInvitado] = useState('');
   const { enviando, error, ejecutar } = useEnvio();
 
   const cambiar = (campo) => (valor) => setFormulario((previo) => ({ ...previo, [campo]: valor }));
@@ -32,6 +33,7 @@ export default function AdminUsuarios() {
     const respuesta = await ejecutar(() => api.post('/users', formulario));
     if (!respuesta) return;
     setInvitacion(respuesta.data);
+    setRecienInvitado(formulario.email.trim().toLowerCase());
     setFormulario({ email: '', displayName: '', role: formulario.role });
     usuarios.recargar();
   }
@@ -54,7 +56,7 @@ export default function AdminUsuarios() {
         <Campo etiqueta="Correo" tipo="email" valor={formulario.email} alCambiar={cambiar('email')} required />
         <Campo etiqueta="Nombre" valor={formulario.displayName} alCambiar={cambiar('displayName')} required minLength={2} />
         <Campo etiqueta="Rol" tipo="select" valor={formulario.role} alCambiar={cambiar('role')} opciones={ROLES} />
-        <button type="submit" className="boton" disabled={enviando}>Invitar</button>
+        <button type="submit" className="boton" disabled={enviando} aria-busy={enviando}>{enviando ? 'Invitando…' : 'Invitar'}</button>
       </form>
       <MensajeError error={error || usuarios.error} />
       {usuarios.cargando && <Cargando />}
@@ -65,7 +67,7 @@ export default function AdminUsuarios() {
             <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
             <tbody>
               {usuarios.datos.map((persona) => (
-                <tr key={persona.id}>
+                <tr key={persona.id} className={persona.email === recienInvitado ? 'fila-nueva' : undefined}>
                   <td>{persona.displayName}</td>
                   <td>{persona.email}</td>
                   <td>{nombreRol(persona.role)}</td>

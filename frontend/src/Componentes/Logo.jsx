@@ -1,26 +1,38 @@
-// Identidad de MENTOR AI: isotipo (burbuja azul con una «m» de dos arcos y una chispa lima) y logotipo.
-// La «m» une dos arcos como un libro abierto o dos personas aprendiendo juntas; la chispa representa la IA.
-export const FORMA_ISOTIPO = 'M16 2H48A14 14 0 0 1 62 16V48A14 14 0 0 1 48 62H7A5 5 0 0 1 2 57V16A14 14 0 0 1 16 2Z';
-export const ARCOS_ISOTIPO = 'M16 47V32a8 8 0 0 1 16 0v15M32 32a8 8 0 0 1 16 0v15';
-export const CHISPA_ISOTIPO = 'M50 5.5c.95 4.6 2.9 6.55 7.5 7.5-4.6.95-6.55 2.9-7.5 7.5-.95-4.6-2.9-6.55-7.5-7.5 4.6-.95 6.55-2.9 7.5-7.5z';
+import { useEffect, useState } from 'react';
 
-export function Isotipo({ tamano = 28, className = '' }) {
-  return (
-    <svg className={`isotipo ${className}`} viewBox="0 0 64 64" width={tamano} height={tamano} aria-hidden="true" focusable="false">
-      <path d={FORMA_ISOTIPO} fill="#3451e1" />
-      <path d={ARCOS_ISOTIPO} fill="none" stroke="#fff" strokeWidth="6.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d={CHISPA_ISOTIPO} fill="#c8f169" />
-    </svg>
-  );
+// Indica si la página se ve en tema oscuro (elegido en la cuenta o por el sistema).
+function useTemaOscuro() {
+  const leer = () => {
+    if (typeof window === 'undefined') return false;
+    const tema = document.documentElement.getAttribute('data-tema');
+    if (tema === 'oscuro') return true;
+    if (tema === 'claro') return false;
+    return Boolean(window.matchMedia?.('(prefers-color-scheme: dark)').matches);
+  };
+  const [oscuro, setOscuro] = useState(leer);
+
+  useEffect(() => {
+    const actualizar = () => setOscuro(leer());
+    const observador = new MutationObserver(actualizar);
+    observador.observe(document.documentElement, { attributes: true, attributeFilter: ['data-tema'] });
+    const consulta = window.matchMedia?.('(prefers-color-scheme: dark)');
+    consulta?.addEventListener?.('change', actualizar);
+    return () => { observador.disconnect(); consulta?.removeEventListener?.('change', actualizar); };
+  }, []);
+
+  return oscuro;
 }
 
-// Logotipo completo; el texto accesible sigue siendo «MENTOR AI».
-export default function Logo({ como = 'span', className = '', ...props }) {
+const MEDIDAS = { horizontal: [912, 214], vertical: [1037, 830] };
+
+// Logo oficial de MENTOR AI (archivos SVG en public/marca, sin redibujar); usa la versión para fondo oscuro cuando corresponde.
+export default function Logo({ como = 'span', className = '', variante = 'horizontal', ...props }) {
   const Etiqueta = como;
+  const oscuro = useTemaOscuro();
+  const [ancho, alto] = MEDIDAS[variante];
   return (
-    <Etiqueta className={`marca ${className}`} {...props}>
-      <Isotipo />
-      <span className="marca-texto">MENTOR <span className="marca-ai">AI</span></span>
+    <Etiqueta className={`marca marca-${variante} ${className}`} {...props}>
+      <img src={`/marca/logo-${variante}-${oscuro ? 'oscuro' : 'claro'}.svg`} alt="MENTOR AI" width={ancho} height={alto} decoding="async" />
     </Etiqueta>
   );
 }

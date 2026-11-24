@@ -1,5 +1,9 @@
 # Estado de desarrollo — mantener actualizado
 
+## Integración de main en feature-CRM
+
+Se conservaron los antecedentes de ambas ramas y se combinaron los estilos accesibles del CRM con los colores de marca, GSAP y animaciones limitadas de `main`. Frontend: `npm run lint`, `npm test` (57 pruebas) y `npm run build` correctos. La prueba de navegador no se ejecutó: la revisión automática de permisos no pudo completarse por el límite de uso. El servidor frontend volvió a iniciarse.
+
 ## Sesión 2026-11-24 · CRM de instituciones de plataforma, avance parcial
 
 Se añadió una ficha separada del CRM de admisiones: lista de instituciones con búsqueda y paginación, creación explícita idempotente de ficha, edición versionada y registro de contactos con clave de reintento. Acceso y auditoría son de plataforma. Se agregaron la migración aditiva `20261124000100`, modelos, servicio, rutas, pantalla y pruebas. No se ha migrado la base de uso. La implementación sigue incompleta: faltan tareas, casos, actividades, pasos verificables, panel, edición/supresión de contactos y conservación; no introducir contactos reales mientras falten controles de privacidad. Detalles en `docs/adr/0007-crm-instituciones.md`.
@@ -18,7 +22,38 @@ Se añadieron bloqueos transaccionales a recuperación y activación, límite de
 
 Verificación: lint backend y frontend correctos; suite backend MySQL 162 pruebas correctas (incluye recuperación concurrente); frontend 51 pruebas y build correctos; Playwright `e2e/acceso.spec.js` 3 pruebas correctas en escritorio/móvil con servicios locales y base `_e2e`. No se ejecutó toda la suite e2e ni se probó Google real. La prueba de activación concurrente se agregó después de iniciar la suite completa y pasó en una ejecución separada de `tests/security.test.js` (9 pruebas).
 
-**Última actualización** — 2026-11-20. Requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+**Antecedentes** — 2026-11-23. Logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+
+## Sesión 2026-11-23 · Logo «M con birrete»
+- La cabecera usa la opción 1: la «M» con birrete oficial ocupa el lugar de la M de «MENTOR» (sin órbita ni estrella). Archivos en `frontend/public/marca/logo-horizontal-*.svg`; las cuatro opciones y la nota de cómo se rellenaron los huecos de la órbita están en `docs/marca/m-birrete/`.
+- Alto del logo: 44 px (50 px en la portada, 36 px en móvil).
+- Ejecutado: lint limpio, 50/50 pruebas de frontend, build correcto y captura de `/login` en tema claro y oscuro. No se volvieron a correr las e2e.
+- Documentación actualizada: 46 mockups en escritorio y 46 en móvil regenerados (`npx playwright test -c playwright.capturas.config.js`, 10/10), láminas de marca, paleta con el naranja botón `#C2410C`, libro de marca, anteproyecto, modelo de datos y plan de producción en Word y PDF (portada con el logo nuevo y fila del cronograma del 23/11).
+
+## Sesión 2026-11-20 · GSAP, microinteracciones y accesibilidad
+
+| Cambio | Dónde | Cómo se comprobó |
+| --- | --- | --- |
+| GSAP es el motor de `Animaciones.jsx` (Revelar, Contador, AnilloPuntaje, TarjetaInteractiva) con la misma API: React pinta el estado final y GSAP anima «desde»; con movimiento reducido no hay animación | `utils/gsap.js`, `Componentes/Animaciones.jsx`, `hooks/useMovimiento.js` | `tests/Animaciones.test.jsx` (4 pruebas) |
+| Revelar usa solo opacidad (no `visibility`) para que el contenido siga alcanzable con el teclado; opción `inmediato` para respuestas a una acción | `Animaciones.jsx`, `Asistentes.jsx` | Playwright 24/24 (detectó y se corrigió un resultado oculto) |
+| Se quitó el CSS que competía con GSAP (`.revelar`, transform de `.tarjeta-enlace`, transición del anillo); la tarjeta sube también con el foco | `styles.css` | Revisión y Vitest |
+| Rejilla de la portada cargada con `React.lazy` solo cuando entra en pantalla; chunk `vendor-gsap` | `Portada.jsx`, `RejillaRasgos.jsx`, `vite.config.js` | Medición con el build |
+| Anunciador global (`aria-live`) para guardados, resultados, cambios de sección y retroalimentación de quizzes y práctica; el foco pasa al botón «Siguiente» | `Anunciador.jsx`, `Estados.jsx`, `OpcionesQuiz.jsx`, `JugarQuiz.jsx`, `PracticaDiaria.jsx`, `EstudianteCurso.jsx`, `Pendientes.jsx` | Vitest y Playwright |
+| Esqueletos de carga con forma de contenido y textos concretos; botones con `aria-busy` y «Guardando…»; aviso de éxito con ✓; fila nueva o guardada resaltada; panel de sección con entrada suave; racha que «salta» al subir | `Estados.jsx`, `Asistentes.jsx`, `AdminUsuarios.jsx`, `CursoCalificaciones.jsx`, `EstudianteTarea.jsx`, `styles.css` | Vitest y Playwright |
+| Accesibilidad: naranja de botones `#c2410c` (5,2:1 con blanco); efectos de hover también con `:focus-visible`; animaciones infinitas limitadas a una entrada o 3 ciclos; `.boton-texto` de 24 × 24 px como mínimo | `styles.css` | Revisión |
+
+### Peso del JavaScript inicial
+- Carga inicial de `index.html` (entrada + precargas): antes **297,1 kB (95,5 kB gzip)**, después **296,2 kB (95,1 kB gzip)**.
+- Todo lo que descarga `/login` al abrir: antes **310,2 kB (100,9 kB gzip)**, después **309,3 kB (100,6 kB gzip)**. GSAP no se descarga hasta que la rejilla de la portada entra en pantalla.
+- `vendor-gsap`: 115,3 kB (45,7 kB gzip), solo en las páginas que lo usan.
+
+### Resultados
+- Frontend: `npm run lint` sin errores; `npm test` **50 de 50**; `npm run build` compila; `npm run test:e2e` **24 de 24**.
+- Backend: `npm run lint` sin errores; `npm test` **139 de 139** (sin cambios en el backend).
+
+### Pendiente
+- Probar con NVDA o VoiceOver los anuncios del anunciador global (se revisaron en el árbol de accesibilidad, no con un lector real).
+- Revisar en un navegador real la vista 390 × 844 y 1280 × 900 en modo oscuro y alto contraste.
 
 ## Sesión 2026-11-20 · CRM de admisiones y mejoras obligatorias
 
@@ -69,7 +104,8 @@ El acceso de plataforma se mantiene operativo sin acceso automático al CRM pers
 | APIs externas (tipo de cambio de Hacienda, feriados de Nager.Date) y endpoints para 3 workflows de n8n (PR #4) | `services/external/`, `integrationService`, `n8n/*.json` | `integrations.test.js` con respuestas simuladas |
 | Configuración de despliegue: Render (Virginia), Vercel con reescritura `/api`, TiDB Cloud con TLS (PR #5) | `render.yaml`, `frontend/vercel.json`, `docs/despliegue.md` | Revisión; **no desplegado todavía** |
 | Catálogo `roles` con FK desde `users.role` (PR #6) | migración `20261121000500` | Migraciones up/down/up; suite completa |
-| Nuevo logotipo (burbuja azul con «m» de dos arcos y chispa lima), favicon y set de íconos propios (PR #8) | `Logo.jsx`, `Iconos.jsx`, `public/` | Vitest y Playwright |
+| Set de íconos propios y primer logotipo (PR #8; el logotipo lo reemplaza el logo oficial) | `Logo.jsx`, `Iconos.jsx`, `public/` | Vitest y Playwright |
+| Logo oficial (entregado por la estudiante en SVG, sin redibujar): «M» con birrete, órbita y estrella; versiones horizontal y vertical, claro y oscuro; favicon e ícono de app. Colores de la interfaz alineados: `#181B3E`, `#3452E1`, `#C5EF6A` (y `#6F86FF` para la órbita en fondo oscuro) | `Logo.jsx`, `public/marca/`, `favicon.png`, `icono-192.png`, `apple-touch-icon.png`, `icono-512.png`, `docs/marca/oficial/`, libro de marca | Vitest 46/46, Playwright 24/24, capturas en escritorio y móvil |
 | Modelo de datos (ER general y 6 por módulo, diccionario), mockups de 46 pantallas en escritorio y móvil, libro de marca, anteproyecto, plan de producción en Word y PDF | `docs/datos/`, `docs/mockups/`, `docs/marca/`, `docs/produccion/`, `docs/entregables/`, `frontend/capturas/` | PDF renderizados y revisados página por página |
 
 ### Resultados

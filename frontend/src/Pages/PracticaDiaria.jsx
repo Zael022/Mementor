@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import EstadoVacio from '../Componentes/EstadoVacio.jsx';
+import { anunciar } from '../Componentes/Anunciador.jsx';
 import { Cargando, MensajeError } from '../Componentes/Estados.jsx';
-import OpcionesQuiz from '../Componentes/OpcionesQuiz.jsx';
+import OpcionesQuiz, { useRetroalimentacion } from '../Componentes/OpcionesQuiz.jsx';
 import { Llama } from '../Componentes/TarjetaRacha.jsx';
 import { useDatos } from '../hooks/useDatos.js';
 import { useEnvio } from '../hooks/useEnvio.js';
@@ -29,6 +30,17 @@ export default function PracticaDiaria() {
     const pendiente = practica.datos.questions.findIndex((q) => !q.answer);
     setActual(pendiente === -1 ? practica.datos.questions.length : pendiente);
   }, [practica.datos]);
+
+  const listaPreguntas = practica.datos?.questions || [];
+  const enCurso = listaPreguntas[Math.min(actual, listaPreguntas.length - 1)];
+  const botonSeguir = useRetroalimentacion(enCurso ? respuestas[enCurso.id] : null, enCurso?.options);
+  const practicaTerminada = listaPreguntas.length > 0 && actual >= listaPreguntas.length;
+  const diasRacha = racha?.current ?? 0;
+
+  // Anuncia el cierre de la práctica con la racha alcanzada.
+  useEffect(() => {
+    if (practicaTerminada) anunciar(`Práctica completada. Racha de ${diasRacha} ${diasRacha === 1 ? 'día' : 'días'}.`);
+  }, [practicaTerminada, diasRacha]);
 
   if (practica.cargando && !practica.datos) return <Cargando />;
   if (practica.error) return <MensajeError error={practica.error} />;
@@ -63,7 +75,7 @@ export default function PracticaDiaria() {
       <div className="practica-cabecera">
         <h1>Práctica del día</h1>
         <div className="racha-mini" aria-label={`Racha: ${racha?.current ?? 0} días`}>
-          <Llama encendida={(racha?.current ?? 0) > 0} tamano={28} /><strong>{racha?.current ?? 0}</strong>
+          <Llama encendida={(racha?.current ?? 0) > 0} tamano={28} /><strong key={racha?.current ?? 0} className="cuenta-sube">{racha?.current ?? 0}</strong>
         </div>
       </div>
       <ol className="puntos-progreso" aria-label={`Respondidas ${Object.keys(respuestas).length} de ${preguntas.length}`}>
@@ -73,7 +85,7 @@ export default function PracticaDiaria() {
       </ol>
 
       {terminada ? (
-        <div className="practica-lista" role="status">
+        <div className="practica-lista">
           <Llama encendida tamano={96} />
           <h2>¡Racha de {racha?.current ?? 0} {racha?.current === 1 ? 'día' : 'días'}!</h2>
           {bono !== null && <p className="aviso exito bono-ganado">+{coma(bono)} a tu nota del curso</p>}
@@ -87,9 +99,9 @@ export default function PracticaDiaria() {
           <OpcionesQuiz opciones={pregunta.options} alElegir={responder} elegida={respuesta?.optionId ?? null}
             correcta={respuesta?.correctOptionId ?? null} bloqueada={enviando} />
           {respuesta && (
-            <div className={`quiz-retro ${respuesta.isCorrect ? 'bien' : 'mal'}`} role="status">
+            <div className={`quiz-retro ${respuesta.isCorrect ? 'bien' : 'mal'}`}>
               <strong>{respuesta.isCorrect ? '¡Correcto!' : 'No era esa; la correcta quedó marcada.'}</strong>
-              <button type="button" className="boton" onClick={() => setActual((indice) => indice + 1)}>
+              <button type="button" className="boton" ref={botonSeguir} onClick={() => setActual((indice) => indice + 1)}>
                 {actual + 1 === preguntas.length ? 'Terminar' : 'Siguiente'}
               </button>
             </div>

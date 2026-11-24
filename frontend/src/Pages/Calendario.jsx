@@ -60,7 +60,7 @@ export default function Calendario() {
         </div>
       </div>
       <MensajeError error={calendario.error} />
-      {calendario.cargando && !calendario.datos && <Cargando />}
+      {calendario.cargando && !calendario.datos && <Cargando texto="Cargando el calendario…" />}
       <div className="calendario-semana">
         {dias.map((dia) => {
           const eventos = (calendario.datos?.items || []).filter((item) => mismoDia(new Date(item.at), dia));
