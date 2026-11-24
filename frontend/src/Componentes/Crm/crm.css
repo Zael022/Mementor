@@ -1,0 +1,24 @@
+.crm-lista { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; margin-block: 16px; }
+.crm-tablero { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+.crm-columna { min-width: 0; padding: 12px; background: var(--cielo); border-radius: 12px; }
+.crm-columna h2 { overflow-wrap: anywhere; font-size: 1.1rem; }
+.crm-card { margin-block: 12px; overflow-wrap: anywhere; }
+.crm-selector-movil { display: none; }
+.crm-dialogo { background: var(--panel); color: var(--tinta); border: 2px solid var(--campo-borde); border-radius: 16px; width: min(92vw, 780px); max-height: 88vh; padding: 24px; }
+.crm-dialogo::backdrop { background: #0009; }
+.crm-dialogo form { margin-bottom: 20px; }
+.crm-resumen { display: grid; grid-template-columns: minmax(110px, 1fr) 2fr; gap: 8px 16px; }
+.crm-resumen dt { font-weight: bold; }
+.crm-resumen dd { margin: 0; overflow-wrap: anywhere; }
+.crm-evento { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .8rem; }
+.crm-dialogo input, .crm-dialogo select, .crm-dialogo textarea { max-width: 100%; }
+button, summary { min-height: 24px; min-width: 24px; }
+summary { cursor: pointer; padding-block: 12px; }
+.boton { min-height: 44px; }
+@media (max-width: 700px) {
+  .crm-tablero { display: block; }
+  .crm-columna:not(.seleccionada) { display: none; }
+  .crm-selector-movil { display: block; }
+  .crm-resumen { grid-template-columns: 1fr; }
+  .crm-dialogo { padding: 16px; }
+}

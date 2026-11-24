@@ -92,3 +92,43 @@ Todas bajo `/api/v1`, con sesión y CSRF. El curso y su corpus se resuelven en e
 | `PATCH /institutions/:id/limits` | admin. plataforma | `{ maxDocuments, aiDailyQuestionLimit }` (null = valor del servidor) |
 
 Errores nuevos: `NO_EVIDENCE` y `NO_VALID_CITATIONS` (avisos con estado 200/201), `AI_INVALID_FORMAT` (502), `RAG_UNAVAILABLE` y `RAG_NOT_CONFIGURED` (503), `RATE_LIMITED` e `INSTITUTION_QUOTA` (429), `DOCUMENT_LIMIT` (409), `ASSESSMENT_CLOSED` (409, también al entregar un intento pendiente).
+
+## CRM de admisiones (2026-11-20)
+
+Todas las rutas tienen prefijo `/api/v1/crm`. Sesión y CSRF existentes. Cuerpos Zod estrictos: institución, actor, rol, aprobador, cuenta/matrícula creada y consumo nunca se aceptan como controles del cliente. Detalle de reglas, configuración y ejemplos reproducibles en [CRM.md](CRM.md).
+
+| Método/ruta CRM | Acceso | Contrato |
+| --- | --- | --- |
+| `POST /prospectos` | administración institución | `{convocatoriaId,nombre,correo,telefono?,procedencia,utm?}` → `{prospectoId,solicitudId,version}`; 409 para ficha/solicitud existente |
+| `PATCH /prospectos/:id/etapa` | administración institución | `{solicitudId,etapa,versionEsperada,motivo,actividad?,fechaEfectiva?}`; URL y solicitud deben corresponder |
+| `GET /embudo` | administración/auditoría | `convocatoriaId` requerido, `desde,hasta,corte,sede,procedencia,configuracionVersion`; `{cohort,cutoff,generatedAt,configVersion,configuration,stages,rankings}` |
+| `GET /atencion` | administración/docente asignado | filtros de convocatoria/sede, page/limit; data/meta; motivos y prioridades deterministas |
+| `POST /prospectos/:id/mensaje` | administración institución | `{solicitudId,canal,tono,objetivo}` → borrador pendiente y `agentRunId`; nunca envía |
+| `GET/POST /convocatorias` | lectura institucional autorizada / administración | lista paginada; alta `{courseId,nombre,sede,inicio,fin,configuracion}` |
+| `PATCH /convocatorias/:id` | administración | `{versionEsperada,nombre?,estado?,configuracion?}`; guarda historial de configuración |
+| `GET /prospectos` | administración | búsqueda institucional/paginación para selección asistida de ficha existente |
+| `GET/POST /solicitudes` | administración; docente solo GET asignadas | lista filtrada; alta `{prospectoId,convocatoriaId}` |
+| `GET/PATCH /solicitudes/:id` | GET administración/docente asignado; PATCH administración | detalle; `{versionEsperada,responsableId?,estado?,revisada?,excepcionConservacion?,motivo}` |
+| `GET /solicitudes/:id/historial` | administración/docente asignado | historial paginado ordenado por fecha efectiva e ID |
+| `POST /solicitudes/:id/actividades` | administración/docente asignado | `{versionEsperada,motivo,actividad:{tipo,programada?,efectiva?,resultado?,evidencia?}}` |
+| `POST /solicitudes/:id/seguimientos` | administración/docente asignado | `{versionEsperada,responsableId,vence,tipo,nota?}` |
+| `PATCH /solicitudes/:id/seguimientos/:childId` | administración/docente responsable | `{versionEsperada,resultado}`; cierre y último contacto |
+| `POST /solicitudes/:id/matricular` | administración | `{versionEsperada,modo:nueva/vincular/reintegrar,motivo,decisionConfirmada:true,excepcional?,actividad?}`; respuesta idempotente sin reemitir invitación |
+| `POST /solicitudes/:id/borradores` | administración | `{canal,tono,objetivo,texto}`; redacción manual identificada |
+| `PATCH /solicitudes/:id/borradores/:childId` | administración | `{versionEsperada,texto,canal}` invalida aprobación |
+| `POST /solicitudes/:id/borradores/:childId/revision` | administración | `{versionEsperada,accion:aprobar/descartar/actualizar_contexto}` |
+| `GET /solicitudes/:id/borradores/:childId/copia` | administración | solo versión aprobada y contexto vigente; texto/destinatario/canal; no implica envío |
+| `POST /prospectos/:id/consentimientos` | administración | `{finalidad:admisiones/promociones,documentoVersion,evidencia,origen,aceptadoEn}` |
+| `POST /prospectos/:id/consentimientos/:childId/revocar` | administración | revocación explícita auditada |
+| `POST /prospectos/:id/privacidad` | administración | `{accion:acceso/correccion/supresion,verificacionRef,verificadaEn,motivo,correccion?}`; caso auditado con referencia de identidad verificada |
+| `GET /trazabilidad` | administración/auditoría | eventos paginados sin contactos, notas ni motivos libres |
+
+Las primeras cinco equivalen a las rutas del taller `/prospectos`, `/prospectos/:id/etapa`, `/embudo`, `/atencion`, `/prospectos/:id/mensaje`. No existe una implementación paralela.
+
+Las listas usan `page` y `limit` (máximo 100). Solicitudes admiten convocatoria, sede, etapa, estado, responsable, procedencia y fechas de creación; búsqueda en servidor sin persistir contactos en la URL del navegador. Reportes no admiten filtros ambiguos de estado actual, se limitan a una convocatoria/configuración y 366 días. Por transición devuelve `N,A,M,AM,observedPct,maturePct,nonConversionPct,targetPct,gapPoints,openWindows,pendingInTime,pendingOverdue,waiting,closures,meanDays,medianDays,waitingMeanDays`; nulos con motivo cuando no hay base o no aplica. Reporte histórico exige fecha efectiva y de registro al corte.
+
+Errores adicionales: `STALE_VERSION`, `INVALID_TRANSITION`, `PROCESS_CLOSED`, `APPLICATION_EXISTS`, `PROSPECT_EXISTS`, `STALE_CONTEXT`, `REVIEW_REQUIRED`, `CONTACT_UNAVAILABLE`, `ACCOUNT_DISABLED`, `EXISTING_ENROLLMENT`, `WITHDRAWN_ENROLLMENT`, `INVITATION_RECENT` (409); `VALIDATION_ERROR` (422); `AGENT_INVALID_OUTPUT` (502); IA no configurada/indisponible (503). Recurso ajeno 404; rol sin permiso 403; cuota 429.
+
+## Seguimiento institucional de plataforma (parcial)
+
+Exclusivo `platform_admin`, bajo `/api/v1/platform-crm`: `GET /institutions` (búsqueda `search`, `page`, `limit`), `GET /institutions/:institutionId`, `POST /institutions/:institutionId/account` (cuerpo vacío, idempotente), `PATCH /institutions/:institutionId/account` (versión obligatoria, `needs`, `onboardingStatus`, `nextReviewAt`) y `GET/POST /institutions/:institutionId/contacts`. El alta de contacto exige `requestKey` UUID, `name` y opcionalmente `position`, `email`, `phone`; repetir la clave con datos diferentes devuelve 409. Las escrituras usan CSRF. La ficha no se crea con GET. La incorporación completada, contactos editables, tareas, casos y panel aún no están implementados.

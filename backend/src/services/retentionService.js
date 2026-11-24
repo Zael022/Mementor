@@ -1,5 +1,7 @@
 import { sequelize } from '../config/database.js';
+import { retainCrmData } from './crmPrivacyService.js';
 import { reconcilePendingDeletions } from './governanceService.js';
+import { purgeExpiredCache } from './agents/responseCache.js';
 
 // Retención de datos: cuánto tiempo se guarda cada cosa se configura en .env (0 = no borrar).
 const days = (name, fallback) => Math.max(0, Number(process.env[name] ?? fallback));
@@ -72,11 +74,13 @@ export async function purgeOldAgentRuns() {
 
 // Ejecuta todas las reglas de retención y devuelve cuántas filas tocó cada una.
 export async function runRetention() {
+  await retainCrmData();
   return {
     versionTexts: await purgeUncitedVersionText(),
     usageRows: await rollupUsage(),
     conversations: await purgeOldConversations(),
     agentRuns: await purgeOldAgentRuns(),
     pendingDeletions: await reconcilePendingDeletions(),
+    aiResponseCache: await purgeExpiredCache(),
   };
 }

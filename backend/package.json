@@ -13,6 +13,8 @@
     "db:migrate:status": "sequelize-cli db:migrate:status",
     "db:migrate:undo": "sequelize-cli db:migrate:undo",
     "admin:create": "node src/scripts/createPlatformAdmin.js",
+    "prompts:lock": "node src/scripts/promptsLock.js",
+    "evals": "cross-env NODE_ENV=test EVALS_REAL=1 NODE_USE_ENV_PROXY=1 node --test --test-concurrency=1 \"tests/evals-real/*.eval.js\"",
     "lint": "eslint .",
     "test": "cross-env NODE_ENV=test node --test --test-concurrency=1 \"tests/**/*.test.js\"",
     "lab:sqli": "node laboratorio/inyeccion-sql/iniciar.js"

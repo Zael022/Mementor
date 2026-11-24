@@ -68,3 +68,14 @@ test('una negación que la fuente comparte, o sobre algo que la respuesta no afi
   assert.equal(verifyAnswer('El denominador indica en cuántas partes se divide la unidad [S1].', [fraccion]).ok, true);
   assert.equal(verifyAnswer('El denominador de una fracción nunca vale cero [S1].', [fraccion]).ok, true);
 });
+
+test('una negación de otra parte del pasaje no contradice una afirmación sobre el mismo objeto', () => {
+  const leccion = [{ sourceId: 'S1', text: 'El denominador nunca puede ser cero porque no se puede dividir un entero en cero partes.' }];
+  assert.equal(verifyAnswer('Las fracciones son partes de un entero [S1].', leccion).ok, true);
+});
+
+test('una afirmación corta que contradice la fuente se rechaza; una pregunta no', () => {
+  const leccion = [{ sourceId: 'S1', text: 'El denominador nunca puede ser cero porque no se puede dividir un entero en cero partes.' }];
+  assert.equal(verifyAnswer('El denominador puede ser cero [S1].', leccion).ok, false);
+  assert.equal(verifyAnswer('¿Puede el denominador ser cero? [S1] No, nunca puede ser cero [S1].', leccion).ok, true);
+});

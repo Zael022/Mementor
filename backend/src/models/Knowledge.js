@@ -112,11 +112,17 @@ export const AiUsageEvent = sequelize.define('AiUsageEvent', {
   retrievalMode: { type: DataTypes.STRING(20), allowNull: true },
   streamed: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   outcome: {
-    type: DataTypes.ENUM('reserved', 'completed', 'no_evidence', 'no_citations', 'invalid_format', 'provider_error', 'retrieval_error', 'cancelled'),
+    type: DataTypes.ENUM('reserved', 'completed', 'no_evidence', 'no_citations', 'invalid_format', 'provider_error', 'retrieval_error', 'cancelled', 'guard_blocked'),
     allowNull: false,
     defaultValue: 'reserved',
   },
   latencyMs: { type: DataTypes.INTEGER, allowNull: true },
   inputTokens: { type: DataTypes.INTEGER, allowNull: true },
   outputTokens: { type: DataTypes.INTEGER, allowNull: true },
+  promptVersion: { type: DataTypes.STRING(80), allowNull: true },
+  modelTier: { type: DataTypes.STRING(20), allowNull: true },
+  cacheHit: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+  guardOutcome: { type: DataTypes.STRING(40), allowNull: true },
+  cacheReadTokens: { type: DataTypes.INTEGER, allowNull: true },
+  cacheWriteTokens: { type: DataTypes.INTEGER, allowNull: true },
 }, { tableName: 'ai_usage_events', underscored: true });

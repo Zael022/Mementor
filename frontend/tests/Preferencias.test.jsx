@@ -68,6 +68,7 @@ describe('Configuración', () => {
     expect(await screen.findByText('Preferencias guardadas en tu cuenta.')).toBeTruthy();
     fireEvent.click(screen.getByLabelText('Alto contraste'));
     expect(sesion.guardarPreferencias).toHaveBeenLastCalledWith({ highContrast: true });
+    await waitFor(() => expect(screen.getByLabelText('Preguntas en la práctica diaria').disabled).toBe(false));
     fireEvent.change(screen.getByLabelText('Preguntas en la práctica diaria'), { target: { value: '10' } });
     expect(sesion.guardarPreferencias).toHaveBeenLastCalledWith({ practiceSize: 10 });
   });

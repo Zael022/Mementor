@@ -6,6 +6,7 @@ import { conflict, forbidden, invalid, notFound } from '../utils/AppError.js';
 import { pageMeta } from '../utils/http.js';
 import { getCourseAccess } from './accessService.js';
 import { recordAudit } from './auditService.js';
+import { applyEnrollment } from './enrollmentMutationService.js';
 
 const toDto = (course) => ({
   id: course.id,
@@ -179,18 +180,16 @@ export async function listEnrollableStudents(user, courseId) {
 export async function enrollStudent(user, courseId, studentId) {
   const { course } = await getCourseAccess(user, courseId, { write: true });
   const student = await findInstitutionUser(user, studentId, 'student');
-  const [enrollment, created] = await Enrollment.findOrCreate({
-    where: { courseId: course.id, studentId: student.id },
-    defaults: { status: 'active' },
+  const { enrollment, kind } = await sequelize.transaction(async (transaction) => {
+    await User.findByPk(student.id, { transaction, lock: transaction.LOCK.UPDATE });
+    const existing = await Enrollment.findOne({ where: { courseId: course.id, studentId: student.id }, transaction });
+    if (existing?.status === 'active') throw conflict('ALREADY_ENROLLED', 'El estudiante ya está matriculado.');
+    return applyEnrollment(user, course, student, existing ? 'reintegrar' : 'nueva', transaction);
   });
-  if (!created && enrollment.status === 'active') throw conflict('ALREADY_ENROLLED', 'El estudiante ya está matriculado.');
-  if (!created) await enrollment.update({ status: 'active' });
-  const action = created ? 'enrollment.created' : 'enrollment.reinstated';
-  await recordAudit({ actor: user, action, resourceType: 'course', resourceId: course.id, metadata: { studentId: student.id } });
   return {
     id: enrollment.id,
     status: 'active',
-    reinstated: !created,
+    reinstated: kind === 'reintegrada',
     student: { id: student.id, displayName: student.displayName, email: student.email },
   };
 }

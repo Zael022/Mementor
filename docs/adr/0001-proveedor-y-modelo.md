@@ -1,6 +1,6 @@
 # ADR 0001 · Proveedor y modelo de generación
 
-**Estado:** aceptada · 2026-11-16
+**Estado:** aceptada · 2026-11-16 · Reemplazada en parte por el [ADR 0009](0009-capas-ia.md): el modelo se elige por tarea (`AI_MODEL_RAPIDO`, `AI_MODEL_AVANZADO`, con `AI_MODEL` como respaldo).
 
 ## Contexto
 El tutor necesita un modelo que redacte respuestas en español a partir de fragmentos autorizados del curso. MENTOR ya tenía `aiProvider.js` con dos adaptadores (Anthropic y OpenAI) elegidos por `AI_PROVIDER` y `AI_MODEL`. La entrega 3 pide streaming real.

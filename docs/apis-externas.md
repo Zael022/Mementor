@@ -14,6 +14,8 @@ Todas se llaman desde el backend (`backend/src/services/external/`). Cada llamad
 - **Feriados:** se guardan 24 horas en memoria. Si la API falla, el calendario sigue funcionando sin la marca de feriado.
 - **El costo en colones** se calcula solo si se configuran `AI_PRICE_INPUT_USD_PER_MTOK` y `AI_PRICE_OUTPUT_USD_PER_MTOK`. No se inventan tarifas.
 
+Para consumos de varios modelos, `AI_MODEL_PRICES_JSON` permite tarifas por proveedor/modelo. Las variables anteriores solo aplican al modelo actualmente configurado. Si falta tarifa o consumo conocido de un grupo, su costo y el total comparable son desconocidos. Se etiqueta como estimación con tarifas de consulta, no factura histórica. El CRM reutiliza el mismo `aiProvider`; no hay envío SMTP, WhatsApp o n8n de borradores. Las integraciones futuras requieren outbox y permisos institucionales (backlog en `CRM.md`). Tener configuración no acredita conectividad; no se llama a un proveedor de pago al abrir páginas.
+
 ## Endpoints propios
 - `GET /api/v1/indicators/exchange-rate`: cualquier persona con sesión.
 - `GET /api/v1/indicators/holidays?year=2026`: cualquier persona con sesión.

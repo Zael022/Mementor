@@ -40,6 +40,8 @@ export function CostoEstimado() {
         <p className="tenue">Para estimar el costo, configura en el servidor el precio por millón de tokens de tu modelo (AI_PRICE_INPUT_USD_PER_MTOK y AI_PRICE_OUTPUT_USD_PER_MTOK).</p>
       )}
       {datos.rateError && <p className="tenue pequeno">Sin tipo de cambio: {datos.rateError}</p>}
+      <p className="tenue pequeno">{datos.estimateAssumption}</p>
+      <ul>{datos.byModel?.map((row) => <li key={`${row.provider}-${row.model}`}>{row.provider || 'Proveedor desconocido'} · {row.model || 'Modelo desconocido'}: {row.usd === null ? 'Costo desconocido; falta tarifa de este modelo' : `US$${row.usd.toFixed(4)} estimados`}</li>)}</ul>
     </section>
   );
 }

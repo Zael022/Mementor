@@ -30,7 +30,10 @@ export function signSessionToken({ userId, role, sessionId }) {
 // Verifica firma, emisor y vencimiento; devuelve null si el token no sirve.
 export function verifySessionToken(token) {
   try {
-    return jwt.verify(String(token), jwtSecret(), { algorithms: ['HS256'], issuer: ISSUER });
+    const payload = jwt.verify(String(token), jwtSecret(), { algorithms: ['HS256'], issuer: ISSUER });
+    if (!payload || typeof payload !== 'object' || typeof payload.sub !== 'string'
+      || typeof payload.sid !== 'string' || !payload.sid || !Number.isInteger(payload.exp)) return null;
+    return payload;
   } catch {
     return null;
   }

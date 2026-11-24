@@ -5,6 +5,11 @@ import { Cargando } from '../Componentes/Estados.jsx';
 import RutaProtegida from './RutaProtegida.jsx';
 import Login from '../Pages/Login.jsx';
 const Inicio = lazy(() => import('../Pages/Inicio.jsx'));
+const CrmPanel = lazy(() => import('../Pages/CrmPanel.jsx'));
+const CrmCandidatos = lazy(() => import('../Pages/CrmCandidatos.jsx'));
+const CrmSolicitud = lazy(() => import('../Pages/CrmSolicitud.jsx'));
+const CrmAtencion = lazy(() => import('../Pages/CrmAtencion.jsx'));
+const CrmConvocatorias = lazy(() => import('../Pages/CrmConvocatorias.jsx'));
 const Activar = lazy(() => import('../Pages/Activar.jsx'));
 const RecuperarClave = lazy(() => import('../Pages/RecuperarClave.jsx'));
 const Terminos = lazy(() => import('../Pages/Terminos.jsx'));
@@ -15,6 +20,7 @@ const Asistentes = lazy(() => import('../Pages/Asistentes.jsx'));
 const RestablecerClave = lazy(() => import('../Pages/RestablecerClave.jsx'));
 const ConfirmarCorreo = lazy(() => import('../Pages/ConfirmarCorreo.jsx'));
 const PlataformaInstituciones = lazy(() => import('../Pages/PlataformaInstituciones.jsx'));
+const PlataformaCrm = lazy(() => import('../Pages/PlataformaCrm.jsx'));
 const AdminUsuarios = lazy(() => import('../Pages/AdminUsuarios.jsx'));
 const AdminAuditoria = lazy(() => import('../Pages/AdminAuditoria.jsx'));
 const CursosGestion = lazy(() => import('../Pages/CursosGestion.jsx'));
@@ -88,6 +94,17 @@ export default function Rutas() {
         <Route element={<Layout />}>
           <Route path="/" element={<Inicio />} />
           <Route path="/configuracion" element={<Configuracion />} />
+          <Route element={<RutaProtegida roles={['institution_admin', 'auditor']} />}>
+            <Route path="/admisiones" element={<CrmPanel />} />
+          </Route>
+          <Route element={<RutaProtegida roles={['institution_admin', 'teacher']} />}>
+            <Route path="/admisiones/candidatos" element={<CrmCandidatos />} />
+            <Route path="/admisiones/solicitudes/:id" element={<CrmSolicitud />} />
+            <Route path="/admisiones/atencion" element={<CrmAtencion />} />
+          </Route>
+          <Route element={<RutaProtegida roles={['institution_admin']} />}>
+            <Route path="/admisiones/convocatorias" element={<CrmConvocatorias />} />
+          </Route>
           <Route element={<RutaProtegida roles={['institution_admin', 'teacher', 'student', 'auditor']} />}>
             <Route path="/asistentes" element={<Asistentes />} />
           </Route>
@@ -100,6 +117,8 @@ export default function Rutas() {
 
           <Route element={<RutaProtegida roles={['platform_admin']} />}>
             <Route path="/plataforma/instituciones" element={<PlataformaInstituciones />} />
+            <Route path="/plataforma/crm-instituciones" element={<PlataformaCrm />} />
+            <Route path="/plataforma/crm-instituciones/:id" element={<PlataformaCrm />} />
           </Route>
 
           <Route element={<RutaProtegida roles={['institution_admin', 'platform_admin']} />}>

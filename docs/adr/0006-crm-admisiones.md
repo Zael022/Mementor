@@ -1,0 +1,19 @@
+# ADR 0006 — Admisiones, historial y conversión
+
+Fecha: 2026-11-20. Estado: aceptada para implementación local.
+
+- Una convocatoria pertenece a una institución y a un curso; la sede es texto dentro de la institución. No hay programas multicurso.
+- La persona y su participación son entidades distintas. Correo normalizado con trim/lowercase, sin equivalencias de proveedor. Unicidad de correo por institución y de solicitud por persona/convocatoria. Ninguna coincidencia enlaza una cuenta automáticamente.
+- Nueve etapas ordenadas, con estado independiente: activo/lista_de_espera/retirado/rechazado; matriculado solo en estudiante. Cambios normales de una etapa, retrocesos administrativos con motivo. El paso final solo ocurre mediante la conversión transaccional o vinculación excepcional explícita.
+- Cada escritura de solicitud bloquea la fila y exige versión. Eventos conservan fecha efectiva y de registro; las citas y resultados se registran sin inventar actividades. Correcciones retroactivas son administrativas, justificadas y no reemplazan eventos.
+- Métricas: primera llegada válida a cada etapa, transición directa posterior, una vez por solicitud. Un retroceso no crea otro denominador. Los saltos excepcionales no acreditan etapas intermedias. Solo eventos efectivos y registrados al corte. Ventana madura completa para todos; nulos con motivo y cierres aparte. Cada solicitud conserva la configuración de su cohorte; reportes separados por versión, sin reinterpretarla.
+- Administración gestiona su institución. Docentes solo fichas y seguimientos de solicitudes con asignación explícita; no cambian etapas, convierten ni redactan con IA. Auditoría solo agregados y eventos sin contactos. Plataforma y estudiantes sin acceso al CRM.
+- Conversión: bloqueo institución → solicitud → prospecto → usuario, transacción compartida con invitación y matrícula, índices únicos. Correo incompatible da conflicto genérico. Cuenta invitada conserva activación pendiente. Vinculación y reintegro requieren modo y motivo explícitos. Reintentos devuelven el vínculo, nunca otro token. Sin SMTP/IA dentro de la transacción.
+- Borradores: proveedor existente, contexto sin contactos ni notas; contexto versionado, revisión de texto/canal/destinatario exactos. Cambios invalidan aprobación. No hay envío real.
+- Consentimientos separados de la aceptación de cuenta: admisiones y promoción, esta última opcional. Evidencia externa verificable y versión; la nota de quien administra no constituye aceptación. Casos de derechos sin cuenta requieren referencia de verificación institucional, fecha y motivo auditados. No se guarda documento de identidad.
+- Conservación: plazos explícitos por convocatoria para contactos cerrados y borradores, aprobados por institución; excepciones justificadas y visibles. Trabajo coordinado por leases. Anonimización también desde la baja de cuenta y exportación propia incluye CRM; no se copian consentimientos a la cuenta.
+- Tablas adicionales: casos de privacidad para evidencia de verificación y resolución. Configuración histórica en JSON inmutable por versión en convocatoria y snapshot por solicitud; no se necesita tabla de citas porque los eventos conservan toda reprogramación.
+
+Las pruebas crean y eliminan datos únicamente en bases descartables. No se envían mensajes ni se migran bases compartidas. La implementación no certifica cumplimiento legal ni accesibilidad integral.
+
+La versión para concurrencia de convocatoria cambia con cualquier edición; la versión de configuración del embudo solo cambia si cambia esa configuración. Cerrar o reabrir una convocatoria no vacía sus reportes. La transacción se propaga explícitamente a cada helper, según el contrato de [transacciones de Sequelize v6](https://sequelize.org/docs/v6/other-topics/transactions/).

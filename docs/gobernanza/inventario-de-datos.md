@@ -29,6 +29,7 @@
 | Restablecimiento de contraseña (hash del token) | MySQL `password_resets` | La propia persona al pedirlo | Nadie desde la interfaz | Vence a los 60 minutos y sirve una vez | Operador |
 | Cambio de correo pendiente (nuevo correo y hash del token) | MySQL `email_changes` | La propia persona al pedirlo | Nadie desde la interfaz | Vence a los 60 minutos y sirve una vez; se borra con la baja de la cuenta | Operador |
 | Recordatorios enviados (persona, día y resultado) | MySQL `reminder_deliveries` | n8n al informar los envíos | Nadie desde la interfaz | Se borra con la baja de la cuenta | Operador |
+| Respuestas guardadas de agentes (hoy solo resúmenes de lección) | MySQL `ai_response_cache` | El servidor tras una respuesta que pasó los guardrails | La misma institución, al pedir el mismo resumen | Vence a los 7 días (`AI_RESPONSE_CACHE_TTL_HOURS`), se borra al editar, despublicar o borrar la lección y al borrar la institución; nunca guarda conversaciones del tutor ni textos escritos por personas | Operador |
 | Aceptación de términos y privacidad (versión, fecha) | MySQL `consent_records` | La propia persona al activar la cuenta o reaceptar | La persona; administración y auditoría de su institución | Se conserva como evidencia aun después de la baja | Administración de la institución |
 | Solicitudes de baja y qué se conservó | MySQL `data_deletion_requests` | La propia persona (confirmando su contraseña) | Administración y auditoría | Permanente, sin datos personales tras anonimizar | Administración de la institución |
 | Ejecuciones de agentes de IA (agente, resultado, modelo, tokens, latencia; sin contenido) | MySQL `agent_runs` | MENTOR | La persona (su historial); administración y auditoría | Mientras exista la institución | Operador |
@@ -36,10 +37,32 @@
 | Recordatorios por correo (nombre, correo, títulos de pendientes) | n8n (en memoria durante la ejecución) y servidor SMTP | Workflow 2 | La propia persona | n8n guarda el historial de ejecuciones según su configuración | Operador |
 
 ## Qué recibe el proveedor de generación
-El prompt del sistema, hasta 6 fragmentos (máximo 1800 caracteres cada uno) con título y página o sección, la pregunta y hasta 6 mensajes previos del mismo hilo. Se omiten los turnos que citaron fuentes retiradas. No se envían nombres, correos ni identificadores.
+El prompt del sistema (versionado en `backend/src/prompts/`), hasta 6 fragmentos (máximo 1800 caracteres cada uno) con título y página o sección, la pregunta y hasta 6 mensajes previos del mismo hilo. Se omiten los turnos que citaron fuentes retiradas. No se envían nombres, correos ni identificadores de cuenta.
+- La pregunta y el historial salen sin cédulas, teléfonos, correos ni enlaces. Desde el ADR 0009, la **consulta al buscador** también: en modo Vertex esa consulta sale hacia Google y antes iba sin ocultar.
+- El resumen de lección envía el cuerpo de la lección sin cédulas, teléfonos ni correos (ADR 0009).
+- Las claves de evaluaciones y quizzes nunca salen hacia el proveedor: el servidor solo las usa para revisar que la respuesta del tutor no las revele.
+- Con `AI_PROMPT_CACHE=on`, Anthropic guarda temporalmente en su caché el bloque marcado (la lección completa) según su política de prompt caching.
+
+## Ampliación CRM y revisión de cumplimiento
+
+| Categoría | Finalidad y acceso | Conservación y derechos |
+| --- | --- | --- |
+| Convocatoria/configuraciones | Administración institucional define curso, sede, política, ventanas y plazos; docentes solo convocatorias asignadas; auditoría agregados | Historial de versiones, sin metas ficticias |
+| Contactos mínimos de prospecto | Admisiones; administración y docente explícitamente asignado; sin acceso automático de plataforma | Plazo institucional por convocatoria desde cierre; excepción justificada visible; casos de acceso/corrección/supresión con identidad verificada |
+| Solicitudes, actividades y seguimientos | Trazabilidad operativa y atención; fechas, evidencia referenciada y notas limitadas | Eliminar texto libre/contactos por supresión; conservar hechos/vínculos mínimos sin identidad, revisar procesos abiertos y excepciones |
+| Borradores/destinatario/contexto | Revisión humana en entidad funcional, nunca log técnico | Plazo institucional de borradores; se eliminan por supresión o baja; no hay colas de envío |
+| Consentimientos de prospecto | Admisiones y promoción separados, versión/aceptación/revocación/evidencia externa | No prueban aceptación de cuenta; borrar referencias identificables en supresión y preservar hecho mínimo |
+| Casos de privacidad | Referencia/fecha de verificación por operador institucional, derecho y resolución | Sin documento de identidad ni exportación persistida; acceso institucional auditado |
+| Contexto de agente de admisiones | Proveedor AI_PROVIDER recibe etapa, condiciones/fechas/política autorizadas, sede/curso, canal/tono/objetivo enmascarados | Sin ficha, contactos, notas ni historial académico por defecto; condiciones de retención del proveedor deben ser aprobadas |
+| Texto de cumplimiento | Apoyo a revisión antes de publicar | Patrones conocidos se sustituyen antes del payload; hallazgos no contienen el valor completo; no garantiza detectar todos los datos sensibles |
+
+Exportación propia ampliada: incluye categorías CRM vinculadas y datos propios de estudio sin claves privadas ni datos de compañeros. Anonimización de cuenta revisa CRM en la misma transacción. Correcciones de contacto invalidan aprobación de borradores; la procedencia original de adquisición se conserva como categoría, con eventos de corrección. El operador debe revisar respaldos, copias y descargas ya entregadas; no hay eliminación automática de archivos fuera del sistema ni un plazo legal universal supuesto. Ver ADR 0006 y `docs/CRM.md`.
 
 ## Qué no se registra
-El registro técnico (`ai_usage_events` y la línea `tutor.consulta` del servidor) no guarda credenciales, preguntas, respuestas ni contenido de documentos. Las claves viven en `.env` (no versionado) o en ADC.
+El registro técnico (`ai_usage_events`, `agent_runs` y la línea `tutor.consulta` del servidor) no guarda credenciales, preguntas, respuestas ni contenido de documentos. Sí guarda la versión del prompt, el nivel y el modelo usados, si la respuesta vino de la caché, los tokens de caché del proveedor y el resultado de los guardrails como código (`pass`, `alert_<motivo>`, `blocked_<motivo>`). Las claves viven en `.env` (no versionado) o en ADC.
+
+## Seguimiento institucional de plataforma (parcial)
+`platform_crm_accounts` contiene necesidades y datos de seguimiento; `platform_crm_contacts` contiene nombre y datos profesionales. Finalidad: relación de servicio de MENTOR con instituciones existentes; origen: captura manual del operador de plataforma; acceso exclusivo de `platform_admin`. La política de conservación, corrección y supresión aún no está implementada ni aprobada. No ingresar contactos reales hasta completar esos controles.
 
 ## Retención automática
 Una vez al día (`RETENTION_INTERVAL_MINUTES`), la instancia con el turno de tareas aplica las reglas anteriores. Con `0` en un plazo, esa regla no borra nada. Borrar una conversación también quita sus citas, así que el contador «usada en respuestas» del docente baja en consecuencia.

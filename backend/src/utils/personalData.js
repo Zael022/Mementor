@@ -25,3 +25,9 @@ export function redactPersonalData(text, { links = true } = {}) {
   }
   return result;
 }
+
+// Valores completos encontrados, solo para comparaciones internas del servidor (nunca se registran ni se devuelven).
+export function findPersonalData(text, { links = false } = {}) {
+  return PATTERNS.filter(({ type }) => links || type !== 'enlace')
+    .flatMap(({ type, regex }) => [...String(text ?? '').matchAll(regex)].map((match) => ({ type, value: match[0] })));
+}

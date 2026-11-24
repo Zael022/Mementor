@@ -26,8 +26,8 @@ test('con TRUST_PROXY=1 cada cliente detrás del proxy se identifica por su prop
     const a = await (await fetch(url, { headers: { 'x-forwarded-for': '203.0.113.5' } })).json();
     const b = await (await fetch(url, { headers: { 'x-forwarded-for': '198.51.100.7' } })).json();
     console.log(JSON.stringify({ setting: app.get('trust proxy'), a: a.ip, b: b.ip }));
-    server.close();
-    process.exit(0);
+    await new Promise((resolve) => server.close(resolve));
+    await (await import('./src/models/index.js')).sequelize.close();
   `;
   const output = execFileSync(process.execPath, ['--input-type=module', '-e', script], {
     cwd: new URL('..', import.meta.url), env: { ...process.env, TRUST_PROXY: '1' }, encoding: 'utf8',

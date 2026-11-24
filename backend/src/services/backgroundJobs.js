@@ -27,7 +27,7 @@ export function startBackgroundJobs() {
         // Solo se registran las ejecuciones lentas o con turno perdido, para no llenar el registro.
         if (result.ran && (result.lostLease || Date.now() - startedAt > 5000)) console.info(JSON.stringify({ evento: 'tarea_periodica', tarea: key, ms: Date.now() - startedAt, turnoPerdido: result.lostLease }));
       } catch (error) {
-        console.error(`Tarea ${label} falló:`, error?.message);
+        console.error(JSON.stringify({ evento: 'tarea.fallo', tarea: label, codigo: error?.code || error?.name }));
       } finally {
         busy = false;
       }
