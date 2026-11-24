@@ -57,6 +57,7 @@ function Fuentes({ citas, mensajeId, base }) {
           </div>
         </>
       )}
+      <p className="tenue pequeno">La revisión automática compara cifras y palabras con la fuente, pero no garantiza que la explicación sea correcta. Abre la cita para confirmarlo y avisa a tu docente si algo no coincide.</p>
     </MotionDiv>
   );
 }
@@ -76,13 +77,17 @@ function MensajeTutor({ mensaje, esEstudiante }) {
       <div className={`burbuja ${esTutor ? 'tutor' : 'persona'}${enCurso ? ' en-curso' : ''}${interrumpido ? ' interrumpida' : ''}`}>
         <p className="burbuja-autor">
           {esTutor ? 'Tutor IA' : 'Tú'}
-          {enCurso && <span className="estado-borrador"> · escribiendo, citas por validar</span>}
+          {enCurso && <span className="estado-borrador"> · preparando y revisando las fuentes</span>}
         </p>
-        {esTutor && mensaje.kind === 'notice'
+        {enCurso ? (
+          <p className="tenue pequeno">
+            {mensaje.progreso ? 'Escribiendo la respuesta. Se muestra cuando cada idea quede revisada contra su fuente.' : 'Buscando en el material del curso…'}
+          </p>
+        ) : esTutor && mensaje.kind === 'notice'
           ? <p className="aviso info">{mensaje.content}</p>
           : esTutor ? <Markdown texto={mensaje.content} /> : <p>{mensaje.content}</p>}
         {interrumpido && (
-          <p className="aviso error pequeno">Respuesta interrumpida: no es una respuesta completa ni tiene citas validadas.</p>
+          <p className="aviso error pequeno">Respuesta interrumpida antes de validarse: no se muestra ningún texto sin revisar.</p>
         )}
         {esTutor && !enCurso && !interrumpido && citas.length > 0 && <Fuentes citas={citas} mensajeId={mensaje.id} base={base} />}
         {esTutor && !enCurso && !interrumpido && mensaje.kind !== 'notice' && citas.length === 0 && (

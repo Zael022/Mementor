@@ -1,7 +1,7 @@
 import { ConsentRecord } from '../models/index.js';
 
 // Versión vigente de cada documento; si cambia, se vuelve a pedir la aceptación.
-export const POLICY_VERSIONS = Object.freeze({ terms: '2026-11-21', privacy: '2026-11-21' });
+export const POLICY_VERSIONS = Object.freeze({ terms: '2026-11-21', privacy: '2026-11-23' });
 
 // Documentos que la persona aún no ha aceptado en su versión vigente.
 export async function pendingConsents(userId) {

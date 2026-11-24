@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Laboratorio de inyección SQL · MENTOR AI</title>
+  <style>
+    :root { --tinta: #181b3e; --azul: #3452e1; --lima: #c5ef6a; --rojo: #b42318; --verde: #067647; --fondo: #f4f6fc; --linea: #dce2f2; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, "Segoe UI", sans-serif; background: var(--fondo); color: var(--tinta); }
+    header { background: var(--tinta); color: #fff; padding: 18px 28px; display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+    header h1 { margin: 0; font-size: 22px; }
+    header p { margin: 0; opacity: .8; font-size: 14px; }
+    .aviso { background: #fff4d6; border-left: 6px solid #f0a51a; padding: 10px 28px; font-size: 14px; }
+    main { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px 28px; }
+    section { background: #fff; border: 1px solid var(--linea); border-radius: 16px; padding: 18px 20px; }
+    section.vulnerable { border-top: 8px solid var(--rojo); }
+    section.protegida { border-top: 8px solid var(--verde); }
+    section.login { grid-column: 1 / -1; border-top: 8px solid var(--azul); }
+    h2 { margin: 0 0 4px; font-size: 19px; }
+    .sub { margin: 0 0 12px; color: #5a6384; font-size: 14px; }
+    form { display: flex; gap: 8px; }
+    input { flex: 1; font: 15px ui-monospace, Consolas, monospace; padding: 9px 10px; border: 1px solid #b9c2dd; border-radius: 10px; }
+    button { font: 600 15px system-ui; padding: 9px 16px; border: 0; border-radius: 10px; background: var(--tinta); color: #fff; cursor: pointer; }
+    pre { white-space: pre-wrap; word-break: break-word; background: #0f1229; color: #e6e9ff; padding: 10px 12px; border-radius: 10px; font-size: 13px; min-height: 44px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--linea); word-break: break-all; }
+    .resumen { font-weight: 700; margin: 10px 0 6px; }
+    .malo { color: var(--rojo); } .bueno { color: var(--verde); }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Laboratorio de inyección SQL</h1>
+    <p>MENTOR AI · búsqueda de personas del «Colegio Norte» · datos efímeros en la base <code>_lab</code></p>
+  </header>
+  <p class="aviso">Solo en esta computadora (127.0.0.1). La versión vulnerable existe únicamente en el laboratorio para la demostración; MENTOR AI usa la versión protegida.</p>
+  <main>
+    <section class="vulnerable" aria-labelledby="t-v">
+      <h2 id="t-v">Antes: versión vulnerable</h2>
+      <p class="sub">El texto se pega dentro del SQL.</p>
+      <form data-destino="vulnerable"><input name="q" aria-label="Buscar (vulnerable)" value="Norte" /><button>Buscar</button></form>
+      <p class="resumen" data-resumen="vulnerable"></p>
+      <pre data-sql="vulnerable"></pre>
+      <table><thead><tr><th>Nombre</th><th>Correo</th></tr></thead><tbody data-filas="vulnerable"></tbody></table>
+    </section>
+    <section class="protegida" aria-labelledby="t-p">
+      <h2 id="t-p">Después: versión protegida (código real de MENTOR AI)</h2>
+      <p class="sub">Sequelize envía el texto como parámetro; los comodines se escapan.</p>
+      <form data-destino="protegida"><input name="q" aria-label="Buscar (protegida)" value="Norte" /><button>Buscar</button></form>
+      <p class="resumen" data-resumen="protegida"></p>
+      <pre data-sql="protegida"></pre>
+      <table><thead><tr><th>Nombre</th><th>Correo</th></tr></thead><tbody data-filas="protegida"></tbody></table>
+    </section>
+    <section class="login" aria-labelledby="t-l">
+      <h2 id="t-l">Inicio de sesión real de MENTOR AI con el mismo ataque</h2>
+      <p class="sub">POST /api/v1/auth/login con un correo inyectado.</p>
+      <form data-login><input name="email" aria-label="Correo" value="' OR '1'='1' -- " /><input name="password" aria-label="Contraseña" value="cualquiera" /><button>Entrar</button></form>
+      <pre data-login-respuesta></pre>
+    </section>
+  </main>
+  <script>
+    // Todo lo que llega del servidor se escribe con textContent: el laboratorio tampoco es vulnerable a XSS.
+    const fila = (datos) => {
+      const tr = document.createElement('tr');
+      for (const valor of [datos.display_name, datos.email]) { const td = document.createElement('td'); td.textContent = valor ?? ''; tr.appendChild(td); }
+      return tr;
+    };
+    async function buscar(destino, texto) {
+      const respuesta = await fetch(`/lab/${destino}/usuarios?q=${encodeURIComponent(texto)}`);
+      const datos = await respuesta.json();
+      document.querySelector(`[data-sql="${destino}"]`).textContent = datos.error ? `${datos.sql}\n\nError de la base: ${datos.error}` : datos.sql;
+      const cuerpo = document.querySelector(`[data-filas="${destino}"]`);
+      cuerpo.replaceChildren(...(datos.filas || []).map(fila));
+      const total = (datos.filas || []).length;
+      const ajenas = (datos.filas || []).filter((f) => /sur|\$2[aby]\$/i.test(`${f.display_name} ${f.email}`)).length;
+      const resumen = document.querySelector(`[data-resumen="${destino}"]`);
+      resumen.textContent = datos.error ? 'La consulta falló y la base reveló su error.' : `${total} ${total === 1 ? 'fila' : 'filas'}${ajenas ? ` · ${ajenas} de otra institución o con hash de contraseña` : ''}`;
+      resumen.className = `resumen ${ajenas || datos.error ? 'malo' : 'bueno'}`;
+    }
+    for (const formulario of document.querySelectorAll('form[data-destino]')) {
+      formulario.addEventListener('submit', (evento) => { evento.preventDefault(); buscar(formulario.dataset.destino, formulario.q.value); });
+      buscar(formulario.dataset.destino, formulario.q.value);
+    }
+    document.querySelector('form[data-login]').addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+      const f = evento.currentTarget;
+      const respuesta = await fetch('/api/v1/auth/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: f.email.value, password: f.password.value }) });
+      const cuerpo = await respuesta.json();
+      document.querySelector('[data-login-respuesta]').textContent = `HTTP ${respuesta.status}\n${JSON.stringify(cuerpo.error || cuerpo.data, null, 2)}`;
+    });
+  </script>
+</body>
+</html>

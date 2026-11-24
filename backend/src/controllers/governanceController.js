@@ -23,7 +23,7 @@ export async function exportData(req, res) {
   res.json({ data: await governance.exportMyData(req.user) });
 }
 
-// Solicitud de baja; si se procesa de inmediato, también se cierra la sesión en el navegador.
+// Solicitud de baja: se completa antes de responder y la cookie se borra solo cuando terminó.
 export async function requestDeletion(req, res) {
   const result = await governance.requestDeletion(req.user, req.body);
   if (result.status === 'completed') res.clearCookie(SESSION_COOKIE, { path: '/' });

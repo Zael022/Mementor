@@ -1,0 +1,8 @@
+# Evidencia CSP: compilación de producción servida con «vite preview» y los encabezados de vercel.json (2026-11-23T10:38:51-06:00)
+
+CSP: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://player.vimeo.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+Título visible: Tus clases, tus tareas y tu avance en un solo lugar
+Script en línea ejecutado: false
+Violaciones: 1 [
+  "Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-xvlsY3BiOdQ/6LKAKHwaSmhwrlceMO7FrjogvWe8tkc='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked."
+]

@@ -12,6 +12,7 @@ export const DEFAULT_PREFERENCES = {
   timeZone: null,
   dailyGoalMinutes: null,
   practiceSize: 5,
+  emailReminders: true,
 };
 const FIELDS = Object.keys(DEFAULT_PREFERENCES);
 

@@ -43,10 +43,10 @@ test.describe('Gobernanza y asistentes de IA @movil', () => {
     await page.getByLabel('Curso').selectOption(String(curso.cursoId));
     await page.getByLabel('Tema o enfoque').fill('denominador de las fracciones');
     await page.getByRole('button', { name: 'Generar' }).click();
-    await expect(page.getByText('¿Por qué el denominador no puede ser cero?')).toBeVisible();
+    await expect(page.locator('#contenido').getByText('¿Por qué el denominador no puede ser cero?')).toBeVisible();
     await capturar(page, '24-agente-preguntas');
     await page.getByRole('button', { name: 'Crear un quiz en borrador con estas preguntas' }).click();
-    await expect(page.getByText('Quiz creado en borrador.')).toBeVisible();
+    await expect(page.locator('#contenido').getByText('Quiz creado en borrador.')).toBeVisible();
   });
 
   test('el estudiante ve sus asistentes, resume una lección y gestiona su privacidad', async ({ page }) => {

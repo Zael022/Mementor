@@ -1,7 +1,9 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { api } from '../src/services/api.js';
-import { CambiarContrasena, DatosPersonales, FotoPerfil } from '../src/Componentes/EditorPerfil.jsx';
+import { MemoryRouter } from 'react-router-dom';
+import { CambiarContrasena, CambiarCorreo, DatosPersonales, FotoPerfil } from '../src/Componentes/EditorPerfil.jsx';
+import ConfirmarCorreo from '../src/Pages/ConfirmarCorreo.jsx';
 
 vi.mock('../src/services/api.js', async (importOriginal) => ({
   ...await importOriginal(),
@@ -58,5 +60,29 @@ describe('Contraseña', () => {
     fireEvent.change(screen.getByLabelText('Repite la nueva contraseña'), { target: { value: 'OtraClave2026' } });
     expect(screen.getByText('Las contraseñas no coinciden.')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Cambiar contraseña' }).disabled).toBe(true);
+  });
+});
+
+describe('Correo de acceso', () => {
+  it('pide el cambio sin modificar el correo de la sesión hasta confirmarlo', async () => {
+    api.post.mockResolvedValue({ data: { pending: true, newEmail: 'nuevo@ejemplo.test', expiresInMinutes: 60 } });
+    render(<CambiarCorreo />);
+    fireEvent.change(screen.getByLabelText('Nuevo correo'), { target: { value: 'nuevo@ejemplo.test' } });
+    fireEvent.change(screen.getByLabelText('Contraseña actual'), { target: { value: 'ClaveActual2026' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar enlace de confirmación' }));
+    expect(await screen.findByText(/Te enviamos un enlace a nuevo@ejemplo.test/)).toBeTruthy();
+    expect(api.post).toHaveBeenCalledWith('/me/email', { newEmail: 'nuevo@ejemplo.test', currentPassword: 'ClaveActual2026' });
+    expect(sesion.actualizarUsuario).not.toHaveBeenCalled();
+  });
+
+  it('confirma con un clic y actualiza la sesión abierta', async () => {
+    const token = 'a'.repeat(64);
+    api.post.mockResolvedValue({ data: { email: 'nuevo@ejemplo.test' } });
+    render(<MemoryRouter initialEntries={[`/confirmar-correo?token=${token}`]}><ConfirmarCorreo /></MemoryRouter>);
+    expect(api.post).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmar correo' }));
+    expect(await screen.findByText(/inicias sesión con nuevo@ejemplo.test/)).toBeTruthy();
+    expect(api.post).toHaveBeenCalledWith('/auth/email/confirm', { token });
+    expect(sesion.actualizarUsuario).toHaveBeenCalledWith({ email: 'nuevo@ejemplo.test' });
   });
 });

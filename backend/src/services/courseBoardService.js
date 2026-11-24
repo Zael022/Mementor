@@ -1,9 +1,8 @@
-import { unlink } from 'node:fs/promises';
 import path from 'node:path';
-import { Announcement, Institution, KnowledgeSource, Material, Lesson, LessonComment, User } from '../models/index.js';
+import { Announcement, Institution, KnowledgeSource, Material, Lesson, LessonComment, User, sequelize } from '../models/index.js';
 import { conflict, forbidden, invalid, notFound } from '../utils/AppError.js';
 import { readRagConfig } from '../config/rag.js';
-import { uploadDir } from '../middlewares/upload.js';
+import { discardUpload, persistUpload, readStored } from './fileStore.js';
 import { getCourseAccess } from './accessService.js';
 import { recordAudit } from './auditService.js';
 import { removeStoredFiles } from './fileCleanup.js';
@@ -101,8 +100,10 @@ export async function createLinkMaterial(user, courseId, { title, url, lessonId 
   return materialDto(row);
 }
 
-// Guarda el registro de un archivo ya recibido; si algo falla, borra el archivo.
+// Guarda un archivo ya recibido en tres pasos: original duradero, registro y auditoría en una transacción,
+// e indexación para el tutor. El original solo se borra si el registro no llegó a confirmarse.
 export async function createFileMaterial(user, courseId, { title, lessonId, file }) {
+  let committed = false;
   try {
     if (!file) throw invalid('Selecciona un archivo permitido (PDF, Word, PowerPoint, Excel, imagen o texto).');
     const { course } = await getCourseAccess(user, courseId, { write: true });
@@ -112,27 +113,39 @@ export async function createFileMaterial(user, courseId, { title, lessonId, file
       throw invalid('El contenido del archivo no corresponde a su formato. Sube el archivo original sin renombrarlo.');
     }
     await assertRoomForDocument(course, file.mimetype);
-    const row = await Material.create({
-      courseId: course.id,
-      lessonId: await resolveLesson(lessonId, course.id),
-      title: (title || originalName).slice(0, 180),
-      kind: 'file',
-      fileName: originalName,
-      storedName: file.filename,
-      mimeType: file.mimetype,
-      sizeBytes: file.size,
-      uploadedBy: user.id,
+    const resolvedLesson = await resolveLesson(lessonId, course.id);
+    const contentSha256 = await persistUpload('materials', file.filename);
+    const row = await sequelize.transaction(async (transaction) => {
+      const created = await Material.create({
+        courseId: course.id,
+        lessonId: resolvedLesson,
+        title: (title || originalName).slice(0, 180),
+        kind: 'file',
+        fileName: originalName,
+        storedName: file.filename,
+        mimeType: file.mimetype,
+        sizeBytes: file.size,
+        contentSha256,
+        uploadedBy: user.id,
+      }, { transaction });
+      await recordAudit({ actor: user, action: 'material.uploaded', resourceType: 'material', resourceId: created.id, transaction });
+      return created;
     });
-    await recordAudit({ actor: user, action: 'material.uploaded', resourceType: 'material', resourceId: row.id });
-    // PDF, DOCX y TXT pasan a ser fuentes del tutor; el estado de indexación viaja en la respuesta.
+    committed = true;
+    // PDF, DOCX y TXT pasan a ser fuentes del tutor. Si la indexación falla, el material queda guardado
+    // y la fuente se puede reintentar desde «Fuentes del tutor».
     let knowledge = { state: 'not_indexable' };
     if (isIndexableMaterial(row)) {
-      const result = await syncMaterialSource(row, { actor: user });
-      knowledge = (await materialKnowledgeStates([row.id])).get(row.id) || { state: result?.version?.state || 'pending' };
+      try {
+        const result = await syncMaterialSource(row, { actor: user });
+        knowledge = (await materialKnowledgeStates([row.id])).get(row.id) || { state: result?.version?.state || 'pending' };
+      } catch {
+        knowledge = { state: 'error', errorCode: 'INDEX_FAILED' };
+      }
     }
     return materialDto(row, knowledge);
   } catch (error) {
-    if (file?.path) await unlink(file.path).catch(() => {});
+    if (file?.filename && !committed) await discardUpload('materials', file.filename);
     throw error;
   }
 }
@@ -145,11 +158,12 @@ async function loadMaterial(user, materialId, { write = false } = {}) {
   return row;
 }
 
-// Entrega la ruta del archivo solo a quien tiene acceso al curso.
+// Entrega el original solo a quien tiene acceso al curso.
 export async function getMaterialFile(user, materialId) {
   const row = await loadMaterial(user, materialId);
   if (row.kind !== 'file') throw invalid('Este material es un enlace, no un archivo.');
-  return { filePath: path.join(uploadDir(), path.basename(row.storedName)), fileName: row.fileName };
+  const buffer = await readStored('materials', row.storedName);
+  return { buffer, fileName: row.fileName, mimeType: row.mimeType, sha256: row.contentSha256 };
 }
 
 export async function deleteMaterial(user, materialId) {

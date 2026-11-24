@@ -1,5 +1,6 @@
 import { invalid } from '../../utils/AppError.js';
 import { getJson } from './httpClient.js';
+import { isCalendarDate } from '../../utils/dates.js';
 
 // Feriados de Costa Rica desde Nager.Date (pública, sin clave); se guardan 24 horas en memoria.
 const BASE = () => process.env.HOLIDAYS_URL || 'https://date.nager.at/api/v3/PublicHolidays';
@@ -17,7 +18,7 @@ export async function holidays(year) {
   if (hit && Date.now() - hit.at < DAY_MS) return hit.list;
   const json = await getJson(`${BASE()}/${value}/CR`, { integration: 'api:feriados' });
   const list = (Array.isArray(json) ? json : [])
-    .filter((item) => /^\d{4}-\d{2}-\d{2}$/.test(item?.date))
+    .filter((item) => isCalendarDate(item?.date))
     .map((item) => ({ date: item.date, name: item.localName || item.name }));
   cache.set(value, { at: Date.now(), list });
   return list;

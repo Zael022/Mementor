@@ -25,7 +25,7 @@ export function errorHandler(error, req, res, next) {
     return res.status(409).json({ error: { code: 'IN_USE', message: 'No se puede eliminar porque tiene registros relacionados.' }, requestId: req.requestId });
   }
   const dbDown = String(error?.name || '').startsWith('SequelizeConnection');
-  if (process.env.NODE_ENV !== 'test') console.error(`[${req.requestId}]`, error?.name, error?.message);
+  if (process.env.NODE_ENV !== 'test') console.error(JSON.stringify({ evento: 'error', requestId: req.requestId, tipo: error?.name, mensaje: error?.message }));
   return res.status(dbDown ? 503 : 500).json({
     error: { code: dbDown ? 'SERVICE_UNAVAILABLE' : 'INTERNAL_ERROR', message: 'No se pudo completar la solicitud.' },
     requestId: req.requestId,

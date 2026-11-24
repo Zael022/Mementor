@@ -1,6 +1,6 @@
 # Diccionario de datos de MENTOR AI
 
-Generado desde las migraciones de Sequelize (62 tablas, 578 columnas, 123 llaves foráneas). Motor: MySQL 8 (utf8mb4).
+Generado desde las migraciones de Sequelize (64 tablas, 595 columnas, 125 llaves foráneas). Motor: MySQL 8 (utf8mb4).
 
 Convenciones: PK = llave primaria, FK = llave foránea, UQ = valor único. Todas las tablas tienen `created_at` y `updated_at` salvo las indicadas.
 
@@ -74,6 +74,21 @@ Enlaces de un solo uso para restablecer la contraseña (solo el hash del token).
 | `created_at` | `datetime` | No |  | Fecha y hora de creación. |
 | `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
 
+### `email_changes`
+
+Cambios de correo pendientes de confirmar desde la nueva dirección (solo el hash del token).
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PK | Identificador único (llave primaria). |
+| `user_id` | `bigint unsigned` | No | FK → users.id | Referencia a users.id (llave foránea). |
+| `new_email` | `varchar(190)` | No |  | Correo nuevo que se aplica al confirmar el enlace. |
+| `token_hash` | `char(64)` | No | UQ | Hash SHA-256 del token (nunca el token). |
+| `expires_at` | `datetime` | No |  | Fecha de vencimiento. |
+| `used_at` | `datetime` | Sí |  | Fecha en que se usó. |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+
 ### `institutions`
 
 Instituciones educativas (aislamiento de datos) y sus topes de uso.
@@ -107,6 +122,7 @@ Preferencias de apariencia, accesibilidad y metas de cada persona.
 | `practice_size` | `tinyint` | No |  | Cantidad de preguntas de la práctica diaria. |
 | `created_at` | `datetime` | No |  | Fecha y hora de creación. |
 | `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+| `email_reminders` | `tinyint(1)` | No |  | Si la persona quiere recibir recordatorios por correo. |
 
 ## Gobernanza y bitácoras
 
@@ -207,6 +223,20 @@ Tipo de cambio de referencia del dólar por día y fuente.
 | `source` | `varchar(30)` | No |  | Fuente del dato. |
 | `buy` | `decimal(10,4)` | No |  | Tipo de cambio de compra (CRC por USD). |
 | `sell` | `decimal(10,4)` | No |  | Tipo de cambio de venta (CRC por USD). |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+
+### `reminder_deliveries`
+
+Recordatorios diarios enviados o fallidos por persona y día (evita repetirlos al reintentar).
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PK | Identificador único (llave primaria). |
+| `user_id` | `bigint unsigned` | No | FK → users.id | Referencia a users.id (llave foránea). |
+| `reminder_day` | `date` | No |  | Día del recordatorio (AAAA-MM-DD). |
+| `status` | `enum('sent','failed')` | No |  | Estado del registro. |
+| `attempts` | `int unsigned` | No |  | Intentos de envío registrados. |
 | `created_at` | `datetime` | No |  | Fecha y hora de creación. |
 | `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
 
@@ -373,6 +403,7 @@ Materiales del curso (archivos o enlaces).
 | `stored_name` | `varchar(120)` | Sí |  | Nombre interno del archivo guardado. |
 | `mime_type` | `varchar(120)` | Sí |  | Tipo de archivo (MIME). |
 | `size_bytes` | `int` | Sí |  | Tamaño en bytes. |
+| `content_sha256` | `char(64)` | Sí |  | Huella SHA-256 del archivo original para comprobar que una descarga o restauración es idéntica. |
 | `uploaded_by` | `bigint unsigned` | No | FK → users.id | Referencia a users.id (llave foránea). |
 | `created_at` | `datetime` | No |  | Fecha y hora de creación. |
 | `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |

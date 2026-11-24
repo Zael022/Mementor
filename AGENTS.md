@@ -3,7 +3,7 @@
 Este archivo es coherente con `CLAUDE.md`; si hay contradicción, mandan `CLAUDE.md`, `docs/01_PROMPT_MAESTRO_CLAUDE.md` y `docs/15_REGLAS_ESTRUCTURA_Y_SIN_DATOS.md`.
 
 ## Stack y estructura
-- React + Vite en JavaScript/JSX (`frontend/src/{Componentes,Pages,Rutas}`), Node.js 22.12+ con Express, MySQL 8 con Sequelize y migraciones.
+- React + Vite en JavaScript/JSX (`frontend/src/{Componentes,Pages,Rutas}`), Node.js 22.22.2+ (o 24.15+) con Express, MySQL 8 con Sequelize y migraciones.
 - Backend en capas: `config`, `models`, `controllers`, `services`, `routes`, `middlewares`, `validators`, `utils`. API bajo `/api/v1`, sesión por cookie httpOnly y token CSRF en `x-csrf-token`.
 - Interfaz y comentarios en español, breves y generales.
 

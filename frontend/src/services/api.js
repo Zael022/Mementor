@@ -10,6 +10,23 @@ export class ApiError extends Error {
 
 let csrfToken = null;
 
+const SIN_SERVICIO = 'El servicio no está disponible en este momento. Intenta de nuevo en unos minutos.';
+
+// Una sola forma de tratar los errores HTTP, igual para peticiones normales y para el streaming del tutor.
+function errorDeRespuesta(response, payload, path) {
+  const error = payload?.error || {};
+  // Si el JWT venció o se cerró la sesión en otro lado, la aplicación vuelve al inicio de sesión.
+  if (response.status === 401 && !path.startsWith('/auth/')) window.dispatchEvent(new Event('mentor:sesion-vencida'));
+  // Términos o privacidad renovados: la aplicación vuelve a mostrar el diálogo de aceptación.
+  if (response.status === 403 && error.code === 'CONSENT_REQUIRED') {
+    window.dispatchEvent(new CustomEvent('mentor:consentimiento-pendiente', { detail: error.details || [] }));
+  }
+  if (!error.code && response.status >= 500) return new ApiError(response.status, 'SERVICE_UNAVAILABLE', SIN_SERVICIO);
+  const detail = Array.isArray(error.details) && error.details.length && error.code !== 'CONSENT_REQUIRED'
+    ? ` ${error.details.map((item) => item.message).filter(Boolean).join(' ')}` : '';
+  return new ApiError(response.status, error.code || 'ERROR', `${error.message || 'No se pudo completar la solicitud.'}${detail}`.trim(), error.details);
+}
+
 // Guarda el token CSRF que entrega el backend al iniciar sesión.
 export function setCsrfToken(token) {
   csrfToken = token;
@@ -41,15 +58,11 @@ async function request(method, path, body, { signal } = {}) {
   try {
     payload = await response.json();
   } catch {
-    throw new ApiError(response.status, 'INVALID_RESPONSE', 'La API devolvió una respuesta no válida.');
+    // Una página de error del proxy (HTML) o un cuerpo vacío: la API no está respondiendo.
+    if (!response.ok) throw errorDeRespuesta(response, null, path);
+    throw new ApiError(response.status, 'SERVICE_UNAVAILABLE', SIN_SERVICIO);
   }
-  if (!response.ok) {
-    const error = payload?.error || {};
-    // Si el JWT venció o se cerró la sesión en otro lado, la aplicación vuelve al inicio de sesión.
-    if (response.status === 401 && !path.startsWith('/auth/')) window.dispatchEvent(new Event('mentor:sesion-vencida'));
-    const detail = Array.isArray(error.details) && error.details.length ? ` ${error.details.map((item) => item.message).join(' ')}` : '';
-    throw new ApiError(response.status, error.code || 'ERROR', `${error.message || 'No se pudo completar la solicitud.'}${detail}`, error.details);
-  }
+  if (!response.ok) throw errorDeRespuesta(response, payload, path);
   return payload;
 }
 
@@ -70,9 +83,9 @@ async function stream(path, body, { signal, onEvento }) {
   }
   // Antes de abrir el flujo, los errores llegan como JSON (por ejemplo 429 o 503).
   if (!response.ok || !response.headers.get('content-type')?.includes('text/event-stream')) {
-    const payload = await response.json().catch(() => ({}));
-    const error = payload?.error || {};
-    throw new ApiError(response.status, error.code || 'ERROR', error.message || 'No se pudo completar la solicitud.', error.details);
+    const payload = await response.json().catch(() => null);
+    if (response.ok) throw new ApiError(response.status, 'SERVICE_UNAVAILABLE', SIN_SERVICIO);
+    throw errorDeRespuesta(response, payload, path);
   }
   const lector = response.body.getReader();
   const decodificador = new TextDecoder();

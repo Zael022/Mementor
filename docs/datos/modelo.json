@@ -430,6 +430,93 @@
   },
   {
    "module": "Seguridad e identidad",
+   "table": "email_changes",
+   "purpose": "Cambios de correo pendientes de confirmar desde la nueva dirección (solo el hash del token).",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "user_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "new_email",
+     "type": "varchar(190)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Correo nuevo que se aplica al confirmar el enlace.",
+     "fk": null
+    },
+    {
+     "name": "token_hash",
+     "type": "char(64)",
+     "null": false,
+     "key": "UNI",
+     "default": null,
+     "extra": "",
+     "purpose": "Hash SHA-256 del token (nunca el token).",
+     "fk": null
+    },
+    {
+     "name": "expires_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha de vencimiento.",
+     "fk": null
+    },
+    {
+     "name": "used_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se usó.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Seguridad e identidad",
    "table": "institutions",
    "purpose": "Instituciones educativas (aislamiento de datos) y sus topes de uso.",
    "columns": [
@@ -638,6 +725,16 @@
      "default": "CURRENT_TIMESTAMP",
      "extra": "DEFAULT_GENERATED",
      "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    },
+    {
+     "name": "email_reminders",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Si la persona quiere recibir recordatorios por correo.",
      "fk": null
     }
    ]
@@ -1240,6 +1337,83 @@
      "default": null,
      "extra": "",
      "purpose": "Tipo de cambio de venta (CRC por USD).",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Gobernanza y bitácoras",
+   "table": "reminder_deliveries",
+   "purpose": "Recordatorios diarios enviados o fallidos por persona y día (evita repetirlos al reintentar).",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "user_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "reminder_day",
+     "type": "date",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Día del recordatorio (AAAA-MM-DD).",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "enum('sent','failed')",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "attempts",
+     "type": "int unsigned",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Intentos de envío registrados.",
      "fk": null
     },
     {
@@ -2124,6 +2298,16 @@
      "default": null,
      "extra": "",
      "purpose": "Tamaño en bytes.",
+     "fk": null
+    },
+    {
+     "name": "content_sha256",
+     "type": "char(64)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Huella SHA-256 del archivo original para comprobar que una descarga o restauración es idéntica.",
      "fk": null
     },
     {
@@ -6630,6 +6814,13 @@
    "card": "1:N"
   },
   {
+   "table": "email_changes",
+   "column": "user_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
    "table": "enrollments",
    "column": "course_id",
    "ref": "courses",
@@ -6917,6 +7108,13 @@
    "card": "1:N"
   },
   {
+   "table": "reminder_deliveries",
+   "column": "user_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
    "table": "session_attendance",
    "column": "session_id",
    "ref": "class_sessions",
@@ -7084,6 +7282,7 @@
    "users",
    "user_sessions",
    "password_resets",
+   "email_changes",
    "institutions",
    "user_preferences"
   ],
@@ -7094,6 +7293,7 @@
    "agent_runs",
    "integration_runs",
    "exchange_rates",
+   "reminder_deliveries",
    "rate_limit_hits",
    "job_leases"
   ],
@@ -7154,6 +7354,6 @@
    "institution_drive_folders"
   ]
  },
- "tables": 62,
- "columns": 578
+ "tables": 64,
+ "columns": 595
 }

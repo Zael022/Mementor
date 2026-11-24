@@ -1,6 +1,81 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-23. Logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+**Última actualización** — 2026-11-23. Correcciones de la auditoría de salida a producción (rama `fix/auditoria-produccion`); antes, correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+
+## Sesión 2026-11-23 (noche) · Auditoría de salida a producción
+Rama `fix/auditoria-produccion` (sobre `fix/revision-independiente`). Decisiones en `docs/adr/0008-auditoria-produccion.md`.
+
+| Hallazgo | Cambio | Prueba |
+| --- | --- | --- |
+| H-01 validador del tutor | `claimCheck.js`: contexto de cada número, negaciones contra la oración más parecida, «por ciento»; texto de la interfaz sin prometer corrección | `claimCheck.test.js` (los 4 casos de la auditoría y paráfrasis que no deben rechazarse) |
+| H-02 baja pendiente | Baja en el servidor antes de responder; n8n solo avisa; `reconcilePendingDeletions` en la retención | `integrations.test.js` (webhook 200, webhook caído, pendiente conciliada) |
+| H-03 sesión cerrada antes de tiempo | `PrivacidadDatos.jsx` distingue `completed` | `PrivacidadDatos.test.jsx` |
+| H-04 recordatorios truncados | Cursor `after`/`limit`, `reminder_deliveries` (migración `20261123000300`), `POST /integrations/daily-reminders/deliveries`, preferencia `emailReminders`, workflow 02 con paginación y registro | `integrations.test.js` |
+| H-05 copia incompleta | `exportMyData` con 19 secciones de aprendizaje y `scope` | `integrations.test.js` |
+| H-06 IP falsa | `limiter({ key })` por correo y por cuenta | `coordination.test.js` |
+| H-08 migraciones | Regla ampliar y luego contraer; sin `undo` en producción; `preDeployCommand` documentado | — |
+| H-09 observabilidad | `requestLog` JSON, `utils/requestMetrics.js`, `GET /ops/metrics` | `observability.test.js` |
+| H-10 Vercel | 120 s para el primer byte en guía y Plan de Producción | — |
+
+Ejecutado el 2026-11-23: backend lint + 176/176, frontend lint + 58/58 + build, Playwright 38/38. Prueba de la auditoría: 4/4. Entregables regenerados (modelo de datos con 64 tablas).
+Pendiente: H-07 (servicio sin suspensión y cola), H-11 (staging con TiDB y servicios reales), prueba de `TRUST_PROXY` en el despliegue, H-12 (inventario por campo y aprobación institucional), validación docente del tutor con el modelo real.
+
+## Sesión 2026-11-23 (noche) · Correcciones de la revisión independiente
+Rama `fix/revision-independiente` (sobre `feature/seguridad-web`). Decisiones en `docs/adr/0007-revision-independiente.md`.
+
+| Hallazgo | Cambio | Prueba |
+| --- | --- | --- |
+| P1 OOXML | `utils/ooxml.js`: directorio central, partes obligatorias, rutas seguras, sin cifrado ni anidados, límites de entradas, tamaño y razón; usado en `fileSignature.js` y antes de `mammoth` | `ooxml.test.js` (válidos reales, ZIP renombrado, truncado, bomba de 30 MB, anidado, `..`, tamaño falsificado) |
+| P2 fechas | `utils/dates.js` en esquemas, tipo de cambio, feriados y `clock.addDays` | `dates.test.js` |
+| P2 Coach | `fitPlanToBudget` recorta el plan al presupuesto; la interfaz muestra el total | `agents.test.js` |
+| P2 tareas de fondo | `runExclusive` con renovación del turno y cancelación; un turno por tarea | `coordination.test.js` (tarea lenta, turno perdido) |
+| P2 despliegue | README «Despliegue: pendiente de verificar»; registro de aceptación en `docs/despliegue.md` §6 | — |
+| P3 correo | `email_changes` (migración `20261123000200`), `emailChangeService.js`, `POST /auth/email/confirm`, página `/confirmar-correo`, avisos a la dirección anterior | `profile.test.js` (pendiente hasta confirmar, enlace reemplazado, usado, vencido, dirección tomada), `Perfil.test.jsx` |
+
+Ejecutado el 2026-11-23: backend lint + 167/167, frontend lint + 56/56 + build, Playwright 38/38.
+Pendiente: despliegue real con su registro de aceptación, pruebas con docentes y estudiantes, mejoras de experiencia (código del curso, inicio con tres acciones, recorrido guiado, explicación de recomendaciones), lector de pantalla y validación institucional de datos de menores.
+
+## Sesión 2026-11-23 (tarde) · Asignación de seguridad: SQL, XSS, CSRF y CORS
+Rama `feature/seguridad-web` (sobre `fix/auditoria`). Todo en `docs/seguridad/`.
+
+| Paso | Cambio | Prueba o evidencia |
+| --- | --- | --- |
+| SQL | Búsqueda de Usuarios (`GET /users?q=`) con `Op.like` y comodines escapados; `consentSummary` sin fragmentos de SQL; interfaz con buscador | `webSecurity.test.js`, `e2e/seguridad.spec.js` |
+| XSS | CSP estricta en `vercel.json` (también en `vite preview`); prueba de `Markdown` con etiquetas | `Markdown.test.jsx`, `frontend/scripts/verificar-csp.mjs`, `evidencias/csp.txt` |
+| CSRF | Sin cambios de código (token por sesión, SameSite=Lax, Origin); pruebas nuevas | `webSecurity.test.js`, `evidencias/csrf-cors.txt` |
+| CORS | `config/cors.js`: lista de orígenes, 403 `ORIGIN_NOT_ALLOWED`, métodos y encabezados limitados | `webSecurity.test.js` |
+| Investigación | `investigacion-inyeccion-sql.md` con fuentes | — |
+| Simulación | `backend/laboratorio/inyeccion-sql/` (`npm run lab:sqli`): solo 127.0.0.1, base `_lab`, datos efímeros; versión vulnerable solo ahí | Capturas 01–07 y `demostracion-inyeccion-sql.mp4` |
+| Presentación | `Presentacion_Seguridad_MENTOR_AI.pptx` (23 diapositivas con notas del orador, estilo de la clase, IBM Plex) | Validada y revisada visualmente |
+
+Ejecutado el 2026-11-23: backend 156/156 y lint, frontend lint + 54/54 + build, Playwright 38/38.
+
+## Sesión 2026-11-23 (tarde) · Correcciones de la auditoría técnica
+La auditoría externa (`Auditoria_tecnica_MENTOR_AI.pdf`) se atendió en la rama `fix/auditoria`. Decisiones en `docs/adr/0006-correcciones-auditoria.md`.
+
+| Hallazgo | Cambio | Prueba |
+| --- | --- | --- |
+| M01 originales en disco temporal | `services/fileStore.js` (`STORAGE_DRIVER=local\|gcs`), materiales y avatares en Cloud Storage, `materials.content_sha256` (migración `20261123000100`), descarga con `X-Content-SHA256`; guía en `docs/despliegue.md` §2 | `storage.test.js`: original binario, borrado del disco y descarga con la misma huella |
+| M02 migrador ausente en producción | `sequelize-cli` en `dependencies` | `NODE_ENV=production npm ci` en directorio limpio: `sequelize-cli --version` responde |
+| M03 fila con archivo borrado | Carga en tres pasos; fila y auditoría en una transacción; la indexación fallida no borra | `storage.test.js`: bitácora caída → 0 filas y 0 objetos; indexación fallida → material descargable |
+| M04 notas infladas | Máximo bloqueado con entregas calificadas (409), cambio auditado, bloqueo al calificar, tope de 100 % por entrega | `classroom.test.js` |
+| M05 falsedad con cita real | Texto retenido hasta validar (`progress` en lugar de `delta`); `utils/claimCheck.js` compara números y términos por oración | `claimCheck.test.js`, `stream.test.js`, `useChatTutor.test.jsx`, `MensajeTutor.test.jsx` |
+| M06 datos hacia la IA | `utils/personalData.js` oculta cédulas, teléfonos, correos y enlaces en tutor, entregas, cumplimiento y anuncios; aviso de privacidad 2026-11-23 con tabla por asistente | `agents.test.js` |
+| M07 aceptación solo en la interfaz | `middlewares/consent.js`: escrituras con documentos pendientes → 403 `CONSENT_REQUIRED`; la interfaz reabre el diálogo | `governance.test.js`, `api.test.js` |
+| M08 tokens no atómicos | Recuperación y activación con bloqueo y actualización condicionada | `security.test.js`: dos peticiones simultáneas, una gana |
+| M10 `agent_runs` sin purga | `purgeOldAgentRuns` a los 90 días | `coordination.test.js` |
+| M12 Node/jsdom | `engines` `^22.22.2 \|\| >=24.15.0`; Node 22.22.2 en Render y CI | — |
+| M13 citas S0/S01 | IDs exactos; todo descartado → `no_evidence` (cuenta para la cuota) | `agents.test.js` |
+| M14 401 distinto en SSE | `errorDeRespuesta` compartido; error de proxy → «El servicio no está disponible» | `api.test.js` |
+| M16 objetivo táctil | `.enlace-tactil` (24 px) en acceso y recuperación; logo móvil a 38 px (≥ 160 px de ancho) | `e2e/accesibilidad.spec.js` con axe-core en 390, 768 y 1280 |
+| M18 residuos en el ZIP | `scripts/empaquetar.sh` (solo archivos versionados) | — |
+| M19 teardown ruidoso | `stream.test.js` cierra solo lo que abrió | — |
+
+Documentación: portadas con grupo 67, Rossman Rivera y Erian Fallas, profesor Steven Ledezma; sin la nota de «Actualizar campo». Mockups (92) regenerados, modelo de datos (62 tablas, 579 columnas, 123 FK), plan de producción (Cloud Storage, P-11) y riesgos R29–R32.
+
+Ejecutado el 2026-11-23 con Node 22.23.4 y MySQL 8.0: backend 149/149, frontend lint + 53/53 + build, Playwright 36/36, capturas 10/10.
+
+Pendiente: M09 (OOXML), M11 (paginación de recordatorios), M15 (sinónimos y números en la búsqueda local), M17 (`uuid` de Sequelize), restauración conjunta con acta, lectores de pantalla, pruebas con usuarios y validación con la institución.
 
 ## Sesión 2026-11-23 · Logo «M con birrete»
 - La cabecera usa la opción 1: la «M» con birrete oficial ocupa el lugar de la M de «MENTOR» (sin órbita ni estrella). Archivos en `frontend/public/marca/logo-horizontal-*.svg`; las cuatro opciones y la nota de cómo se rellenaron los huecos de la órbita están en `docs/marca/m-birrete/`.

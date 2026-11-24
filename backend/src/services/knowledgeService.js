@@ -1,13 +1,11 @@
 import { createHash } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
 import { Op } from 'sequelize';
 import { readRagConfig } from '../config/rag.js';
 import {
   AiMessageSource, CourseDriveLink, CourseRagCorpus, Institution, KnowledgeSource, Lesson, Material, SourceVersion, sequelize,
 } from '../models/index.js';
 import { AppError, conflict, invalid, notFound } from '../utils/AppError.js';
-import { uploadDir } from '../middlewares/upload.js';
+import { readStored } from './fileStore.js';
 import { getCourseAccess } from './accessService.js';
 import { recordAudit } from './auditService.js';
 import { ExtractionError, INDEXABLE_TYPES, extractDocument } from './extractionService.js';
@@ -352,7 +350,7 @@ export async function syncMaterialSource(material, { actor = null } = {}) {
   });
   let buffer;
   try {
-    buffer = await readFile(path.join(uploadDir(), path.basename(material.storedName)));
+    buffer = await readStored('materials', material.storedName);
   } catch {
     return { version: await recordFailedVersion(source, new ExtractionError('FILE_MISSING', 'El archivo original no está en el servidor.'), { userId: actor?.id }), changed: true };
   }
