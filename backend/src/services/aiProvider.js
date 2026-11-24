@@ -88,7 +88,7 @@ export function assertAiConfigured({ tier = 'avanzado' } = {}) {
   if (testDoubles) return { configured: true, provider: 'prueba', model: testDoubles.models?.[tier] ?? 'modelo-de-prueba', tier };
   const config = readAiConfig({ tier });
   if (!config.configured) {
-    throw new AppError(503, 'AI_NOT_CONFIGURED', `El tutor de IA no está configurado. ${config.reason}`);
+    throw new AppError(503, 'AI_NOT_CONFIGURED', `La generación con IA no está configurada. ${config.reason}`);
   }
   return config;
 }

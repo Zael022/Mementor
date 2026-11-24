@@ -1,5 +1,6 @@
 // Título de la pestaña según la sección; la primera coincidencia gana.
 const TITULOS = [
+  [/^\/admisiones/, 'Admisiones'],
   [/\/quizzes\/\d+$/, 'Quiz rápido'],
   [/\/racha$/, 'Práctica del día'],
   [/\/quizzes$/, 'Quizzes'],

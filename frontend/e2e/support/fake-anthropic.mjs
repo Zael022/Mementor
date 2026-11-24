@@ -15,6 +15,7 @@ function answerFor(body) {
 // Respuestas de ejemplo para los agentes (se reconocen por su instrucción de sistema).
 function agentReply(system) {
   const s = String(system || '');
+  if (s.includes('borradores de admisiones')) return { texto: 'Consulta las condiciones autorizadas de tu convocatoria y confirma el siguiente paso con la administración.', faltantes: [] };
   if (s.includes('diseñador de evaluaciones')) return { questions: [
     { prompt: '¿Por qué el denominador no puede ser cero?', options: ['Porque no se divide un entero en cero partes', 'Porque siempre es par', 'Porque es negativo'], correctIndex: 0, explanation: 'Así lo explica la lección.', citations: ['S1'] },
     { prompt: '¿Qué indica el numerador?', options: ['Cuántas partes se toman', 'En cuántas partes se divide'], correctIndex: 0, explanation: 'Definición de la lección.', citations: ['S1'] },

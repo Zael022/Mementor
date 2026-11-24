@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
 import {
-  Assignment, AssignmentSubmission, ClassSession, Course, CourseStreak, CourseTeacher, Enrollment, QuickQuiz, User, sequelize,
+  Assignment, AssignmentSubmission, ClassSession, Course, CourseStreak, CourseTeacher, Enrollment, QuickQuiz, User, sequelize, CrmApplication, CrmCycle,
 } from '../models/index.js';
 import { forbidden, invalid } from '../utils/AppError.js';
 import { clock, dayKey } from '../utils/clock.js';
@@ -58,7 +58,6 @@ export async function getCalendar(user, { from, to, courseId }) {
   if (courseId) courses = courses.filter((course) => course.id === courseId);
   const ids = courses.map((course) => course.id);
   const titleOf = new Map(courses.map((course) => [course.id, course.title]));
-  if (ids.length === 0) return { courses: [], items: [] };
 
   const staff = user.role !== 'student';
   const [assignments, sessions] = await Promise.all([
@@ -75,6 +74,14 @@ export async function getCalendar(user, { from, to, courseId }) {
     ...assignments.map((row) => ({ type: 'assignment', id: row.id, courseId: row.courseId, courseTitle: titleOf.get(row.courseId), title: row.title, at: row.dueAt, draft: row.status === 'draft' })),
     ...sessions.map((row) => ({ type: 'session', id: row.id, courseId: row.courseId, courseTitle: titleOf.get(row.courseId), title: row.title, at: row.startsAt, durationMinutes: row.durationMinutes })),
   ].sort((a, b) => new Date(a.at) - new Date(b.at));
+  if (['institution_admin', 'teacher'].includes(user.role)) {
+    const applications = await CrmApplication.findAll({ where: { institutionId: user.institutionId, status: ['activo', 'lista_de_espera'], ...(user.role === 'teacher' ? { responsibleId: user.id } : {}) }, include: [{ model: CrmCycle, as: 'cycle', attributes: ['name', 'courseId'], ...(courseId ? { where: { courseId } } : {}) }], limit: 5000 });
+    for (const row of applications) for (const [type, activity] of Object.entries(row.activityJson)) {
+      const at = new Date(activity.programada);
+      if (!activity.resultado && at >= start && at <= end) items.push({ type: 'admission', id: `${row.id}-${type}`, applicationId: row.id, courseId: row.cycle.courseId, courseTitle: row.cycle.name, title: `Admisiones: ${type} · solicitud ${row.id}`, at });
+    }
+    items.sort((a, b) => new Date(a.at) - new Date(b.at));
+  }
   return { courses: courses.map((course) => ({ id: course.id, title: course.title })), items };
 }
 

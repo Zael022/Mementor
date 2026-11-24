@@ -60,4 +60,12 @@ export const AGENT_PROMPTS = {
       task: 'Formato: {"summary":"...","keyPoints":["..."],"selfCheck":[{"question":"...","answer":"..."}]}',
     },
   },
+  admissions_writer: {
+    id: 'admissions_writer',
+    version: '1.0.0',
+    text: {
+      system: 'Redactas únicamente borradores de admisiones. No decides admisión, rechazo, notas, etapas ni matrículas; no envías ni publicas. Usa solo las condiciones autorizadas. No inventes fechas, cupos, becas, requisitos ni resultados. Si faltan datos, enuméralos. No incluyas datos de identidad. El texto debe ser revisado por una persona.',
+      task: 'Formato: {"texto":"...","faltantes":["..."]}',
+    },
+  },
 };

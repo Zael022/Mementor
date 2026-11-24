@@ -2,7 +2,7 @@ import { Op } from 'sequelize';
 import { User, UserSession, Institution, sequelize } from '../models/index.js';
 import { AppError, invalid, unauthenticated } from '../utils/AppError.js';
 import { jwtHours, signSessionToken, verifySessionToken } from '../utils/jwt.js';
-import { createToken, hashPassword, hashToken, needsRehash, verifyPassword } from '../utils/security.js';
+import { createToken, hashPassword, hashToken, needsRehash, verifyDummyPassword, verifyPassword } from '../utils/security.js';
 import { recordAudit } from './auditService.js';
 import { acceptPolicies } from './consentService.js';
 
@@ -47,7 +47,7 @@ export async function login({ email, password }) {
   const genericError = unauthenticated('Correo o contraseña incorrectos.');
 
   if (!user || user.status !== 'active' || !user.passwordHash) {
-    await hashPassword(password);
+    await verifyDummyPassword(password);
     throw genericError;
   }
   if (user.institution && user.institution.status !== 'active') throw genericError;
@@ -68,7 +68,7 @@ export async function login({ email, password }) {
   const csrf = createToken().token;
   const expiresAt = new Date(Date.now() + jwtHours() * 3600000);
   // Contraseñas de cuentas anteriores (scrypt) pasan a bcrypt sin que la persona note nada.
-  const upgradedHash = needsRehash(user.passwordHash) ? await hashPassword(password) : null;
+  const upgradedHash = needsRehash(user.passwordHash) && Buffer.byteLength(password, 'utf8') <= 72 ? await hashPassword(password) : null;
   await sequelize.transaction(async (transaction) => {
     await user.update({ failedLoginCount: 0, lockedUntil: null, ...(upgradedHash ? { passwordHash: upgradedHash } : {}) }, { transaction });
     await UserSession.create({ userId: user.id, tokenHash, csrfToken: csrf, expiresAt }, { transaction });
@@ -102,6 +102,9 @@ export async function logout(session) {
 
 // Exige contraseñas con longitud y variedad mínimas.
 export function assertStrongPassword(password) {
+  if (typeof password === 'string' && Buffer.byteLength(password, 'utf8') > 72) {
+    throw invalid('La contraseña no puede superar 72 bytes en UTF-8.');
+  }
   const ok = typeof password === 'string' && password.length >= 10 && password.length <= 200
     && /[a-zA-Z]/.test(password) && /[0-9]/.test(password);
   if (!ok) throw invalid('La contraseña debe tener al menos 10 caracteres e incluir letras y números.');

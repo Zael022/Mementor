@@ -6644,6 +6644,1376 @@
      "fk": null
     }
    ]
+  },
+  {
+   "module": "CRM de admisiones y plataforma",
+   "table": "crm_admission_cycles",
+   "purpose": "Convocatorias de admisión de una institución, ligadas a un curso, con su política versionada.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "name",
+     "type": "varchar(180)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre.",
+     "fk": null
+    },
+    {
+     "name": "campus",
+     "type": "varchar(120)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Campus.",
+     "fk": null
+    },
+    {
+     "name": "starts_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de inicio.",
+     "fk": null
+    },
+    {
+     "name": "ends_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Ends (fecha).",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "varchar(20)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "version",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Versión del documento.",
+     "fk": null
+    },
+    {
+     "name": "config_json",
+     "type": "json",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Config json.",
+     "fk": null
+    },
+    {
+     "name": "config_history",
+     "type": "json",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Config history.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "CRM de admisiones y plataforma",
+   "table": "crm_prospects",
+   "purpose": "Personas interesadas en una convocatoria (contacto, origen y consentimiento); se anonimizan al cerrar.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "name",
+     "type": "varchar(120)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre.",
+     "fk": null
+    },
+    {
+     "name": "email",
+     "type": "varchar(190)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Correo electrónico (único).",
+     "fk": null
+    },
+    {
+     "name": "phone",
+     "type": "varchar(30)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Teléfono de contacto (opcional).",
+     "fk": null
+    },
+    {
+     "name": "origin",
+     "type": "varchar(80)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Origen del registro.",
+     "fk": null
+    },
+    {
+     "name": "utm_json",
+     "type": "json",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Utm json.",
+     "fk": null
+    },
+    {
+     "name": "user_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "anonymized_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se anonimizó la cuenta tras la baja.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "CRM de admisiones y plataforma",
+   "table": "crm_applications",
+   "purpose": "Solicitud de una persona a una convocatoria: etapa, estado, responsable y conversión en matrícula.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "prospect_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a crm_prospects.id (llave foránea).",
+     "fk": "crm_prospects.id"
+    },
+    {
+     "name": "cycle_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a crm_admission_cycles.id (llave foránea).",
+     "fk": "crm_admission_cycles.id"
+    },
+    {
+     "name": "stage",
+     "type": "varchar(30)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Stage.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "varchar(25)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "responsible_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "version",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Versión del documento.",
+     "fk": null
+    },
+    {
+     "name": "last_stage_changed_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Last stage changed (fecha).",
+     "fk": null
+    },
+    {
+     "name": "last_contact_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Last contact (fecha).",
+     "fk": null
+    },
+    {
+     "name": "reviewed_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha de revisión.",
+     "fk": null
+    },
+    {
+     "name": "config_version",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Config version.",
+     "fk": null
+    },
+    {
+     "name": "config_json",
+     "type": "json",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Config json.",
+     "fk": null
+    },
+    {
+     "name": "activity_json",
+     "type": "json",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Activity json.",
+     "fk": null
+    },
+    {
+     "name": "enrollment_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a enrollments.id (llave foránea).",
+     "fk": "enrollments.id"
+    },
+    {
+     "name": "conversion_kind",
+     "type": "varchar(25)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Conversion kind.",
+     "fk": null
+    },
+    {
+     "name": "converted_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Converted (fecha).",
+     "fk": null
+    },
+    {
+     "name": "retention_exception",
+     "type": "varchar(300)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Retention exception.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    },
+    {
+     "name": "acquisition_origin",
+     "type": "varchar(80)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Acquisition origin.",
+     "fk": null
+    },
+    {
+     "name": "closed_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Closed (fecha).",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "CRM de admisiones y plataforma",
+   "table": "crm_stage_events",
+   "purpose": "Historial de cambios de etapa de una solicitud (quién, cuándo y por qué).",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "application_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a crm_applications.id (llave foránea).",
+     "fk": "crm_applications.id"
+    },
+    {
+     "name": "from_stage",
+     "type": "varchar(30)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "From stage.",
+     "fk": null
+    },
+    {
+     "name": "to_stage",
+     "type": "varchar(30)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "To stage.",
+     "fk": null
+    },
+    {
+     "name": "kind",
+     "type": "varchar(25)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tipo de registro.",
+     "fk": null
+    },
+    {
+     "name": "reason",
+     "type": "varchar(500)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Motivo indicado por la persona.",
+     "fk": null
+    },
+    {
+     "name": "actor_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "effective_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Effective (fecha).",
+     "fk": null
+    },
+    {
+     "name": "recorded_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Recorded (fecha).",
+     "fk": null
+    },
+    {
+     "name": "metadata_json",
+     "type": "json",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Datos adicionales en JSON.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "CRM de admisiones y plataforma",
+   "table": "crm_followups",
+   "purpose": "Seguimientos programados de una solicitud y su resultado.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "application_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a crm_applications.id (llave foránea).",
+     "fk": "crm_applications.id"
+    },
+    {
+     "name": "responsible_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "due_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha límite.",
+     "fk": null
+    },
+    {
+     "name": "type",
+     "type": "varchar(30)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tipo.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "varchar(20)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "note",
+     "type": "varchar(500)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Note.",
+     "fk": null
+    },
+    {
+     "name": "result",
+     "type": "varchar(300)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Result.",
+     "fk": null
+    },
+    {
+     "name": "completed_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se completó.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "CRM de admisiones y plataforma",
+   "table": "crm_message_drafts",
+   "purpose": "Borradores de mensajes de admisiones (manuales o del agente) pendientes de revisión humana.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "application_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a crm_applications.id (llave foránea).",
+     "fk": "crm_applications.id"
+    },
+    {
+     "name": "author_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "approver_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "agent_run_id",
+     "type": "bigint unsigned",
+     "null": true,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a agent_runs.id (llave foránea).",
+     "fk": "agent_runs.id"
+    },
+    {
+     "name": "text",
+     "type": "text",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Text.",
+     "fk": null
+    },
+    {
+     "name": "channel",
+     "type": "varchar(20)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Channel.",
+     "fk": null
+    },
+    {
+     "name": "recipient",
+     "type": "varchar(190)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Recipient.",
+     "fk": null
+    },
+    {
+     "name": "status",
+     "type": "varchar(20)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Estado del registro.",
+     "fk": null
+    },
+    {
+     "name": "version",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Versión del documento.",
+     "fk": null
+    },
+    {
+     "name": "context_hash",
+     "type": "varchar(64)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Context hash.",
+     "fk": null
+    },
+    {
+     "name": "context_json",
+     "type": "json",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Context json.",
+     "fk": null
+    },
+    {
+     "name": "approved_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Approved (fecha).",
+     "fk": null
+    },
+    {
+     "name": "approved_version",
+     "type": "int",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Approved version.",
+     "fk": null
+    },
+    {
+     "name": "source",
+     "type": "varchar(20)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fuente del dato.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "CRM de admisiones y plataforma",
+   "table": "crm_consent_records",
+   "purpose": "Evidencia de los consentimientos de una persona interesada por finalidad.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "prospect_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a crm_prospects.id (llave foránea).",
+     "fk": "crm_prospects.id"
+    },
+    {
+     "name": "purpose",
+     "type": "varchar(30)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Purpose.",
+     "fk": null
+    },
+    {
+     "name": "document_version",
+     "type": "varchar(40)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Document version.",
+     "fk": null
+    },
+    {
+     "name": "evidence_ref",
+     "type": "varchar(200)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Evidence ref.",
+     "fk": null
+    },
+    {
+     "name": "origin",
+     "type": "varchar(80)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Origen del registro.",
+     "fk": null
+    },
+    {
+     "name": "accepted_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de aceptación.",
+     "fk": null
+    },
+    {
+     "name": "revoked_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se revocó.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "CRM de admisiones y plataforma",
+   "table": "crm_privacy_cases",
+   "purpose": "Solicitudes de derechos sobre datos (acceso, corrección, supresión) de personas interesadas.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "prospect_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a crm_prospects.id (llave foránea).",
+     "fk": "crm_prospects.id"
+    },
+    {
+     "name": "actor_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "action",
+     "type": "varchar(20)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Acción registrada.",
+     "fk": null
+    },
+    {
+     "name": "verification_ref",
+     "type": "varchar(200)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Verification ref.",
+     "fk": null
+    },
+    {
+     "name": "verified_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Verified (fecha).",
+     "fk": null
+    },
+    {
+     "name": "reason",
+     "type": "varchar(300)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Motivo indicado por la persona.",
+     "fk": null
+    },
+    {
+     "name": "completed_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha en que se completó.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "CRM de admisiones y plataforma",
+   "table": "platform_crm_accounts",
+   "purpose": "Ficha comercial de cada institución cliente para el equipo de la plataforma.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "UNI",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "responsible_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "onboarding_status",
+     "type": "varchar(24)",
+     "null": false,
+     "key": "",
+     "default": "pending",
+     "extra": "",
+     "purpose": "Onboarding status.",
+     "fk": null
+    },
+    {
+     "name": "needs",
+     "type": "varchar(2000)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Needs.",
+     "fk": null
+    },
+    {
+     "name": "next_review_at",
+     "type": "datetime",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Next review (fecha).",
+     "fk": null
+    },
+    {
+     "name": "version",
+     "type": "int",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Versión del documento.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "CRM de admisiones y plataforma",
+   "table": "platform_crm_contacts",
+   "purpose": "Contactos profesionales de una institución cliente.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "account_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a platform_crm_accounts.id (llave foránea).",
+     "fk": "platform_crm_accounts.id"
+    },
+    {
+     "name": "name",
+     "type": "varchar(120)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Nombre.",
+     "fk": null
+    },
+    {
+     "name": "position",
+     "type": "varchar(120)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Orden dentro de su grupo.",
+     "fk": null
+    },
+    {
+     "name": "email",
+     "type": "varchar(190)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Correo electrónico (único).",
+     "fk": null
+    },
+    {
+     "name": "phone",
+     "type": "varchar(30)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Teléfono de contacto (opcional).",
+     "fk": null
+    },
+    {
+     "name": "request_key",
+     "type": "varchar(36)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Request key.",
+     "fk": null
+    },
+    {
+     "name": "actor_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
   }
  ],
  "fks": [
@@ -7019,6 +8389,181 @@
    "card": "1:N"
   },
   {
+   "table": "crm_admission_cycles",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_admission_cycles",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_applications",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_applications",
+   "column": "prospect_id",
+   "ref": "crm_prospects",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_applications",
+   "column": "cycle_id",
+   "ref": "crm_admission_cycles",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_applications",
+   "column": "responsible_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_applications",
+   "column": "enrollment_id",
+   "ref": "enrollments",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_consent_records",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_consent_records",
+   "column": "prospect_id",
+   "ref": "crm_prospects",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_followups",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_followups",
+   "column": "application_id",
+   "ref": "crm_applications",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_followups",
+   "column": "responsible_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_message_drafts",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_message_drafts",
+   "column": "application_id",
+   "ref": "crm_applications",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_message_drafts",
+   "column": "author_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_message_drafts",
+   "column": "approver_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_message_drafts",
+   "column": "agent_run_id",
+   "ref": "agent_runs",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_privacy_cases",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_privacy_cases",
+   "column": "prospect_id",
+   "ref": "crm_prospects",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_privacy_cases",
+   "column": "actor_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_prospects",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_prospects",
+   "column": "user_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_stage_events",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_stage_events",
+   "column": "application_id",
+   "ref": "crm_applications",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "crm_stage_events",
+   "column": "actor_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
    "table": "daily_practice_answers",
    "column": "practice_id",
    "ref": "daily_practices",
@@ -7273,6 +8818,34 @@
   {
    "table": "password_resets",
    "column": "user_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "platform_crm_accounts",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:1"
+  },
+  {
+   "table": "platform_crm_accounts",
+   "column": "responsible_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "platform_crm_contacts",
+   "column": "account_id",
+   "ref": "platform_crm_accounts",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "platform_crm_contacts",
+   "column": "actor_id",
    "ref": "users",
    "refcol": "id",
    "card": "1:N"
@@ -7607,8 +9180,20 @@
    "course_rag_corpora",
    "course_drive_links",
    "institution_drive_folders"
+  ],
+  "CRM de admisiones y plataforma": [
+   "crm_admission_cycles",
+   "crm_prospects",
+   "crm_applications",
+   "crm_stage_events",
+   "crm_followups",
+   "crm_message_drafts",
+   "crm_consent_records",
+   "crm_privacy_cases",
+   "platform_crm_accounts",
+   "platform_crm_contacts"
   ]
  },
- "tables": 65,
- "columns": 619
+ "tables": 75,
+ "columns": 749
 }

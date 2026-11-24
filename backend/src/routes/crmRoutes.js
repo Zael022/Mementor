@@ -1,0 +1,48 @@
+import { Router } from 'express';
+import * as c from '../controllers/crmController.js';
+import * as s from '../validators/crmSchemas.js';
+import { requireRole } from '../middlewares/auth.js';
+import { validateBody, limiter } from '../middlewares/common.js';
+import { invalid } from '../utils/AppError.js';
+
+const router = Router();
+const admin = requireRole('institution_admin');
+const assigned = requireRole('institution_admin', 'teacher');
+const reports = requireRole('institution_admin', 'auditor');
+router.use('/crm', requireRole('institution_admin', 'teacher', 'auditor'));
+const params = (req, res, next) => {
+  for (const value of Object.values(req.params)) if (!s.id.safeParse(value).success) throw invalid('Identificador inválido.');
+  next();
+};
+const filters = (req, res, next) => {
+  const parsed = s.filterSchema.safeParse(req.query);
+  if (!parsed.success) throw invalid('Revisa los filtros del CRM.');
+  req.crmFilters = parsed.data; next();
+};
+router.get('/crm/convocatorias', filters, c.cycles);
+router.post('/crm/convocatorias', admin, validateBody(s.cycleSchema), c.addCycle);
+router.patch('/crm/convocatorias/:id', admin, params, validateBody(s.cycleUpdateSchema), c.editCycle);
+router.get('/crm/prospectos', admin, filters, c.prospects);
+router.post('/crm/prospectos', admin, validateBody(s.prospectSchema), c.addProspect);
+router.patch('/crm/prospectos/:id/etapa', admin, params, validateBody(s.stageSchema), c.move);
+router.post('/crm/prospectos/:id/mensaje', admin, params, limiter({ name: 'crm-ai', windowMinutes: 1, max: 10 }), validateBody(s.messageSchema), c.generate);
+router.get('/crm/solicitudes', assigned, filters, c.applications);
+router.post('/crm/solicitudes', admin, validateBody(s.applicationSchema), c.addApplication);
+router.get('/crm/solicitudes/:id', assigned, params, c.detail);
+router.get('/crm/solicitudes/:id/historial', assigned, params, filters, c.history);
+router.patch('/crm/solicitudes/:id', admin, params, validateBody(s.updateApplicationSchema), c.update);
+router.post('/crm/solicitudes/:id/actividades', assigned, params, validateBody(s.recordActivitySchema), c.activity);
+router.post('/crm/solicitudes/:id/seguimientos', assigned, params, validateBody(s.followupSchema), c.followup);
+router.patch('/crm/solicitudes/:id/seguimientos/:childId', assigned, params, validateBody(s.finishFollowupSchema), c.closeFollowup);
+router.post('/crm/solicitudes/:id/matricular', admin, params, validateBody(s.convertSchema), c.convert);
+router.post('/crm/solicitudes/:id/borradores', admin, params, validateBody(s.manualDraftSchema), c.manualDraft);
+router.patch('/crm/solicitudes/:id/borradores/:childId', admin, params, validateBody(s.editDraftSchema), c.editDraft);
+router.post('/crm/solicitudes/:id/borradores/:childId/revision', admin, params, validateBody(s.reviewDraftSchema), c.reviewDraft);
+router.get('/crm/solicitudes/:id/borradores/:childId/copia', admin, params, c.copyDraft);
+router.post('/crm/prospectos/:id/consentimientos', admin, params, validateBody(s.consentSchema), c.consent);
+router.post('/crm/prospectos/:id/consentimientos/:childId/revocar', admin, params, c.revoke);
+router.post('/crm/prospectos/:id/privacidad', admin, params, validateBody(s.privacySchema), c.privacy);
+router.get('/crm/embudo', reports, filters, c.funnel);
+router.get('/crm/atencion', assigned, filters, c.attention);
+router.get('/crm/trazabilidad', reports, filters, c.trace);
+export default router;

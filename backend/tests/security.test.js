@@ -8,11 +8,29 @@ import app from '../src/app.js';
 import { PasswordReset, User } from '../src/models/index.js';
 import { sentInTests } from '../src/services/mailService.js';
 import { jwtSecret, signSessionToken, verifySessionToken } from '../src/utils/jwt.js';
-import { hashPassword, needsRehash, verifyPassword } from '../src/utils/security.js';
+import { createToken, hashPassword, needsRehash, verifyPassword } from '../src/utils/security.js';
+import { assertStrongPassword } from '../src/services/authService.js';
+import { runAgent } from '../src/services/agents/agentRunner.js';
 import { closeDatabase, createPlatformAdmin, loginAs, PASSWORD, prepareDatabase } from './helpers.js';
 
 // Prueba bcrypt, el JWT de sesión y la recuperación de contraseña con datos temporales.
 const scryptAsync = promisify(scrypt);
+
+test('contraseñas nuevas respetan el límite de bcrypt en bytes UTF-8', () => {
+  assert.doesNotThrow(() => assertStrongPassword(`A1${'a'.repeat(70)}`));
+  assert.throws(() => assertStrongPassword(`A1${'a'.repeat(71)}`));
+  assert.doesNotThrow(() => assertStrongPassword(`A1${'é'.repeat(35)}`));
+  assert.throws(() => assertStrongPassword(`A1${'é'.repeat(36)}`));
+  const prefix = `A1${'a'.repeat(70)}`;
+  assert.throws(() => assertStrongPassword(`${prefix}x`));
+  assert.throws(() => assertStrongPassword(`${prefix}y`));
+});
+
+test('propiedades heredadas no son agentes', async () => {
+  for (const key of ['constructor', 'toString', '__proto__']) {
+    await assert.rejects(() => runAgent({ role: 'teacher' }, key, {}), (error) => error.status === 404);
+  }
+});
 
 before(prepareDatabase);
 after(closeDatabase);
@@ -39,6 +57,8 @@ test('el JWT lleva solo usuario, rol y sesión, vence y se rechaza si lo alteran
   assert.equal(verifySessionToken(jwt.sign({ sid: 'x' }, 'otro-secreto-de-al-menos-treinta-y-dos-caracteres', { subject: '7', issuer: 'mentor-ai' })), null);
   const vencido = jwt.sign({ role: 'student', sid: 'abc' }, jwtSecret(), { subject: '7', issuer: 'mentor-ai', expiresIn: -10 });
   assert.equal(verifySessionToken(vencido), null);
+  const sinVencimiento = jwt.sign({ role: 'student', sid: 'abc' }, jwtSecret(), { subject: '7', issuer: 'mentor-ai' });
+  assert.equal(verifySessionToken(sinVencimiento), null);
   assert.ok(cuerpo);
 });
 
@@ -99,6 +119,29 @@ test('recuperar la contraseña: respuesta igual exista o no la cuenta, enlace de
   assert.equal((await sesionAbierta.get('/auth/me')).status, 401);
   await assert.rejects(() => loginAs('olvido@prueba.test'));
   await loginAs('olvido@prueba.test', 'NuevaClave2026x');
+});
+
+test('un enlace de recuperación solo se consume una vez con solicitudes simultáneas', async () => {
+  await createPlatformAdmin('concurrencia-reset@prueba.test');
+  sentInTests.length = 0;
+  await request(app).post('/api/v1/auth/password/forgot').send({ email: 'concurrencia-reset@prueba.test' });
+  const token = sentInTests[0].text.match(/token=([a-f0-9]{64})/)[1];
+  const results = await Promise.all([
+    request(app).post('/api/v1/auth/password/reset').send({ token, password: 'NuevaClave2026x' }),
+    request(app).post('/api/v1/auth/password/reset').send({ token, password: 'OtraClave2026xx' }),
+  ]);
+  assert.deepEqual(results.map((result) => result.status).sort(), [200, 422]);
+});
+
+test('una invitación solo se consume una vez con solicitudes simultáneas', async () => {
+  const { token, tokenHash } = createToken();
+  await User.create({ email: 'concurrencia-invitacion@prueba.test', displayName: 'Prueba', role: 'platform_admin', status: 'invited', invitationTokenHash: tokenHash, invitationExpiresAt: new Date(Date.now() + 60000) });
+  const body = { token, password: 'NuevaClave2026x', acceptTerms: true, acceptPrivacy: true };
+  const results = await Promise.all([
+    request(app).post('/api/v1/auth/activate').send(body),
+    request(app).post('/api/v1/auth/activate').send(body),
+  ]);
+  assert.deepEqual(results.map((result) => result.status).sort(), [200, 422]);
 });
 
 // M08: dos solicitudes simultáneas con el mismo enlace: una sola contraseña queda vigente.

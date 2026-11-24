@@ -1,0 +1,134 @@
+[
+  {
+    "theme": "claro",
+    "contrast": "normal",
+    "state": "normal",
+    "button": 5.178415705888697,
+    "fieldBoundary": 3.9289708215978147,
+    "selectedText": 8.5839811968533,
+    "selectedIndicator": 5.237867970279843,
+    "focus": 1,
+    "focusWidth": 3
+  },
+  {
+    "theme": "claro",
+    "contrast": "normal",
+    "state": "hover",
+    "button": 7.3070519776298735,
+    "fieldBoundary": 3.9289708215978147,
+    "selectedText": 8.5839811968533,
+    "selectedIndicator": 5.237867970279843,
+    "focus": 1,
+    "focusWidth": 3
+  },
+  {
+    "theme": "claro",
+    "contrast": "normal",
+    "state": "focus",
+    "button": 7.3070519776298735,
+    "fieldBoundary": 3.9289708215978147,
+    "selectedText": 8.5839811968533,
+    "selectedIndicator": 5.237867970279843,
+    "focus": 3.4152335258589503,
+    "focusWidth": 3
+  },
+  {
+    "theme": "claro",
+    "contrast": "alto",
+    "state": "normal",
+    "button": 7.3070519776298735,
+    "fieldBoundary": 12.699482928434835,
+    "selectedText": 8.5839811968533,
+    "selectedIndicator": 5.237867970279843,
+    "focus": 21,
+    "focusWidth": 4
+  },
+  {
+    "theme": "claro",
+    "contrast": "alto",
+    "state": "hover",
+    "button": 7.3070519776298735,
+    "fieldBoundary": 12.699482928434835,
+    "selectedText": 8.5839811968533,
+    "selectedIndicator": 5.237867970279843,
+    "focus": 21,
+    "focusWidth": 4
+  },
+  {
+    "theme": "claro",
+    "contrast": "alto",
+    "state": "focus",
+    "button": 7.3070519776298735,
+    "fieldBoundary": 12.699482928434835,
+    "selectedText": 8.5839811968533,
+    "selectedIndicator": 5.237867970279843,
+    "focus": 21,
+    "focusWidth": 4
+  },
+  {
+    "theme": "oscuro",
+    "contrast": "normal",
+    "state": "normal",
+    "button": 7.3070519776298735,
+    "fieldBoundary": 4.981863746284696,
+    "selectedText": 10.465116392285374,
+    "selectedIndicator": 10.512499695318791,
+    "focus": 9.590163079997431,
+    "focusWidth": 3
+  },
+  {
+    "theme": "oscuro",
+    "contrast": "normal",
+    "state": "hover",
+    "button": 7.3070519776298735,
+    "fieldBoundary": 4.981863746284696,
+    "selectedText": 10.465116392285374,
+    "selectedIndicator": 10.512499695318791,
+    "focus": 9.590163079997431,
+    "focusWidth": 3
+  },
+  {
+    "theme": "oscuro",
+    "contrast": "normal",
+    "state": "focus",
+    "button": 7.3070519776298735,
+    "fieldBoundary": 4.981863746284696,
+    "selectedText": 10.465116392285374,
+    "selectedIndicator": 10.512499695318791,
+    "focus": 9.590163079997431,
+    "focusWidth": 3
+  },
+  {
+    "theme": "oscuro",
+    "contrast": "alto",
+    "state": "normal",
+    "button": 7.3070519776298735,
+    "fieldBoundary": 12.401330030906207,
+    "selectedText": 12.012645353529347,
+    "selectedIndicator": 12.067035461931663,
+    "focus": 13.218653962171373,
+    "focusWidth": 4
+  },
+  {
+    "theme": "oscuro",
+    "contrast": "alto",
+    "state": "hover",
+    "button": 7.3070519776298735,
+    "fieldBoundary": 12.401330030906207,
+    "selectedText": 12.012645353529347,
+    "selectedIndicator": 12.067035461931663,
+    "focus": 13.218653962171373,
+    "focusWidth": 4
+  },
+  {
+    "theme": "oscuro",
+    "contrast": "alto",
+    "state": "focus",
+    "button": 7.3070519776298735,
+    "fieldBoundary": 12.401330030906207,
+    "selectedText": 12.012645353529347,
+    "selectedIndicator": 12.067035461931663,
+    "focus": 13.218653962171373,
+    "focusWidth": 4
+  }
+]

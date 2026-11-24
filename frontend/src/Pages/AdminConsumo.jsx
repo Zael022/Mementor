@@ -18,6 +18,8 @@ export default function AdminConsumo() {
   return (
     <>
       <h1>Consumo del tutor</h1>
+      <p>{datos.providerState} · Modelo: {datos.configuredModel || 'No configurado'}</p>
+      {datos.assistants && <section className="tarjeta"><h2>Asistentes, incluido admisiones</h2><p>{datos.assistants.usedLast24h} reservas o ejecuciones en 24 horas; límite institucional {datos.assistants.institutionDailyLimit}, por persona {datos.assistants.perUserDailyLimit}. Cuota independiente del tutor; sus ejecuciones no se vuelven a contar aquí. Los intentos fallidos también consumen cuota para limitar reintentos.</p></section>}
       <p className="tenue">Últimos {datos.days} días. El registro no guarda preguntas, respuestas ni contenido de documentos.</p>
       <div className="dos-columnas-auto">
         <TipoCambio />

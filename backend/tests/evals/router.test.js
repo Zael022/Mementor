@@ -27,12 +27,12 @@ test('cada nivel usa su variable y, si falta, AI_MODEL (los despliegues anterior
   assert.match(sinAvanzado.reason, /AI_MODEL_AVANZADO o AI_MODEL/);
 });
 
-test('asignación de modelos: tareas simples al rápido; tutor, retroalimentación, preguntas y cumplimiento al avanzado', () => {
+test('asignación de modelos: tareas simples (incluye borradores de admisiones) al rápido; tutor, retroalimentación, preguntas y cumplimiento al avanzado', () => {
   setEnv({});
   const niveles = Object.fromEntries(Object.values(AGENTS).filter((agent) => !agent.external).map((agent) => [agent.key, tierFor(agent)]));
   assert.deepEqual(niveles, {
     question_generator: 'avanzado', feedback_assistant: 'avanzado', course_analyst: 'rapido', compliance_checker: 'avanzado',
-    announcement_writer: 'rapido', study_coach: 'rapido', lesson_summarizer: 'rapido',
+    announcement_writer: 'rapido', study_coach: 'rapido', lesson_summarizer: 'rapido', admissions_writer: 'rapido',
   });
   // Se puede reasignar un agente sin tocar código; un valor inválido se ignora.
   process.env.AI_TIER_ANNOUNCEMENT_WRITER = 'avanzado';

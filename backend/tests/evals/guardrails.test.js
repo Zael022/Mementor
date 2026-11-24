@@ -65,3 +65,13 @@ test('la consulta al buscador no lleva datos personales ni la palabra que los pr
   assert.equal(/1-2345-6789|ana@correo\.test|c[eé]dula|correo/.test(consulta), false, consulta);
   assert.match(consulta, /denominador/);
 });
+
+test('admisiones · sin datos de identidad, enlaces ni fechas o cupos que no estén en las condiciones autorizadas', async () => {
+  const { admissionsAgent } = await import('../../src/services/agents/admissionsAgent.js');
+  const data = { convocatoria: 'Admisión 2027', curso: 'Matemática', inicio: '2027-02-01T00:00:00.000Z', cierre: '2027-02-28T00:00:00.000Z', objetivo: 'Recordar documentos pendientes' };
+  const guard = (texto) => admissionsAgent.guard({ texto, faltantes: [] }, { data });
+  assert.deepEqual(guard('Le recordamos que la convocatoria Admisión 2027 cierra el 28 de febrero.'), {});
+  assert.deepEqual(guard('Quedan 15 cupos disponibles; la convocatoria cierra el 28 de febrero.'), { block: 'unsupported_number' });
+  assert.deepEqual(guard('Escriba a admisiones.privado@correo.test para confirmar.'), { block: 'personal_data' });
+  assert.deepEqual(guard('Consulte https://otro-sitio.test/becas para más información.'), { block: 'external_link' });
+});

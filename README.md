@@ -5,6 +5,10 @@ Plataforma educativa adaptativa: cursos, lecciones, cuestionarios con correcció
 **Stack:** React + Vite (JSX) · Node.js + Express · MySQL 8 + Sequelize (migraciones) · Google Cloud RAG Engine (opcional) · Anthropic u OpenAI para generar respuestas.
 **Sin datos precargados:** después de migrar, la base queda vacía (solo el catálogo de roles). No hay seeds, cuentas demo ni IA simulada.
 
+**Admisiones CRM:** convocatorias por curso, nueve etapas, historial y seguimientos, métricas de cohortes, matrícula transaccional, borradores revisados y derechos de prospectos. Recorrido, configuración, pruebas aisladas de 40 solicitudes y estado de requisitos en [docs/CRM.md](docs/CRM.md). No requiere IA para gestionar admisiones. Las migraciones nuevas son `20261122000100` y `20261122000200`.
+
+**Seguimiento institucional de plataforma (avance parcial):** módulo separado de admisiones para `platform_admin`. Permite listar instituciones, configurar una ficha y registrar contactos profesionales; aún faltan tareas, soporte, incorporación verificable y políticas de conservación. Requiere la migración `20261124000100`; véase [la decisión y pendientes](docs/adr/0007-crm-instituciones.md). No aplicar la migración en producción como parte de esta entrega.
+
 **Despliegue:** pendiente de verificar. Las direcciones previstas son https://mentor-ai.vercel.app (frontend) y https://mentor-api.onrender.com/api/v1 (API), pero no cuentan como publicadas hasta completar el registro de aceptación de `docs/despliegue.md` (sección 6) sobre la URL pública.
 
 ## Entregables del Proyecto Final (FWD Costa Rica)
@@ -157,12 +161,12 @@ Recorrido: el docente crea un quiz en *Quizzes*, le agrega preguntas y lo public
 ## 5. Pruebas
 
 ```powershell
-# Backend: 209 pruebas (incluye las evals rápidas de IA de tests/evals) en mentor_ai_test (crean y borran sus datos). Google Cloud, la IA y las APIs externas son dobles.
+# Backend: 241 pruebas (incluye las evals rápidas de IA de tests/evals) en mentor_ai_test (crean y borran sus datos). Google Cloud, la IA y las APIs externas son dobles.
 cd backend
 npm run lint
 npm test
 
-# Frontend: lint, 58 pruebas de componentes y hooks (Vitest + jsdom) y compilación
+# Frontend: lint, 65 pruebas de componentes y hooks (Vitest + jsdom) y compilación
 cd ..\frontend
 npm run lint
 npm test
@@ -179,7 +183,7 @@ cd frontend
 npx playwright install chromium
 npm run test:e2e
 ```
-Son 38 pruebas, incluidas 12 revisiones automáticas de accesibilidad con axe-core (WCAG 2.2 AA) en tres anchos. Usan los datos de conexión de `backend/.env`.
+Son 44 pruebas, incluidas 12 revisiones automáticas de accesibilidad con axe-core (WCAG 2.2 AA) en tres anchos. Usan los datos de conexión de `backend/.env`.
 
 Las capturas de los mockups (escritorio y móvil) se generan con `npx playwright test -c playwright.capturas.config.js` sobre la misma base `_e2e` y quedan en `frontend/capturas/salida/` (no se versionan; las optimizadas están en `docs/mockups/`). Para cambiar puertos o base: `E2E_DB_NAME`, `E2E_API_PORT` (3101), `E2E_WEB_PORT` (5174) y `E2E_FAKE_AI_PORT` (4599).
 

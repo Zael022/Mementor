@@ -8,10 +8,12 @@ import Icono from './Iconos.jsx';
 const GENERAL = {
   platform_admin: [
     { to: '/plataforma/instituciones', texto: 'Instituciones', icono: 'instituciones' },
+    { to: '/plataforma/crm-instituciones', texto: 'Seguimiento institucional', icono: 'instituciones' },
     { to: '/admin/auditoria', texto: 'Auditoría', icono: 'bitacora' },
     { to: '/admin/gobernanza', texto: 'Gobernanza', icono: 'gobernanza' },
   ],
   institution_admin: [
+    { to: '/admisiones', texto: 'Admisiones', icono: 'personas' },
     { to: '/admin/usuarios', texto: 'Usuarios', icono: 'personas' },
     { to: '/admin/cursos', texto: 'Cursos', icono: 'cursos' },
     { to: '/calendario', texto: 'Calendario', icono: 'calendario' },
@@ -23,11 +25,13 @@ const GENERAL = {
   ],
   // Auditoría: solo lectura de bitácoras y gobernanza.
   auditor: [
+    { to: '/admisiones', texto: 'Embudo de admisiones', icono: 'progreso' },
     { to: '/auditoria/bitacora', texto: 'Bitácora', icono: 'bitacora' },
     { to: '/auditoria/gobernanza', texto: 'Gobernanza', icono: 'gobernanza' },
     { to: '/asistentes', texto: 'Asistentes IA', icono: 'asistentes' },
   ],
   teacher: [
+    { to: '/admisiones/candidatos', texto: 'Admisiones asignadas', icono: 'personas' },
     { to: '/docente/cursos', texto: 'Página principal', icono: 'inicio' },
     { to: '/calendario', texto: 'Calendario', icono: 'calendario' },
     { to: '/pendientes', texto: 'Por revisar', icono: 'revisar' },

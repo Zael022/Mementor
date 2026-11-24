@@ -8,7 +8,7 @@ import { normalize, terms } from './textChunks.js';
 export const GUARD_MESSAGES = {
   personal_data: 'La respuesta incluía datos personales (cédula, teléfono o correo) que no vienen del material autorizado, así que no se muestra. Intenta de nuevo.',
   unsupported_claim: 'La respuesta incluía cifras o afirmaciones que no están en el material, así que no se muestra. Intenta de nuevo.',
-  unsupported_number: 'El texto incluía fechas o cifras que no están en tu indicación, así que no se muestra. Escribe en la indicación los datos que quieres incluir.',
+  unsupported_number: 'El texto incluía fechas o cifras que no están en la indicación ni en los datos autorizados, así que no se muestra. Agrega esos datos a la indicación o a la ficha si deben incluirse.',
   off_topic: 'El texto generado se alejaba del curso y de tu indicación, así que no se muestra. Prueba con una indicación más concreta.',
   external_link: 'La respuesta recomendaba enlaces que no están en el material ni en tu indicación, así que no se muestra.',
   assessment_answer: 'Esta pregunta es de una evaluación abierta. El tutor puede darte pistas, pero no la respuesta: inténtalo con las pistas o consulta a tu docente.',

@@ -1,3 +1,4 @@
+import { anonymizeLinkedCrm, exportLinkedCrm } from './crmPrivacyService.js';
 import path from 'node:path';
 import { Op, QueryTypes } from 'sequelize';
 import { removeStored } from './fileStore.js';
@@ -35,7 +36,7 @@ const LEARNING_EXPORT = {
       t.total_points AS totalPoints, t.submitted_at AS submittedAt
       FROM assessment_attempts t JOIN assessments a ON a.id = t.assessment_id WHERE t.student_id = :id ORDER BY t.id`,
   attemptAnswers: `SELECT aa.attempt_id AS attemptId, aa.question_id AS questionId, aa.is_correct AS isCorrect, aa.earned_points AS earnedPoints
-      FROM attempt_answers aa JOIN assessment_attempts t ON t.id = aa.attempt_id WHERE t.student_id = :id ORDER BY aa.id`,
+      FROM attempt_answers aa JOIN assessment_attempts t ON t.id = aa.attempt_id WHERE t.student_id = :id AND t.status = 'submitted' ORDER BY aa.id`,
   assignmentSubmissions: `SELECT a.title AS assignment, s.body, s.link_url AS linkUrl, s.submitted_at AS submittedAt,
       s.grade_points AS gradePoints, s.feedback, s.graded_at AS gradedAt
       FROM assignment_submissions s JOIN assignments a ON a.id = s.assignment_id WHERE s.student_id = :id ORDER BY s.id`,
@@ -86,6 +87,7 @@ export async function exportMyData(user) {
       phone: row.phone, bio: row.bio, role: row.role, createdAt: row.createdAt,
     },
     consents: (await myConsents(user)).history,
+    admissions: await exportLinkedCrm(user),
     deletionRequests: await DataDeletionRequest.findAll({ where: { userId: user.id }, attributes: ['id', 'status', 'createdAt', 'processedAt'] }),
     learning,
   };
@@ -155,6 +157,7 @@ export async function processDeletion(requestId, via, { notify = true } = {}) {
       passwordHash: null, invitationTokenHash: null, invitationExpiresAt: null,
       status: 'disabled', anonymizedAt: new Date(),
     }, { transaction });
+    await anonymizeLinkedCrm(user, transaction);
     await UserSession.update({ revokedAt: new Date() }, { where: { userId: user.id, revokedAt: null }, transaction });
     await PasswordReset.destroy({ where: { userId: user.id }, transaction });
     await EmailChange.destroy({ where: { userId: user.id }, transaction });

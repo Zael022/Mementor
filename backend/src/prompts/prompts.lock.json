@@ -34,5 +34,9 @@
   "lesson_summarizer": {
     "version": "1.0.0",
     "sha256": "fce8aff974c053ffa5c66087b7251705d99846497f9831f56c9c24ec164997df"
+  },
+  "admissions_writer": {
+    "version": "1.0.0",
+    "sha256": "45058c990770154e595f0331e40d91ac8bd078c54a2a237a735022e20538e89a"
   }
 }

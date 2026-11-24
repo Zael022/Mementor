@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
-import { AgentRun, User, sequelize } from '../../models/index.js';
+import { AgentRun, Institution, User, sequelize } from '../../models/index.js';
+import { clock } from '../../utils/clock.js';
 import { AppError, forbidden, invalid, notFound } from '../../utils/AppError.js';
 import { AGENT_COMMON_PROMPT, agentPromptVersion } from '../../prompts/index.js';
 import { GUARD_MESSAGES, guardCode } from '../../utils/outputGuard.js';
@@ -42,17 +43,27 @@ export function parseJson(text, schema) {
 // Reserva un turno respetando el límite diario por persona (bloqueo para que dos pedidos no lo superen).
 async function reserve(user, agent, courseId, inputChars, trace) {
   return sequelize.transaction(async (transaction) => {
+    if (user.institutionId) await Institution.findByPk(user.institutionId, { lock: transaction.LOCK.UPDATE, transaction });
     await User.findByPk(user.id, { lock: transaction.LOCK.UPDATE, transaction });
+    const since = new Date(clock.now() - DAY_MS);
     const used = await AgentRun.count({
       // Cuentan las ejecuciones que llamaron al modelo, aunque su resultado se descartara.
-      // Las respuestas servidas desde la caché no cuentan: no llamaron al modelo.
+      // Las respuestas servidas desde la caché no cuentan: no llamaron al modelo. El tutor tiene su propia cuota.
       where: {
-        userId: user.id, cacheHit: false, createdAt: { [Op.gte]: new Date(Date.now() - DAY_MS) },
+        userId: user.id, agent: { [Op.ne]: 'tutor' }, cacheHit: false, createdAt: { [Op.gte]: since },
         [Op.or]: [{ status: { [Op.ne]: 'no_evidence' } }, { model: { [Op.ne]: null } }],
       },
       transaction,
     });
     if (used >= dailyLimit()) throw new AppError(429, 'RATE_LIMITED', 'Alcanzaste el límite diario de uso de los asistentes de IA.');
+    const shared = await AgentRun.count({
+      where: {
+        institutionId: user.institutionId, agent: { [Op.ne]: 'tutor' }, cacheHit: false, createdAt: { [Op.gte]: since },
+        [Op.or]: [{ status: { [Op.ne]: 'no_evidence' } }, { model: { [Op.ne]: null } }],
+      },
+      transaction,
+    });
+    if (shared >= Number(process.env.AGENT_DAILY_LIMIT_PER_INSTITUTION || 500)) throw new AppError(429, 'INSTITUTION_QUOTA', 'La institución alcanzó su límite diario de asistentes de IA.');
     return AgentRun.create({ institutionId: user.institutionId, userId: user.id, courseId, agent, inputChars, ...trace }, { transaction });
   });
 }
@@ -68,9 +79,10 @@ const usageFields = (response) => ({
 });
 
 // Ejecuta un agente: permisos, cuota, contexto autorizado, router, caché, llamada al modelo, guardrails y bitácora.
-export async function runAgent(user, key, rawInput) {
-  const agent = AGENTS[key];
-  if (!agent || agent.external) throw notFound('Asistente no encontrado.');
+export async function runAgent(user, key, rawInput, { workflow = false } = {}) {
+  const agent = Object.hasOwn(AGENTS, key) ? AGENTS[key] : null;
+  if (!agent || agent.external || !Array.isArray(agent.roles) || !agent.inputSchema || typeof agent.buildContext !== 'function') throw notFound('Asistente no encontrado.');
+  if (agent.workflowOnly && !workflow) throw invalid('Abre una solicitud de admisiones para generar y guardar un borrador revisable.');
   if (!agent.roles.includes(user.role)) throw forbidden('Tu rol no puede usar este asistente.');
   const parsed = agent.inputSchema.safeParse(rawInput ?? {});
   if (!parsed.success) {
@@ -84,6 +96,7 @@ export async function runAgent(user, key, rawInput) {
   // El modelo nunca elige qué datos lee: solo recibe lo que el servidor ya autorizó.
   const context = await agent.buildContext(user, input);
   const inputChars = JSON.stringify(context.data ?? {}).length;
+  if (inputChars > 50000) throw invalid('El contexto supera el tamaño permitido para este asistente.');
   if (context.noEvidence) {
     const run = await AgentRun.create({
       institutionId: user.institutionId, userId: user.id, courseId: context.courseId ?? null, agent: key, inputChars, status: 'no_evidence', promptVersion, modelTier,

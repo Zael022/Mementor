@@ -1,6 +1,6 @@
 # Diccionario de datos de MENTOR AI
 
-Generado desde las migraciones de Sequelize (65 tablas, 619 columnas, 126 llaves foráneas). Motor: MySQL 8 (utf8mb4).
+Generado desde las migraciones de Sequelize (75 tablas, 749 columnas, 155 llaves foráneas). Motor: MySQL 8 (utf8mb4).
 
 Convenciones: PK = llave primaria, FK = llave foránea, UQ = valor único. Todas las tablas tienen `created_at` y `updated_at` salvo las indicadas.
 
@@ -1087,6 +1087,208 @@ Carpetas de Drive autorizadas por la institución.
 | `label` | `varchar(180)` | No |  | Etiqueta visible. |
 | `status` | `enum('enabled','disabled')` | No |  | Estado del registro. |
 | `created_by` | `bigint unsigned` | Sí | FK → users.id | Referencia a users.id (llave foránea). |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+
+## CRM de admisiones y plataforma
+
+### `crm_admission_cycles`
+
+Convocatorias de admisión de una institución, ligadas a un curso, con su política versionada.
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PK | Identificador único (llave primaria). |
+| `institution_id` | `bigint unsigned` | No | FK → institutions.id | Referencia a institutions.id (llave foránea). |
+| `course_id` | `bigint unsigned` | No | FK → courses.id | Referencia a courses.id (llave foránea). |
+| `name` | `varchar(180)` | No |  | Nombre. |
+| `campus` | `varchar(120)` | No |  | Campus. |
+| `starts_at` | `datetime` | No |  | Fecha y hora de inicio. |
+| `ends_at` | `datetime` | No |  | Ends (fecha). |
+| `status` | `varchar(20)` | No |  | Estado del registro. |
+| `version` | `int` | No |  | Versión del documento. |
+| `config_json` | `json` | No |  | Config json. |
+| `config_history` | `json` | No |  | Config history. |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+
+### `crm_prospects`
+
+Personas interesadas en una convocatoria (contacto, origen y consentimiento); se anonimizan al cerrar.
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PK | Identificador único (llave primaria). |
+| `institution_id` | `bigint unsigned` | No | FK → institutions.id | Referencia a institutions.id (llave foránea). |
+| `name` | `varchar(120)` | No |  | Nombre. |
+| `email` | `varchar(190)` | Sí |  | Correo electrónico (único). |
+| `phone` | `varchar(30)` | Sí |  | Teléfono de contacto (opcional). |
+| `origin` | `varchar(80)` | No |  | Origen del registro. |
+| `utm_json` | `json` | Sí |  | Utm json. |
+| `user_id` | `bigint unsigned` | Sí | FK → users.id | Referencia a users.id (llave foránea). |
+| `anonymized_at` | `datetime` | Sí |  | Fecha en que se anonimizó la cuenta tras la baja. |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+
+### `crm_applications`
+
+Solicitud de una persona a una convocatoria: etapa, estado, responsable y conversión en matrícula.
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PK | Identificador único (llave primaria). |
+| `institution_id` | `bigint unsigned` | No | FK → institutions.id | Referencia a institutions.id (llave foránea). |
+| `prospect_id` | `bigint unsigned` | No | FK → crm_prospects.id | Referencia a crm_prospects.id (llave foránea). |
+| `cycle_id` | `bigint unsigned` | No | FK → crm_admission_cycles.id | Referencia a crm_admission_cycles.id (llave foránea). |
+| `stage` | `varchar(30)` | No |  | Stage. |
+| `status` | `varchar(25)` | No |  | Estado del registro. |
+| `responsible_id` | `bigint unsigned` | Sí | FK → users.id | Referencia a users.id (llave foránea). |
+| `version` | `int` | No |  | Versión del documento. |
+| `last_stage_changed_at` | `datetime` | No |  | Last stage changed (fecha). |
+| `last_contact_at` | `datetime` | Sí |  | Last contact (fecha). |
+| `reviewed_at` | `datetime` | Sí |  | Fecha de revisión. |
+| `config_version` | `int` | No |  | Config version. |
+| `config_json` | `json` | No |  | Config json. |
+| `activity_json` | `json` | No |  | Activity json. |
+| `enrollment_id` | `bigint unsigned` | Sí | FK → enrollments.id | Referencia a enrollments.id (llave foránea). |
+| `conversion_kind` | `varchar(25)` | Sí |  | Conversion kind. |
+| `converted_at` | `datetime` | Sí |  | Converted (fecha). |
+| `retention_exception` | `varchar(300)` | Sí |  | Retention exception. |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+| `acquisition_origin` | `varchar(80)` | Sí |  | Acquisition origin. |
+| `closed_at` | `datetime` | Sí |  | Closed (fecha). |
+
+### `crm_stage_events`
+
+Historial de cambios de etapa de una solicitud (quién, cuándo y por qué).
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PK | Identificador único (llave primaria). |
+| `institution_id` | `bigint unsigned` | No | FK → institutions.id | Referencia a institutions.id (llave foránea). |
+| `application_id` | `bigint unsigned` | No | FK → crm_applications.id | Referencia a crm_applications.id (llave foránea). |
+| `from_stage` | `varchar(30)` | Sí |  | From stage. |
+| `to_stage` | `varchar(30)` | No |  | To stage. |
+| `kind` | `varchar(25)` | No |  | Tipo de registro. |
+| `reason` | `varchar(500)` | No |  | Motivo indicado por la persona. |
+| `actor_id` | `bigint unsigned` | Sí | FK → users.id | Referencia a users.id (llave foránea). |
+| `effective_at` | `datetime` | No |  | Effective (fecha). |
+| `recorded_at` | `datetime` | No |  | Recorded (fecha). |
+| `metadata_json` | `json` | Sí |  | Datos adicionales en JSON. |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+
+### `crm_followups`
+
+Seguimientos programados de una solicitud y su resultado.
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PK | Identificador único (llave primaria). |
+| `institution_id` | `bigint unsigned` | No | FK → institutions.id | Referencia a institutions.id (llave foránea). |
+| `application_id` | `bigint unsigned` | No | FK → crm_applications.id | Referencia a crm_applications.id (llave foránea). |
+| `responsible_id` | `bigint unsigned` | No | FK → users.id | Referencia a users.id (llave foránea). |
+| `due_at` | `datetime` | No |  | Fecha límite. |
+| `type` | `varchar(30)` | No |  | Tipo. |
+| `status` | `varchar(20)` | No |  | Estado del registro. |
+| `note` | `varchar(500)` | Sí |  | Note. |
+| `result` | `varchar(300)` | Sí |  | Result. |
+| `completed_at` | `datetime` | Sí |  | Fecha en que se completó. |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+
+### `crm_message_drafts`
+
+Borradores de mensajes de admisiones (manuales o del agente) pendientes de revisión humana.
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PK | Identificador único (llave primaria). |
+| `institution_id` | `bigint unsigned` | No | FK → institutions.id | Referencia a institutions.id (llave foránea). |
+| `application_id` | `bigint unsigned` | No | FK → crm_applications.id | Referencia a crm_applications.id (llave foránea). |
+| `author_id` | `bigint unsigned` | No | FK → users.id | Referencia a users.id (llave foránea). |
+| `approver_id` | `bigint unsigned` | Sí | FK → users.id | Referencia a users.id (llave foránea). |
+| `agent_run_id` | `bigint unsigned` | Sí | FK → agent_runs.id | Referencia a agent_runs.id (llave foránea). |
+| `text` | `text` | No |  | Text. |
+| `channel` | `varchar(20)` | No |  | Channel. |
+| `recipient` | `varchar(190)` | No |  | Recipient. |
+| `status` | `varchar(20)` | No |  | Estado del registro. |
+| `version` | `int` | No |  | Versión del documento. |
+| `context_hash` | `varchar(64)` | No |  | Context hash. |
+| `context_json` | `json` | No |  | Context json. |
+| `approved_at` | `datetime` | Sí |  | Approved (fecha). |
+| `approved_version` | `int` | Sí |  | Approved version. |
+| `source` | `varchar(20)` | No |  | Fuente del dato. |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+
+### `crm_consent_records`
+
+Evidencia de los consentimientos de una persona interesada por finalidad.
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PK | Identificador único (llave primaria). |
+| `institution_id` | `bigint unsigned` | No | FK → institutions.id | Referencia a institutions.id (llave foránea). |
+| `prospect_id` | `bigint unsigned` | No | FK → crm_prospects.id | Referencia a crm_prospects.id (llave foránea). |
+| `purpose` | `varchar(30)` | No |  | Purpose. |
+| `document_version` | `varchar(40)` | No |  | Document version. |
+| `evidence_ref` | `varchar(200)` | No |  | Evidence ref. |
+| `origin` | `varchar(80)` | No |  | Origen del registro. |
+| `accepted_at` | `datetime` | No |  | Fecha y hora de aceptación. |
+| `revoked_at` | `datetime` | Sí |  | Fecha en que se revocó. |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+
+### `crm_privacy_cases`
+
+Solicitudes de derechos sobre datos (acceso, corrección, supresión) de personas interesadas.
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PK | Identificador único (llave primaria). |
+| `institution_id` | `bigint unsigned` | No | FK → institutions.id | Referencia a institutions.id (llave foránea). |
+| `prospect_id` | `bigint unsigned` | No | FK → crm_prospects.id | Referencia a crm_prospects.id (llave foránea). |
+| `actor_id` | `bigint unsigned` | No | FK → users.id | Referencia a users.id (llave foránea). |
+| `action` | `varchar(20)` | No |  | Acción registrada. |
+| `verification_ref` | `varchar(200)` | No |  | Verification ref. |
+| `verified_at` | `datetime` | No |  | Verified (fecha). |
+| `reason` | `varchar(300)` | No |  | Motivo indicado por la persona. |
+| `completed_at` | `datetime` | No |  | Fecha en que se completó. |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+
+### `platform_crm_accounts`
+
+Ficha comercial de cada institución cliente para el equipo de la plataforma.
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PK | Identificador único (llave primaria). |
+| `institution_id` | `bigint unsigned` | No | FK → institutions.id | Referencia a institutions.id (llave foránea). |
+| `responsible_id` | `bigint unsigned` | No | FK → users.id | Referencia a users.id (llave foránea). |
+| `onboarding_status` | `varchar(24)` | No |  | Onboarding status. |
+| `needs` | `varchar(2000)` | Sí |  | Needs. |
+| `next_review_at` | `datetime` | Sí |  | Next review (fecha). |
+| `version` | `int` | No |  | Versión del documento. |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+
+### `platform_crm_contacts`
+
+Contactos profesionales de una institución cliente.
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PK | Identificador único (llave primaria). |
+| `account_id` | `bigint unsigned` | No | FK → platform_crm_accounts.id | Referencia a platform_crm_accounts.id (llave foránea). |
+| `name` | `varchar(120)` | No |  | Nombre. |
+| `position` | `varchar(120)` | Sí |  | Orden dentro de su grupo. |
+| `email` | `varchar(190)` | Sí |  | Correo electrónico (único). |
+| `phone` | `varchar(30)` | Sí |  | Teléfono de contacto (opcional). |
+| `request_key` | `varchar(36)` | No |  | Request key. |
+| `actor_id` | `bigint unsigned` | No | FK → users.id | Referencia a users.id (llave foránea). |
 | `created_at` | `datetime` | No |  | Fecha y hora de creación. |
 | `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
 

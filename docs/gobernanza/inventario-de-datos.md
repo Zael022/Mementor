@@ -43,8 +43,26 @@ El prompt del sistema (versionado en `backend/src/prompts/`), hasta 6 fragmentos
 - Las claves de evaluaciones y quizzes nunca salen hacia el proveedor: el servidor solo las usa para revisar que la respuesta del tutor no las revele.
 - Con `AI_PROMPT_CACHE=on`, Anthropic guarda temporalmente en su caché el bloque marcado (la lección completa) según su política de prompt caching.
 
+## Ampliación CRM y revisión de cumplimiento
+
+| Categoría | Finalidad y acceso | Conservación y derechos |
+| --- | --- | --- |
+| Convocatoria/configuraciones | Administración institucional define curso, sede, política, ventanas y plazos; docentes solo convocatorias asignadas; auditoría agregados | Historial de versiones, sin metas ficticias |
+| Contactos mínimos de prospecto | Admisiones; administración y docente explícitamente asignado; sin acceso automático de plataforma | Plazo institucional por convocatoria desde cierre; excepción justificada visible; casos de acceso/corrección/supresión con identidad verificada |
+| Solicitudes, actividades y seguimientos | Trazabilidad operativa y atención; fechas, evidencia referenciada y notas limitadas | Eliminar texto libre/contactos por supresión; conservar hechos/vínculos mínimos sin identidad, revisar procesos abiertos y excepciones |
+| Borradores/destinatario/contexto | Revisión humana en entidad funcional, nunca log técnico | Plazo institucional de borradores; se eliminan por supresión o baja; no hay colas de envío |
+| Consentimientos de prospecto | Admisiones y promoción separados, versión/aceptación/revocación/evidencia externa | No prueban aceptación de cuenta; borrar referencias identificables en supresión y preservar hecho mínimo |
+| Casos de privacidad | Referencia/fecha de verificación por operador institucional, derecho y resolución | Sin documento de identidad ni exportación persistida; acceso institucional auditado |
+| Contexto de agente de admisiones | Proveedor AI_PROVIDER recibe etapa, condiciones/fechas/política autorizadas, sede/curso, canal/tono/objetivo enmascarados | Sin ficha, contactos, notas ni historial académico por defecto; condiciones de retención del proveedor deben ser aprobadas |
+| Texto de cumplimiento | Apoyo a revisión antes de publicar | Patrones conocidos se sustituyen antes del payload; hallazgos no contienen el valor completo; no garantiza detectar todos los datos sensibles |
+
+Exportación propia ampliada: incluye categorías CRM vinculadas y datos propios de estudio sin claves privadas ni datos de compañeros. Anonimización de cuenta revisa CRM en la misma transacción. Correcciones de contacto invalidan aprobación de borradores; la procedencia original de adquisición se conserva como categoría, con eventos de corrección. El operador debe revisar respaldos, copias y descargas ya entregadas; no hay eliminación automática de archivos fuera del sistema ni un plazo legal universal supuesto. Ver ADR 0006 y `docs/CRM.md`.
+
 ## Qué no se registra
 El registro técnico (`ai_usage_events`, `agent_runs` y la línea `tutor.consulta` del servidor) no guarda credenciales, preguntas, respuestas ni contenido de documentos. Sí guarda la versión del prompt, el nivel y el modelo usados, si la respuesta vino de la caché, los tokens de caché del proveedor y el resultado de los guardrails como código (`pass`, `alert_<motivo>`, `blocked_<motivo>`). Las claves viven en `.env` (no versionado) o en ADC.
+
+## Seguimiento institucional de plataforma (parcial)
+`platform_crm_accounts` contiene necesidades y datos de seguimiento; `platform_crm_contacts` contiene nombre y datos profesionales. Finalidad: relación de servicio de MENTOR con instituciones existentes; origen: captura manual del operador de plataforma; acceso exclusivo de `platform_admin`. La política de conservación, corrección y supresión aún no está implementada ni aprobada. No ingresar contactos reales hasta completar esos controles.
 
 ## Retención automática
 Una vez al día (`RETENTION_INTERVAL_MINUTES`), la instancia con el turno de tareas aplica las reglas anteriores. Con `0` en un plazo, esa regla no borra nada. Borrar una conversación también quita sus citas, así que el contador «usada en respuestas» del docente baja en consecuencia.
