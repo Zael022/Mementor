@@ -45,12 +45,20 @@ test('activar la cuenta exige aceptar términos y privacidad y deja la evidencia
 });
 
 test('una cuenta anterior sin aceptación ve los documentos pendientes y los acepta', async () => {
-  // El administrador de plataforma se creó por consola, sin aceptar nada todavía.
-  const me = await ctx.plataforma.get('/auth/me');
+  // Un administrador creado por consola, sin aceptar nada todavía.
+  await createPlatformAdmin('legado.gob@prueba.test');
+  const legado = await loginAs('legado.gob@prueba.test', PASSWORD, { acceptPending: false });
+  const me = await legado.get('/auth/me');
   assert.equal(me.body.data.pendingConsents.length, 2);
-  const aceptado = await ctx.plataforma.post('/me/consents', { documents: ['terms', 'privacy'] });
+  // M07: el servidor rechaza operaciones nuevas mientras haya documentos pendientes; leer y aceptar siguen disponibles.
+  const bloqueado = await legado.post('/institutions', { name: 'Sin aceptar' });
+  assert.equal(bloqueado.status, 403);
+  assert.equal(bloqueado.body.error.code, 'CONSENT_REQUIRED');
+  assert.equal((await legado.get('/institutions')).status, 200);
+  const aceptado = await legado.post('/me/consents', { documents: ['terms', 'privacy'] });
   assert.deepEqual(aceptado.body.data.pending, []);
-  assert.equal((await ctx.plataforma.post('/me/consents', { documents: ['otro'] })).status, 422);
+  assert.equal((await legado.post('/me/consents', { documents: ['otro'] })).status, 422);
+  assert.equal((await legado.post('/institutions', { name: 'Ya aceptó' })).status, 201);
 });
 
 test('la baja confirma la identidad, anonimiza, conserva lo académico, cierra la sesión y notifica', async () => {

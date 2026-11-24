@@ -30,7 +30,8 @@ function assignmentScores(assignments, submissions, studentId, now) {
   const counted = [];
   for (const assignment of assignments) {
     const submission = submissions.find((item) => item.assignmentId === assignment.id && item.studentId === studentId);
-    if (submission && submission.gradePoints !== null) counted.push((submission.gradePoints / assignment.maxPoints) * 100);
+    // Defensa adicional: una entrega nunca vale más del 100 %.
+    if (submission && submission.gradePoints !== null) counted.push(Math.min(100, (submission.gradePoints / assignment.maxPoints) * 100));
     else if (!submission && assignment.dueAt && assignment.dueAt < now) counted.push(0);
   }
   return counted;
@@ -41,7 +42,7 @@ function classWorkScores(items, grades, studentId) {
   const counted = [];
   for (const item of items) {
     const grade = grades.find((row) => row.itemId === item.id && row.studentId === studentId);
-    if (grade) counted.push((Number(grade.points) / item.maxPoints) * 100);
+    if (grade) counted.push(Math.min(100, (Number(grade.points) / item.maxPoints) * 100));
   }
   return counted;
 }

@@ -9,6 +9,8 @@ services:
     rootDir: backend
     buildCommand: npm ci
     # Aplica las migraciones pendientes antes de arrancar (el plan gratuito no tiene paso previo al despliegue).
+    # En un plan de pago: preDeployCommand: npm run db:migrate y startCommand: npm start (ver docs/despliegue.md §3).
+    # Las migraciones solo agregan; lo que se borra va en una versión posterior (ampliar y luego contraer).
     startCommand: npm run db:migrate && npm start
     healthCheckPath: /api/v1/health
     autoDeploy: true
@@ -17,11 +19,19 @@ services:
       - key: NODE_ENV
         value: production
       - key: NODE_VERSION
-        value: 22.12.0
+        value: 22.22.2
+      # Vercel + Render = 2 proxies. Comprobar también la URL directa de Render antes de abrir (docs/despliegue.md §3).
       - key: TRUST_PROXY
         value: "2"
       - key: RAG_PROVIDER
         value: local
+      # El disco del plan gratuito se borra al reiniciar: los originales van a Cloud Storage.
+      - key: STORAGE_DRIVER
+        value: gcs
+      - key: STORAGE_GCS_BUCKET
+        sync: false
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        value: /etc/secrets/gcp-mentor-storage.json
       - key: DB_SSL
         value: "true"
       - key: FRONTEND_ORIGIN

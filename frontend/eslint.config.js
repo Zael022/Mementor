@@ -20,5 +20,5 @@ export default [
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },
-  { files: ['vite.config.js', 'playwright.config.js', 'tests/**', 'e2e/**'], languageOptions: { globals: { ...globals.node, ...globals.browser } } },
+  { files: ['vite.config.js', 'playwright.config.js', 'tests/**', 'e2e/**', 'scripts/**'], languageOptions: { globals: { ...globals.node, ...globals.browser } } },
 ];

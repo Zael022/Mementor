@@ -1,0 +1,29 @@
+# Evidencia CSRF y CORS contra la API real de MENTOR AI (laboratorio local, 2026-11-23T10:38:40-06:00)
+
+$ curl -i -X OPTIONS $API/courses -H "Origin: https://sitio-malicioso.test" -H "Access-Control-Request-Method: DELETE"
+HTTP/1.1 403 Forbidden
+{"error":{"code":"ORIGIN_NOT_ALLOWED","message":"Origen no permitido."},"requestId":"aafb3ddc-00dd-44bb-bfc1-893eed712ad0"}
+
+
+$ curl -i -X OPTIONS $API/courses -H "Origin: http://127.0.0.1:3199" -H "Access-Control-Request-Method: POST"  (origen autorizado)
+HTTP/1.1 204 No Content
+Access-Control-Allow-Origin: http://127.0.0.1:3199
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET,POST,PUT,PATCH,DELETE
+Access-Control-Allow-Headers: Content-Type,Accept,X-CSRF-Token
+Access-Control-Max-Age: 600
+Access-Control-Expose-Headers: X-Content-SHA256,Content-Disposition
+
+$ curl -i -c cookies.txt -X POST $API/auth/login -d {"email":"admin.norte@lab.test",...}
+HTTP/1.1 200 OK
+Set-Cookie: mentor_session=<token>; Path=/; Expires=Tue, 24 Nov 2026 00:38:40 GMT; HttpOnly; SameSite=Lax
+
+$ curl -i -b cookies.txt -X POST $API/users -d {...}   (sin x-csrf-token, como lo enviaría un formulario de otro sitio)
+HTTP/1.1 403 Forbidden
+{"error":{"code":"FORBIDDEN","message":"Token CSRF inválido o ausente."},"requestId":"5b3097f2-00f4-442b-8376-cc202aadd2d2"}
+
+
+$ curl -i -b cookies.txt -X POST $API/users -H "Origin: https://sitio-malicioso.test" -H "x-csrf-token: <token real>"
+HTTP/1.1 403 Forbidden
+{"error":{"code":"ORIGIN_NOT_ALLOWED","message":"Origen no permitido."},"requestId":"7eac4082-323b-416b-a449-ff3964b34e94"}
+

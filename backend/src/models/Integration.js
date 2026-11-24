@@ -19,3 +19,12 @@ export const IntegrationRun = sequelize.define('IntegrationRun', {
   detail: { type: DataTypes.STRING(255), allowNull: true },
   latencyMs: { type: DataTypes.INTEGER, allowNull: true },
 }, { tableName: 'integration_runs', underscored: true });
+
+// Recordatorio diario enviado (o fallido) por persona y día: un reintento no repite lo que ya salió.
+export const ReminderDelivery = sequelize.define('ReminderDelivery', {
+  id: { type: DataTypes.BIGINT.UNSIGNED, primaryKey: true, autoIncrement: true },
+  userId: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
+  reminderDay: { type: DataTypes.DATEONLY, allowNull: false },
+  status: { type: DataTypes.ENUM('sent', 'failed'), allowNull: false },
+  attempts: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 1 },
+}, { tableName: 'reminder_deliveries', underscored: true });

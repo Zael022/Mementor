@@ -40,7 +40,8 @@ async function reserve(user, agent, courseId, inputChars) {
   return sequelize.transaction(async (transaction) => {
     await User.findByPk(user.id, { lock: transaction.LOCK.UPDATE, transaction });
     const used = await AgentRun.count({
-      where: { userId: user.id, status: { [Op.ne]: 'no_evidence' }, createdAt: { [Op.gte]: new Date(Date.now() - DAY_MS) } },
+      // Cuentan las ejecuciones que llamaron al modelo, aunque su resultado se descartara por falta de respaldo.
+      where: { userId: user.id, [Op.or]: [{ status: { [Op.ne]: 'no_evidence' } }, { model: { [Op.ne]: null } }], createdAt: { [Op.gte]: new Date(Date.now() - DAY_MS) } },
       transaction,
     });
     if (used >= dailyLimit()) throw new AppError(429, 'RATE_LIMITED', 'Alcanzaste el límite diario de uso de los asistentes de IA.');
@@ -81,6 +82,14 @@ export async function runAgent(user, key, rawInput) {
     const output = parseJson(response.text, agent.outputSchema);
     if (!output) throw new AppError(502, 'AGENT_INVALID_OUTPUT', 'El asistente devolvió una respuesta con formato inesperado. Intenta de nuevo.');
     const result = agent.finalize ? agent.finalize(output, context) : output;
+    // Si la validación descartó todo, se informa como falta de respaldo y no como resultado.
+    if (typeof result?.noEvidence === 'string') {
+      await run.update({
+        status: 'no_evidence', provider: response.provider ?? config.provider, model: response.model ?? config.model, latencyMs: Date.now() - startedAt,
+        inputTokens: response.usage?.inputTokens ?? null, outputTokens: response.usage?.outputTokens ?? null,
+      });
+      return { runId: run.id, status: 'no_evidence', message: result.noEvidence, result: null };
+    }
     await run.update({
       status: 'completed', provider: response.provider ?? config.provider, model: response.model ?? config.model,
       outputChars: JSON.stringify(result).length, latencyMs: Date.now() - startedAt,

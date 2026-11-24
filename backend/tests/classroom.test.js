@@ -223,6 +223,17 @@ test('tareas: entrega del estudiante y calificación del docente', async () => {
 
   const list = await ctx.student.get(`/courses/${ctx.courseId}/assignments`);
   assert.deepEqual([list.body.data[0].submitted, list.body.data[0].gradePoints], [true, 18]);
+
+  // M04: con una nota emitida (18/20) el máximo ya no cambia; la nota del curso queda intacta.
+  const antes = await ctx.student.get(`/courses/${ctx.courseId}/my-grade`);
+  assert.equal(antes.status, 200);
+  const cambio = await ctx.teacher.patch(`/assignments/${ctx.assignmentId}`, { maxPoints: 10 });
+  assert.equal(cambio.status, 409);
+  assert.equal(cambio.body.error.code, 'GRADED_MAX_LOCKED');
+  assert.equal((await ctx.teacher.get(`/assignments/${ctx.assignmentId}`)).body.data.maxPoints, 20);
+  assert.deepEqual((await ctx.student.get(`/courses/${ctx.courseId}/my-grade`)).body, antes.body);
+  // Otros cambios de la tarea siguen permitidos.
+  assert.equal((await ctx.teacher.patch(`/assignments/${ctx.assignmentId}`, { title: 'Tarea 1 (revisada)' })).status, 200);
 });
 
 test('el inicio del estudiante resume clases, tareas, anuncios y avance', async () => {

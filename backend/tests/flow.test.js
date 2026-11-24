@@ -28,7 +28,7 @@ test('la API responde y la base inicia sin registros', async () => {
   assert.equal(health.status, 200);
   // Informa qué está configurado sin exponer claves, proyectos ni proveedores.
   assert.deepEqual(health.body.data, {
-    status: 'ok', database: 'connected', tutor: { configured: false }, retrieval: { mode: 'local', configured: true }, googleCloud: { required: false, configured: null },
+    status: 'ok', database: 'connected', tutor: { configured: false }, retrieval: { mode: 'local', configured: true }, files: { driver: 'local', configured: true }, googleCloud: { required: false, configured: null },
   });
   assert.equal(await User.count(), 0);
 });

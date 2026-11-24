@@ -23,6 +23,7 @@ Se instalan desde npm con sus propias licencias (consulta `node_modules/<paquete
 | `google-auth-library` | Apache-2.0 | backend |
 | `unpdf` | MIT | backend |
 | `mammoth` | BSD-2-Clause | backend |
+| `@axe-core/playwright` y `axe-core` | MPL-2.0 (solo desarrollo: pruebas de accesibilidad, no se distribuyen con la aplicación) | frontend |
 
 ## GSAP
 `gsap` y `@gsap/react` (GreenSock) se usan bajo la Standard «No Charge» GSAP License, que no es una licencia MIT. Antes de redistribuir el proyecto, revisa sus condiciones en el texto completo: https://gsap.com/standard-license

@@ -66,8 +66,11 @@ export async function uploadMaterial(req, res) {
 
 // Envía el archivo siempre como descarga, nunca para abrirse dentro de la página.
 export async function downloadMaterial(req, res) {
-  const { filePath, fileName } = await board.getMaterialFile(req.user, readId(req.params.materialId));
-  res.download(filePath, fileName);
+  const { buffer, fileName, mimeType, sha256 } = await board.getMaterialFile(req.user, readId(req.params.materialId));
+  res.attachment(fileName);
+  res.set({ 'Content-Type': mimeType || 'application/octet-stream', 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'private, no-store' });
+  if (sha256) res.set('X-Content-SHA256', sha256);
+  res.send(buffer);
 }
 
 export async function deleteMaterial(req, res) {

@@ -41,7 +41,7 @@ export default function RestablecerClave() {
           <Campo etiqueta="Repite la contraseña" tipo="password" valor={confirmacion} alCambiar={setConfirmacion} autoComplete="new-password" required />
           <MensajeError error={errorLocal || error} />
           <button type="submit" className="boton" disabled={enviando || !token} aria-busy={enviando}>{enviando ? 'Guardando…' : 'Guardar contraseña'}</button>
-          <p className="pequeno"><Link to="/recuperar">Solicitar otro enlace</Link></p>
+          <p className="pequeno"><Link className="enlace-tactil" to="/recuperar">Solicitar otro enlace</Link></p>
         </form>
       )}
     </Portada>
