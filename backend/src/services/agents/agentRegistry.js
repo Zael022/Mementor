@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { admissionsAgent } from './admissionsAgent.js';
-import { redactPersonalData } from '../../utils/personalData.js';
 import {
   Assignment, AssignmentSubmission, CourseStreak, Lesson, Topic, TopicMastery,
 } from '../../models/index.js';
@@ -11,6 +10,7 @@ import { getCourseAnalytics } from '../analyticsService.js';
 import { retrievePassages } from '../retrievalService.js';
 import { streakView } from '../streakService.js';
 import { asData } from '../tutorService.js';
+import { detectPersonalData, redactPersonalData } from '../../utils/personalData.js';
 
 // Catálogo de los 8 agentes de IA: propósito, roles, entradas, contexto autorizado y formato de salida.
 
@@ -24,8 +24,11 @@ function sourcesBlock(passages) {
 const sourceList = (passages) => passages.map((passage, index) => ({
   id: `S${index + 1}`, title: passage.title, versionId: passage.versionId, page: passage.page ?? null, heading: passage.heading ?? null,
 }));
-// Solo se conservan las citas que existen entre las fuentes entregadas.
-const validCitations = (citations, passages) => [...new Set(citations)].filter((cite) => /^S\d+$/.test(cite) && Number(cite.slice(1)) <= passages.length);
+// Solo se conservan las citas que coinciden exactamente con un identificador entregado (S1…Sn; no S0 ni S01).
+export const validCitations = (citations, passages) => {
+  const delivered = new Set(passages.map((_, index) => `S${index + 1}`));
+  return [...new Set(citations)].filter((cite) => delivered.has(cite));
+};
 
 export const AGENTS = {
   admissions_writer: admissionsAgent,
@@ -37,7 +40,7 @@ export const AGENTS = {
     roles: ['student', 'teacher'],
     inputs: ['Curso (de la sesión)', 'Pregunta'],
     provider: PROVIDER,
-    privacy: 'No envía nombre ni correo; sin evidencia no llama al modelo.',
+    privacy: 'Envía la pregunta (con cédulas, teléfonos, correos y enlaces ocultos), los pasajes del curso y los últimos turnos del hilo; nunca el nombre ni el correo de la cuenta. Sin evidencia no llama al modelo.',
     external: true,
     link: { student: '/estudiante/tutor/:courseId', teacher: '/docente/tutor/:courseId' },
   },
@@ -70,12 +73,13 @@ export const AGENTS = {
         citations: z.array(z.string()).default([]),
       })).min(1).max(8),
     }),
-    // Se descartan preguntas sin cita válida o con índice fuera de rango.
-    finalize: (result, { passages }) => ({
-      questions: result.questions
+    // Se descartan preguntas sin cita válida o con índice fuera de rango; si no queda ninguna, no hay respaldo.
+    finalize: (result, { passages }) => {
+      const questions = result.questions
         .map((question) => ({ ...question, citations: validCitations(question.citations, passages) }))
-        .filter((question) => question.citations.length && question.correctIndex < question.options.length),
-    }),
+        .filter((question) => question.citations.length && question.correctIndex < question.options.length);
+      return questions.length ? { questions } : { noEvidence: 'Ninguna pregunta propuesta citaba una fuente entregada, así que no se muestran. Prueba con un tema más concreto.' };
+    },
   },
 
   // 3. Borrador de retroalimentación para una entrega (el docente decide la nota).
@@ -86,7 +90,7 @@ export const AGENTS = {
     roles: ['teacher', 'institution_admin'],
     inputs: ['Entrega'],
     provider: PROVIDER,
-    privacy: 'Envía las instrucciones y el texto de la entrega, nunca el nombre ni el correo del estudiante.',
+    privacy: 'Envía las instrucciones y el texto de la entrega con cédulas, teléfonos, correos y enlaces ocultos; nunca el nombre ni el correo de la cuenta del estudiante.',
     inputSchema: z.object({ submissionId: id }),
     async buildContext(user, input) {
       const submission = await AssignmentSubmission.findByPk(input.submissionId);
@@ -95,11 +99,12 @@ export const AGENTS = {
       await getCourseAccess(user, assignment.courseId, { write: true });
       return {
         courseId: assignment.courseId,
-        data: { title: assignment.title, instructions: assignment.instructions, maxPoints: assignment.maxPoints, body: submission.body, link: submission.linkUrl },
+        // El enlace de la entrega no se envía: solo se indica que existe.
+        data: { title: assignment.title, instructions: assignment.instructions, maxPoints: assignment.maxPoints, body: redactPersonalData(submission.body), hasLink: Boolean(submission.linkUrl) },
       };
     },
     system: 'Eres un docente que da retroalimentación formativa: específica, respetuosa y accionable. Sugieres una nota orientativa, nunca definitiva.',
-    prompt: ({ data }) => `<dato>Tarea: ${asData(data.title)}\nInstrucciones: ${asData(data.instructions)}\nPuntaje máximo: ${data.maxPoints}</dato>\n<dato>Entrega del estudiante:\n${asData(data.body)}${data.link ? `\nEnlace: ${asData(data.link)}` : ''}</dato>\nFormato: {"strengths":["..."],"improvements":["..."],"feedback":"texto para el estudiante","suggestedPoints":0}`,
+    prompt: ({ data }) => `<dato>Tarea: ${asData(data.title)}\nInstrucciones: ${asData(data.instructions)}\nPuntaje máximo: ${data.maxPoints}</dato>\n<dato>Entrega del estudiante:\n${asData(data.body)}${data.hasLink ? '\n(La entrega incluye un enlace que el docente revisa directamente.)' : ''}</dato>\nFormato: {"strengths":["..."],"improvements":["..."],"feedback":"texto para el estudiante","suggestedPoints":0}`,
     outputSchema: z.object({
       strengths: z.array(z.string().max(300)).max(5),
       improvements: z.array(z.string().max(300)).max(5),
@@ -146,10 +151,11 @@ export const AGENTS = {
     roles: ['teacher', 'institution_admin', 'auditor'],
     inputs: ['Texto a revisar'],
     provider: PROVIDER,
-    privacy: 'Primero detecta en el servidor cédulas, teléfonos y correos; el texto se envía al modelo solo para el análisis.',
+    privacy: 'Detecta en el servidor cédulas, teléfonos y correos y los reemplaza por etiquetas antes de enviar el texto: el proveedor recibe el texto sin esos datos.',
     inputSchema: z.object({ text: z.string().trim().min(20).max(12000) }),
     async buildContext(user, input) {
-      return { data: { text: redactPersonalData(input.text) }, findings: detectPersonalData(input.text) };
+      // El modelo recibe el texto ya sin los datos detectados; los hallazgos viajan solo como tipo y muestra enmascarada.
+      return { data: { text: redactPersonalData(input.text, { links: false }) }, findings: detectPersonalData(input.text) };
     },
     system: 'Eres un oficial de cumplimiento de la Ley 8968 de Costa Rica. Detectas datos personales y sensibles y explicas el riesgo y cómo corregirlo.',
     prompt: ({ data, findings }) => `<dato>Hallazgos automáticos: ${asData(JSON.stringify(findings))}</dato>\n<dato>Texto:\n${asData(data.text)}</dato>\nFormato: {"riskLevel":"bajo|medio|alto","issues":[{"type":"...","detail":"...","fix":"..."}],"summary":"..."}`,
@@ -169,7 +175,7 @@ export const AGENTS = {
     roles: ['teacher', 'institution_admin'],
     inputs: ['Curso', 'Indicación', 'Tono', 'Formato'],
     provider: PROVIDER,
-    privacy: 'Envía solo la indicación y el nombre del curso.',
+    privacy: 'Envía la indicación (con cédulas, teléfonos y correos ocultos) y el nombre del curso.',
     inputSchema: z.object({
       courseId: id,
       brief: z.string().trim().min(10).max(1000),
@@ -178,7 +184,7 @@ export const AGENTS = {
     }),
     async buildContext(user, input) {
       const { course } = await getCourseAccess(user, input.courseId, { write: true });
-      return { courseId: course.id, data: { course: course.title, ...input } };
+      return { courseId: course.id, data: { course: course.title, ...input, brief: redactPersonalData(input.brief, { links: false }) } };
     },
     system: 'Eres un redactor educativo. Escribes textos breves, claros e inclusivos, sin inventar fechas ni datos que no estén en la indicación.',
     prompt: ({ data }) => `<dato>Curso: ${asData(data.course)}\nIndicación: ${asData(data.brief)}\nTono: ${data.tone}\nFormato: ${data.format === 'redes' ? 'publicación para redes (máximo 280 caracteres) con 2 o 3 etiquetas' : 'anuncio para el curso'}</dato>\nFormato: {"title":"...","body":"...","hashtags":["..."]}`,
@@ -216,11 +222,13 @@ export const AGENTS = {
       };
     },
     system: 'Eres un coach de estudio amable y concreto. Priorizas temas con menor dominio y entregas cercanas, y respetas el tiempo disponible.',
-    prompt: ({ data }) => `<dato>${asData(JSON.stringify(data))}</dato>\nFormato: {"plan":[{"minutes":10,"activity":"...","why":"..."}],"motivation":"..."}`,
+    prompt: ({ data }) => `<dato>${asData(JSON.stringify(data))}</dato>\nLa suma de los minutos del plan no puede superar ${data.minutes}.\nFormato: {"plan":[{"minutes":10,"activity":"...","why":"..."}],"motivation":"..."}`,
     outputSchema: z.object({
       plan: z.array(z.object({ minutes: z.number().int().min(1).max(240), activity: z.string().max(300), why: z.string().max(300) })).min(1).max(8),
       motivation: z.string().max(500),
     }),
+    // El modelo puede pasarse del tiempo disponible: el servidor recorta el plan para que la suma nunca lo supere.
+    finalize: (result, { data }) => fitPlanToBudget(result, data.minutes),
   },
 
   // 8. Resumen de lección con preguntas de autoevaluación.
@@ -251,17 +259,24 @@ export const AGENTS = {
   },
 };
 
-// Patrones de datos personales comunes en Costa Rica (detección determinista, previa al modelo).
-const PATTERNS = [
-  { type: 'cédula', regex: /(?<![\d-])[1-9]-?\d{4}-?\d{4}(?![\d-])/g },
-  { type: 'teléfono', regex: /(?<![\d-])(?:\+?506[\s-]?)?[2-8]\d{3}[\s-]?\d{4}(?![\d-])/g },
-  { type: 'correo', regex: /\b[\w.+-]+@[\w-]+\.[\w.]+\b/g },
-];
+export { detectPersonalData };
 
-export function detectPersonalData(text) {
-  return PATTERNS.flatMap(({ type, regex }) => [...String(text).matchAll(regex)].map((match) => ({
-    type,
-    // Se enmascara el valor para no repetirlo completo.
-    sample: `${match[0].slice(0, 2)}…${match[0].slice(-2)}`,
-  }))).slice(0, 20);
+// Recorta un plan de estudio al tiempo disponible: conserva el orden propuesto, acorta la actividad que
+// cruza el límite si le quedan al menos 5 minutos y descarta el resto. Informa si hubo ajuste.
+export function fitPlanToBudget(result, budget) {
+  const plan = [];
+  let used = 0;
+  for (const item of result.plan) {
+    const left = budget - used;
+    if (left <= 0) break;
+    if (item.minutes <= left) {
+      plan.push(item);
+      used += item.minutes;
+    } else if (left >= 5 || plan.length === 0) {
+      plan.push({ ...item, minutes: left });
+      used += left;
+    }
+  }
+  const proposed = result.plan.reduce((total, item) => total + item.minutes, 0);
+  return { ...result, plan, totalMinutes: used, budgetMinutes: budget, adjusted: proposed > budget };
 }

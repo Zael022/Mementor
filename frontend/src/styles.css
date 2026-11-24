@@ -90,7 +90,7 @@ code { background: var(--cielo); padding: 1px 6px; border-radius: 6px; font-size
 /* El logo oficial se muestra tal cual; solo se ajusta su alto. */
 .marca img { display: block; width: auto; height: 44px; }
 .portada .marca img { height: 50px; }
-@media (max-width: 560px) { .marca img { height: 36px; } }
+@media (max-width: 560px) { .marca img { height: 38px; } }
 /* Íconos de línea con un tono suave de relleno. */
 .icono { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .icono .icono-tono { fill: currentColor; fill-opacity: 0.16; stroke: none; }
@@ -429,6 +429,10 @@ html[data-movimiento="reducido"] .confeti { display: none; }
 .estado-borrador { font-weight: 500; color: var(--tenue); font-size: 0.85rem; }
 .boton-texto { background: none; border: 0; padding: 4px 0; min-height: 24px; min-width: 24px; margin-top: 2px; color: var(--enlace); font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .boton-texto:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; border-radius: 4px; }
+/* Buscador de una lista: ancho cómodo de lectura. */
+.buscador { max-width: 440px; margin: 18px 0 6px; }
+/* Enlaces sueltos que se tocan con el dedo: al menos 24 px de alto efectivo (WCAG 2.5.8). */
+.enlace-tactil { display: inline-flex; align-items: center; min-height: 24px; padding: 4px 0; }
 .citas-resto { overflow: hidden; margin: 2px 0 0; padding-left: 18px; }
 
 /* Carga de archivos (adaptación de File Upload de Aceternity UI) */
@@ -807,6 +811,13 @@ img.con-foto { object-fit: cover; background: var(--suave-neutro); padding: 0; }
 .casilla input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--azul); flex: none; }
 .dialogo-consentimiento { max-width: 520px; border: 0; border-radius: var(--radio-grande); padding: 26px; box-shadow: var(--sombra-alta); background: var(--panel); color: var(--tinta); }
 .dialogo-consentimiento::backdrop { background: rgba(20, 25, 61, 0.5); }
+/* Privacidad y datos: bloques separados, con el título, el texto y el botón agrupados. */
+.privacidad-bloque { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-block: 18px; }
+.privacidad-bloque + .privacidad-bloque { border-top: 1px solid var(--linea); }
+.privacidad-bloque:last-child { padding-bottom: 0; }
+.privacidad-bloque > h3, .privacidad-bloque > p { margin: 0; }
+.privacidad-bloque > .lista-simple, .privacidad-bloque > .zona-peligro { align-self: stretch; margin: 0; }
+.boton.peligro.contorno { border-color: color-mix(in srgb, var(--error) 55%, transparent); padding-inline: 20px; }
 .zona-peligro { border: 2px solid #f3c2bd; background: color-mix(in srgb, var(--error) 6%, var(--panel)); border-radius: var(--radio); padding: 16px 18px; }
 
 /* ===== Asistentes de IA ===== */

@@ -16,6 +16,7 @@ export default function PrivacidadDatos() {
   const consentimientos = useDatos('/me/consents');
   const [abierto, setAbierto] = useState(false);
   const [formulario, setFormulario] = useState({ password: '', reason: '', confirm: false });
+  const [recibida, setRecibida] = useState(false);
   const { enviando, error, ejecutar } = useEnvio();
   const descarga = useEnvio();
 
@@ -36,8 +37,14 @@ export default function PrivacidadDatos() {
       password: formulario.password, confirm: formulario.confirm, ...(formulario.reason ? { reason: formulario.reason } : {}),
     }));
     if (!respuesta) return;
-    sesionEliminada();
-    navegar(respuesta.data.status === 'completed' ? '/cuenta-eliminada' : '/login', { replace: true });
+    // La sesión solo se da por cerrada cuando el servidor confirma que la baja terminó.
+    if (respuesta.data.status === 'completed') {
+      sesionEliminada();
+      navegar('/cuenta-eliminada', { replace: true });
+      return;
+    }
+    setAbierto(false);
+    setRecibida(true);
   }
 
   const puedeDarseDeBaja = usuario.role !== 'platform_admin';
@@ -45,6 +52,8 @@ export default function PrivacidadDatos() {
   return (
     <section className="tarjeta" aria-labelledby="titulo-privacidad">
       <h2 id="titulo-privacidad">Privacidad y datos</h2>
+      {/* Cada tema va en su propio bloque, separado por una línea, con su texto y su botón juntos. */}
+      <div className="privacidad-bloque">
       <h3>Documentos aceptados</h3>
       <ul className="lista-simple">
         {consentimientos.datos?.history?.map((item) => (
@@ -54,17 +63,28 @@ export default function PrivacidadDatos() {
           </li>
         ))}
       </ul>
+      </div>
 
+      <div className="privacidad-bloque">
       <h3>Copia de mis datos</h3>
-      <p className="tenue pequeno">Descarga en formato JSON los datos personales que MENTOR AI guarda sobre ti.</p>
+      <p className="tenue pequeno">
+        Descarga en formato JSON tu perfil, las aceptaciones y tus datos de aprendizaje: cursos, evaluaciones, entregas,
+        calificaciones, progreso, planes, repasos, prácticas, comentarios y conversaciones con el tutor. La bitácora de
+        seguridad y los registros técnicos se piden a la administración de tu institución.
+      </p>
       <button type="button" className="boton secundario" onClick={descargar} disabled={descarga.enviando}>Descargar mis datos</button>
       <MensajeError error={descarga.error} />
+      </div>
 
       {puedeDarseDeBaja && (
-        <>
+        <div className="privacidad-bloque">
           <h3>Eliminar mi cuenta</h3>
+          <p className="tenue pequeno">Borra tus datos personales de forma definitiva. Antes de confirmar verás qué se borra y qué se conserva.</p>
+          {recibida && (
+            <p className="aviso info" role="status">Recibimos tu solicitud, pero todavía no terminó. Tu cuenta sigue activa hasta que se complete; te avisaremos por correo.</p>
+          )}
           {!abierto ? (
-            <button type="button" className="boton peligro" onClick={() => setAbierto(true)}>Solicitar la eliminación de mi cuenta</button>
+            <button type="button" className="boton peligro contorno" onClick={() => setAbierto(true)}>Solicitar la eliminación de mi cuenta</button>
           ) : (
             <form className="zona-peligro" onSubmit={eliminar}>
               <p><strong>Qué pasa al eliminar tu cuenta:</strong></p>
@@ -82,12 +102,12 @@ export default function PrivacidadDatos() {
               </label>
               <MensajeError error={error} />
               <div className="acciones">
-                <button type="submit" className="boton peligro" disabled={enviando || !formulario.confirm}>Eliminar mi cuenta</button>
+                <button type="submit" className="boton peligro contorno" disabled={enviando || !formulario.confirm}>Eliminar mi cuenta</button>
                 <button type="button" className="boton secundario" onClick={() => setAbierto(false)}>Cancelar</button>
               </div>
             </form>
           )}
-        </>
+        </div>
       )}
     </section>
   );

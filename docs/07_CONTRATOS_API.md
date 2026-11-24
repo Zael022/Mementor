@@ -6,6 +6,9 @@ Prefijo: `/api/v1`. JSON: `{ "data": ... , "meta": ... }` éxito; `{ "error": {"
 | Método | Ruta | Acceso | Operación |
 |---|---|---|---|
 | GET | `/health` | Público | API+DB salud sin credenciales |
+| GET | `/ops/metrics` | Cuenta de la plataforma | Latencia p50/p95/p99, errores 4xx/5xx y rutas más lentas de la instancia |
+| GET | `/integrations/daily-reminders?after=&limit=` | n8n (`x-integration-key`) | Página de recordatorios; `meta.nextCursor` hasta `null`; excluye enviados hoy y a quien los apagó |
+| POST | `/integrations/daily-reminders/deliveries` | n8n (`x-integration-key`) | `{ day, results: [{ userId, status }] }`; un enviado no vuelve a fallido |
 | POST | `/auth/login` | Público | Crear sesión |
 | POST | `/auth/logout` | Autenticado | Cerrar sesión |
 | GET | `/auth/me` | Autenticado | Perfil y rol actuales |
@@ -51,7 +54,9 @@ Prefijo: `/api/v1`. JSON: `{ "data": ... , "meta": ... }` éxito; `{ "error": {"
 | POST | `/topics/:topicId/reviews` | Estudiante matriculado; solo si el repaso ya toca (`409 REVIEW_NOT_DUE`) |
 | GET/PATCH | `/me/preferences` | Cualquier cuenta (solo las propias) |
 | GET/PATCH | `/me/profile` | Datos personales propios |
-| POST | `/me/password` · `/me/email` | Propia cuenta, con la contraseña actual |
+| POST | `/me/password` | Propia cuenta, con la contraseña actual |
+| POST | `/me/email` | Propia cuenta, con la contraseña actual; responde `{ pending, newEmail, expiresInMinutes }` y envía el enlace a la nueva dirección |
+| POST | `/auth/email/confirm` | Público con el token del enlace (un uso, 60 min); `409 EMAIL_IN_USE` si otra cuenta tomó la dirección |
 | POST/DELETE | `/me/avatar` | Foto propia (multipart `avatar`) |
 | GET | `/users/:id/avatar` | Misma institución o la propia persona |
 | GET | `/teacher/courses/:id/analytics` | Docente asignado |

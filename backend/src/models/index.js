@@ -15,9 +15,10 @@ import {
   CourseRagCorpus, KnowledgeSource, SourceVersion, AiMessageSource, InstitutionDriveFolder, CourseDriveLink, AiUsageEvent,
 } from './Knowledge.js';
 import { PasswordReset } from './PasswordReset.js';
+import { EmailChange } from './EmailChange.js';
 import { ConsentRecord, DataDeletionRequest } from './Governance.js';
 import { AgentRun } from './AgentRun.js';
-import { ExchangeRate, IntegrationRun } from './Integration.js';
+import { ExchangeRate, IntegrationRun, ReminderDelivery } from './Integration.js';
 import {
   CourseGradePolicy, ClassWorkItem, ClassWorkGrade, QuickQuiz, QuickQuizQuestion, QuickQuizOption, QuizPlay, QuizPlayAnswer,
   DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent,
@@ -138,6 +139,6 @@ export {
   Assessment, Question, QuestionOption, AssessmentAttempt, AttemptAnswer,
   TopicMastery, LearningRecommendation, AiThread, AiMessage, AuditLog,
   CourseGradePolicy, ClassWorkItem, ClassWorkGrade, QuickQuiz, QuickQuizQuestion, QuickQuizOption, QuizPlay, QuizPlayAnswer,
-  DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent, PasswordReset,
-  ConsentRecord, DataDeletionRequest, AgentRun, ExchangeRate, IntegrationRun, Role,
+  DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent, PasswordReset, EmailChange,
+  ConsentRecord, DataDeletionRequest, AgentRun, ExchangeRate, IntegrationRun, ReminderDelivery, Role,
 };

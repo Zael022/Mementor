@@ -1,6 +1,6 @@
 # Diccionario de datos de MENTOR AI
 
-Generado por `backend/src/scripts/exportDataModel.js` desde una base aislada migrada: 70 tablas, 689 columnas, 148 llaves foráneas. No contiene datos de personas.
+Generado por `backend/src/scripts/exportDataModel.js` desde una base aislada migrada: 74 tablas, 725 columnas, 154 llaves foráneas. No contiene datos de personas.
 
 ## Gobernanza y bitácoras
 
@@ -123,6 +123,20 @@ Contadores compartidos de límites por IP (varias instancias).
 | `rate_key` | `varchar(255)` | No | PRI | Clave del límite de solicitudes. |
 | `hits` | `int` | No |  | Cantidad de solicitudes en la ventana. |
 | `reset_at` | `datetime(3)` | No | MUL | Momento en que se reinicia el contador. |
+
+### `reminder_deliveries`
+
+Recordatorios diarios enviados o fallidos por persona y día (evita repetirlos al reintentar).
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PRI | Identificador único (llave primaria). |
+| `user_id` | `bigint unsigned` | No | FK → users.id | Referencia a users.id (llave foránea). |
+| `reminder_day` | `date` | No |  | Día del recordatorio (AAAA-MM-DD). |
+| `status` | `enum('sent','failed')` | No |  | Estado del registro. |
+| `attempts` | `int unsigned` | No |  | Intentos de envío registrados. |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
 
 ## Tutor IA, fuentes e integraciones
 
@@ -458,6 +472,7 @@ Materiales del curso (archivos o enlaces).
 | `stored_name` | `varchar(120)` | Sí |  | Nombre interno del archivo guardado. |
 | `mime_type` | `varchar(120)` | Sí |  | Tipo de archivo (MIME). |
 | `size_bytes` | `int` | Sí |  | Tamaño en bytes. |
+| `content_sha256` | `char(64)` | Sí |  | Huella SHA-256 del archivo original para comprobar que una descarga o restauración es idéntica. |
 | `uploaded_by` | `bigint unsigned` | No | FK → users.id | Referencia a users.id (llave foránea). |
 | `created_at` | `datetime` | No |  | Fecha y hora de creación. |
 | `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
@@ -1093,6 +1108,21 @@ Persistencia institucional de stage events.
 
 ## Seguridad e identidad
 
+### `email_changes`
+
+Cambios de correo pendientes de confirmar desde la nueva dirección (solo el hash del token).
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PRI | Identificador único (llave primaria). |
+| `user_id` | `bigint unsigned` | No | FK → users.id | Referencia a users.id (llave foránea). |
+| `new_email` | `varchar(190)` | No |  | Correo nuevo que se aplica al confirmar el enlace. |
+| `token_hash` | `char(64)` | No | UNI | Hash SHA-256 del token (nunca el token). |
+| `expires_at` | `datetime` | No |  | Fecha de vencimiento. |
+| `used_at` | `datetime` | Sí |  | Fecha en que se usó. |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+
 ### `institutions`
 
 Instituciones educativas (aislamiento de datos) y sus topes de uso.
@@ -1152,6 +1182,7 @@ Preferencias de apariencia, accesibilidad y metas de cada persona.
 | `practice_size` | `tinyint` | No |  | Cantidad de preguntas de la práctica diaria. |
 | `created_at` | `datetime` | No |  | Fecha y hora de creación. |
 | `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+| `email_reminders` | `tinyint(1)` | No |  | Si la persona quiere recibir recordatorios por correo. |
 
 ### `user_sessions`
 
@@ -1194,3 +1225,38 @@ Personas que usan la plataforma, su rol, institución y datos de perfil.
 | `avatar_file` | `varchar(64)` | Sí |  | Nombre interno del archivo de la foto de perfil. |
 | `avatar_updated_at` | `datetime` | Sí |  | Fecha del último cambio de foto. |
 | `anonymized_at` | `datetime` | Sí |  | Fecha en que se anonimizó la cuenta tras la baja. |
+
+## Operación
+
+### `platform_crm_accounts`
+
+Persistencia institucional de platform accounts.
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PRI | id |
+| `institution_id` | `bigint unsigned` | No | FK → institutions.id | Referencia a institutions.id. |
+| `responsible_id` | `bigint unsigned` | No | FK → users.id | Referencia a users.id. |
+| `onboarding_status` | `varchar(24)` | No |  | onboarding status |
+| `needs` | `varchar(2000)` | Sí |  | needs |
+| `next_review_at` | `datetime` | Sí |  | next review at |
+| `version` | `int` | No |  | version |
+| `created_at` | `datetime` | No |  | created at |
+| `updated_at` | `datetime` | No |  | updated at |
+
+### `platform_crm_contacts`
+
+Persistencia institucional de platform contacts.
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PRI | id |
+| `account_id` | `bigint unsigned` | No | FK → platform_crm_accounts.id | Referencia a platform_crm_accounts.id. |
+| `name` | `varchar(120)` | No |  | name |
+| `position` | `varchar(120)` | Sí |  | position |
+| `email` | `varchar(190)` | Sí |  | email |
+| `phone` | `varchar(30)` | Sí |  | phone |
+| `request_key` | `varchar(36)` | No |  | request key |
+| `actor_id` | `bigint unsigned` | No | FK → users.id | Referencia a users.id. |
+| `created_at` | `datetime` | No |  | created at |
+| `updated_at` | `datetime` | No |  | updated at |

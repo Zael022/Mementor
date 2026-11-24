@@ -31,21 +31,28 @@ export async function requestReset(email) {
 }
 
 // Cambia la contraseña con un token vigente y cierra todas las sesiones abiertas.
+// El token se consume con una actualización condicionada dentro de la transacción: si dos solicitudes
+// llegan a la vez con el mismo enlace, solo una afecta la fila y la otra recibe el mismo error que un enlace usado.
 export async function resetPassword({ token, password }) {
   assertStrongPassword(password);
   const passwordHash = await hashPassword(password);
+  const tokenHash = hashToken(token);
+  const failure = () => invalid('El enlace no es válido o ya venció. Solicita uno nuevo.');
   await sequelize.transaction(async (transaction) => {
-    const reset = await PasswordReset.findOne({
-      where: { tokenHash: hashToken(token), usedAt: null, expiresAt: { [Op.gt]: new Date() } },
-      transaction, lock: transaction.LOCK.UPDATE,
-    });
-    const user = reset ? await User.findByPk(reset.userId, { transaction, lock: transaction.LOCK.UPDATE }) : null;
-    if (!user || user.status !== 'active') throw invalid('El enlace no es válido o ya venció. Solicita uno nuevo.');
+    const now = new Date();
+    const reset = await PasswordReset.findOne({ where: { tokenHash }, lock: transaction.LOCK.UPDATE, transaction });
+    if (!reset) throw failure();
+    const [consumed] = await PasswordReset.update(
+      { usedAt: now },
+      { where: { id: reset.id, usedAt: null, expiresAt: { [Op.gt]: now } }, transaction },
+    );
+    if (consumed !== 1) throw failure();
+    const user = await User.findByPk(reset.userId, { lock: transaction.LOCK.UPDATE, transaction });
+    if (!user || user.status !== 'active') throw failure();
     await user.update({ passwordHash, failedLoginCount: 0, lockedUntil: null }, { transaction });
-    await reset.update({ usedAt: new Date() }, { transaction });
     // Invalida otros enlaces pendientes y las sesiones, por si alguien más tenía acceso.
-    await PasswordReset.update({ usedAt: new Date() }, { where: { userId: user.id, usedAt: null }, transaction });
-    await UserSession.update({ revokedAt: new Date() }, { where: { userId: user.id, revokedAt: null }, transaction });
+    await PasswordReset.update({ usedAt: now }, { where: { userId: user.id, usedAt: null }, transaction });
+    await UserSession.update({ revokedAt: now }, { where: { userId: user.id, revokedAt: null }, transaction });
     await recordAudit({ actor: user, action: 'auth.password_reset', resourceType: 'user', resourceId: user.id, transaction });
   });
 }

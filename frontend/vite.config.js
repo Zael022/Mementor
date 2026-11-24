@@ -1,5 +1,13 @@
+import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+
+// Los encabezados de seguridad (CSP incluida) se definen una sola vez en vercel.json;
+// «vite preview» los repite para probar la compilación con la misma política que producción.
+const vercel = JSON.parse(readFileSync(new URL('./vercel.json', import.meta.url), 'utf8'));
+const encabezadosSeguridad = Object.fromEntries(vercel.headers[0].headers.map(({ key, value }) => [key, value]));
+// En local no hay HTTPS: se quita solo la directiva que obliga a usarlo.
+encabezadosSeguridad['Content-Security-Policy'] = encabezadosSeguridad['Content-Security-Policy'].replace(/;\s*upgrade-insecure-requests/, '');
 
 // Configura el servidor de desarrollo.
 export default defineConfig({
@@ -7,6 +15,10 @@ export default defineConfig({
   server: {
     port: 5173,
     // VITE_API_PROXY permite apuntar a otro backend (por ejemplo, el de las pruebas en navegador).
+    proxy: { '/api': process.env.VITE_API_PROXY || 'http://localhost:3001' },
+  },
+  preview: {
+    headers: encabezadosSeguridad,
     proxy: { '/api': process.env.VITE_API_PROXY || 'http://localhost:3001' },
   },
   build: {

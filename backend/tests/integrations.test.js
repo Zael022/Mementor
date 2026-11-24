@@ -2,7 +2,9 @@ import test, { before, after, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
 import app from '../src/app.js';
-import { AgentRun, DataDeletionRequest, ExchangeRate, IntegrationRun, User } from '../src/models/index.js';
+import { AgentRun, DataDeletionRequest, ExchangeRate, IntegrationRun, ReminderDelivery, User, sequelize } from '../src/models/index.js';
+import { reconcilePendingDeletions } from '../src/services/governanceService.js';
+import { sentInTests } from '../src/services/mailService.js';
 import { parseHacienda } from '../src/services/external/exchangeRateService.js';
 import { setExternalFetchForTests } from '../src/services/external/httpClient.js';
 import { clearHolidayCache } from '../src/services/external/holidayService.js';
@@ -123,32 +125,126 @@ test('recordatorios diarios: solo estudiantes con tareas próximas sin entregar'
   await ctx.org.student.post(`/assignments/${tarea.body.data.id}/submission`, { body: 'Listo' });
   const despues = await request(app).get('/api/v1/integrations/daily-reminders').set('x-integration-key', KEY);
   assert.equal(despues.body.data.some((item) => item.email === ctx.org.student.user.email), false);
+
+  // H-05: la copia de datos incluye lo académico propio y nada de otras personas.
+  const copia = (await ctx.org.student.get('/me/data-export')).body.data;
+  assert.match(copia.scope, /datos de aprendizaje/);
+  assert.deepEqual(copia.learning.assignmentSubmissions.map((row) => [row.assignment, row.body]), [['Mapa conceptual', 'Listo']]);
+  assert.ok(copia.learning.courses.length >= 1);
+  assert.equal('gradedBy' in copia.learning.assignmentSubmissions[0], false);
+  const docente = (await ctx.org.teacher.get('/me/data-export')).body.data;
+  assert.deepEqual(docente.learning.assignmentSubmissions, []);
 });
 
-test('workflow de baja: n8n recibe el aviso, procesa la baja y registra la confirmación', async () => {
+test('recordatorios por páginas: nadie queda fuera, no se repiten al reintentar y se pueden desactivar', async () => {
+  const otros = [];
+  for (const n of [1, 2, 3]) {
+    const persona = await ctx.org.invite(ctx.org.admin, '/users', { email: `recordar${n}@prueba.test`, displayName: `Recordar ${n}`, role: 'student' });
+    await ctx.org.teacher.post(`/courses/${ctx.course.courseId}/enrollments`, { studentId: persona.user.id });
+    otros.push(persona);
+  }
+  const tarea = await ctx.org.teacher.post(`/courses/${ctx.course.courseId}/assignments`, {
+    title: 'Ensayo corto', instructions: 'Entregar.', dueAt: new Date(Date.now() + 5 * 3600000).toISOString(),
+  });
+  await ctx.org.teacher.patch(`/assignments/${tarea.body.data.id}`, { status: 'published' });
+  // La tercera persona apaga los recordatorios desde su configuración.
+  assert.equal((await otros[2].patch('/me/preferences', { emailReminders: false })).status, 200);
+
+  const pedir = (query) => request(app).get(`/api/v1/integrations/daily-reminders${query}`).set('x-integration-key', KEY);
+  assert.equal((await pedir('?limit=0')).status, 422);
+  assert.equal((await pedir('?after=-1')).status, 422);
+  const correos = [];
+  let cursor = 0;
+  let paginas = 0;
+  do {
+    const pagina = await pedir(`?after=${cursor}&limit=1`);
+    assert.equal(pagina.status, 200);
+    correos.push(...pagina.body.data.map((item) => item.email));
+    cursor = pagina.body.meta.nextCursor;
+    paginas += 1;
+  } while (cursor && paginas < 20);
+  assert.ok(paginas >= 3);
+  assert.ok(correos.includes('recordar1@prueba.test') && correos.includes('recordar2@prueba.test'));
+  assert.equal(correos.includes('recordar3@prueba.test'), false);
+  assert.equal(new Set(correos).size, correos.length);
+
+  // n8n informa: uno salió y otro falló. El que salió no vuelve a aparecer hoy; el fallido sí, para reintentar.
+  const todos = (await pedir('?limit=500')).body;
+  const dia = todos.meta.day;
+  const [uno, dos] = [otros[0].user.id, otros[1].user.id];
+  const registro = await request(app).post('/api/v1/integrations/daily-reminders/deliveries').set('x-integration-key', KEY)
+    .send({ day: dia, results: [{ userId: uno, status: 'sent' }, { userId: dos, status: 'failed' }] });
+  assert.equal(registro.status, 200, JSON.stringify(registro.body));
+  assert.deepEqual(registro.body.data, { recorded: 2, sent: 1, failed: 1 });
+  const reintento = (await pedir('?limit=500')).body.data.map((item) => item.userId);
+  assert.equal(reintento.includes(uno), false);
+  assert.equal(reintento.includes(dos), true);
+  // Repetir el aviso no convierte un envío en fallo.
+  await request(app).post('/api/v1/integrations/daily-reminders/deliveries').set('x-integration-key', KEY)
+    .send({ day: dia, results: [{ userId: uno, status: 'failed' }] });
+  const fila = await ReminderDelivery.findOne({ where: { userId: uno, reminderDay: dia } });
+  assert.deepEqual([fila.status, fila.attempts], ['sent', 2]);
+  assert.equal((await request(app).post('/api/v1/integrations/daily-reminders/deliveries').set('x-integration-key', KEY)
+    .send({ day: '2026-02-31', results: [{ userId: uno, status: 'sent' }] })).status, 422);
+});
+
+test('workflow de baja: la baja se completa en el servidor y n8n solo confirma y avisa', async () => {
   const usuario = await ctx.org.invite(ctx.org.admin, '/users', { email: 'baja.n8n@prueba.test', displayName: 'Baja N8n', role: 'student' });
   process.env.DELETION_PROCESSOR = 'n8n';
   process.env.N8N_DELETION_WEBHOOK_URL = 'http://n8n.prueba.invalid/webhook/baja';
   const fetchReal = global.fetch;
   let aviso;
+  // El webhook de n8n responde 200 al recibir, antes de ejecutar el resto del workflow.
   global.fetch = async (url, opciones) => { aviso = { url, body: JSON.parse(opciones.body), key: opciones.headers['x-integration-key'] }; return respuesta({ ok: true }); };
   try {
     const solicitud = await usuario.post('/me/deletion-request', { password: PASSWORD, confirm: true });
     assert.equal(solicitud.status, 202, JSON.stringify(solicitud.body));
-    assert.equal(solicitud.body.data.status, 'pending');
+    // Aunque el workflow fallara después de responder, la cuenta ya está anonimizada y la sesión cerrada.
+    assert.equal(solicitud.body.data.status, 'completed');
+    assert.equal(solicitud.body.data.notificationStatus, null);
     assert.deepEqual([aviso.body.email, aviso.key], ['baja.n8n@prueba.test', KEY]);
+    assert.equal((await User.findByPk(usuario.user.id)).displayName, 'Usuario eliminado');
+    assert.equal((await usuario.get('/auth/me')).status, 401);
 
+    // n8n confirma (idempotente) y registra el correo enviado.
     const procesada = await request(app).post(`/api/v1/integrations/deletion-requests/${aviso.body.requestId}/process`).set('x-integration-key', KEY);
     assert.equal(procesada.body.data.status, 'completed');
-    assert.equal(procesada.body.data.processedVia, 'n8n');
+    assert.equal(procesada.body.data.processedVia, 'app');
     const notificada = await request(app).post(`/api/v1/integrations/deletion-requests/${aviso.body.requestId}/notified`).set('x-integration-key', KEY).send({ status: 'sent' });
     assert.equal(notificada.body.data.notificationStatus, 'sent');
-    const fila = await User.findByPk(usuario.user.id);
-    assert.equal(fila.displayName, 'Usuario eliminado');
-    assert.equal((await DataDeletionRequest.findByPk(aviso.body.requestId)).processedVia, 'n8n');
   } finally {
     global.fetch = fetchReal;
     delete process.env.DELETION_PROCESSOR;
     delete process.env.N8N_DELETION_WEBHOOK_URL;
   }
+});
+
+test('si n8n no responde, la baja igual se completa y el aviso sale desde el servidor', async () => {
+  const usuario = await ctx.org.invite(ctx.org.admin, '/users', { email: 'baja.caida@prueba.test', displayName: 'Baja Caída', role: 'student' });
+  process.env.DELETION_PROCESSOR = 'n8n';
+  process.env.N8N_DELETION_WEBHOOK_URL = 'http://n8n.prueba.invalid/webhook/baja';
+  const fetchReal = global.fetch;
+  global.fetch = async () => { throw new Error('ECONNREFUSED'); };
+  sentInTests.length = 0;
+  try {
+    const solicitud = await usuario.post('/me/deletion-request', { password: PASSWORD, confirm: true });
+    assert.equal(solicitud.body.data.status, 'completed');
+    assert.equal(solicitud.body.data.notificationStatus, 'sent');
+    assert.ok(sentInTests.some((m) => m.to === 'baja.caida@prueba.test'));
+  } finally {
+    global.fetch = fetchReal;
+    delete process.env.DELETION_PROCESSOR;
+    delete process.env.N8N_DELETION_WEBHOOK_URL;
+  }
+});
+
+test('una solicitud de baja que quedó pendiente se completa en la conciliación diaria', async () => {
+  const usuario = await ctx.org.invite(ctx.org.admin, '/users', { email: 'baja.pendiente@prueba.test', displayName: 'Baja Pendiente', role: 'student' });
+  // Simula una baja interrumpida: la solicitud existe, pero la cuenta sigue intacta.
+  const fila = await DataDeletionRequest.create({ userId: usuario.user.id, institutionId: usuario.user.institutionId, identityConfirmedAt: new Date() });
+  await sequelize.query('UPDATE data_deletion_requests SET created_at = NOW() - INTERVAL 1 HOUR WHERE id = :id', { replacements: { id: fila.id } });
+  assert.equal(await reconcilePendingDeletions(), 1);
+  assert.equal((await DataDeletionRequest.findByPk(fila.id)).status, 'completed');
+  assert.equal((await User.findByPk(usuario.user.id)).displayName, 'Usuario eliminado');
+  assert.equal(await reconcilePendingDeletions(), 0);
 });

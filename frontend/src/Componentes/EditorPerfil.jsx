@@ -118,9 +118,9 @@ export function DatosPersonales() {
   );
 }
 
-// Correo de acceso: se confirma con la contraseña actual.
+// Correo de acceso: se pide con la contraseña actual y se aplica al confirmar desde la nueva dirección.
 export function CambiarCorreo() {
-  const { usuario, actualizarUsuario } = useSesion();
+  const { usuario } = useSesion();
   const [correo, setCorreo] = useState('');
   const [clave, setClave] = useState('');
   const [aviso, setAviso] = useState('');
@@ -131,10 +131,9 @@ export function CambiarCorreo() {
     setAviso('');
     const respuesta = await envio.ejecutar(() => api.post('/me/email', { newEmail: correo, currentPassword: clave }));
     if (respuesta) {
-      actualizarUsuario({ email: respuesta.data.email });
       setCorreo('');
       setClave('');
-      setAviso(`Listo. Desde ahora inicias sesión con ${respuesta.data.email}.`);
+      setAviso(`Te enviamos un enlace a ${respuesta.data.newEmail}. Ábrelo en los próximos ${respuesta.data.expiresInMinutes} minutos para terminar el cambio; mientras tanto sigues entrando con tu correo actual.`);
     }
   }
 
@@ -143,7 +142,7 @@ export function CambiarCorreo() {
       <p>Correo actual: <strong>{usuario.email}</strong></p>
       <Campo etiqueta="Nuevo correo" tipo="email" valor={correo} alCambiar={setCorreo} required maxLength={190} autoComplete="email" />
       <Campo etiqueta="Contraseña actual" tipo="password" valor={clave} alCambiar={setClave} required autoComplete="current-password" />
-      <button type="submit" className="boton secundario" disabled={envio.enviando}>Cambiar correo</button>
+      <button type="submit" className="boton secundario" disabled={envio.enviando}>Enviar enlace de confirmación</button>
       <p role="status" className="texto-exito">{aviso}</p>
       <MensajeError error={envio.error} />
     </form>

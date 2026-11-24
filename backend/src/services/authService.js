@@ -114,12 +114,19 @@ export function assertStrongPassword(password) {
 export async function activateAccount({ token, password }) {
   assertStrongPassword(password);
   const passwordHash = await hashPassword(password);
+  const tokenHash = hashToken(token);
+  const failure = () => invalid('El enlace de invitación no es válido o ya venció.');
+  // Activación atómica: la fila se actualiza solo si sigue invitada con ese token vigente; dos envíos simultáneos
+  // no pueden fijar contraseñas distintas.
   return sequelize.transaction(async (transaction) => {
-    const user = await User.findOne({ where: { invitationTokenHash: hashToken(token), status: 'invited' }, transaction, lock: transaction.LOCK.UPDATE });
-    if (!user || !user.invitationExpiresAt || user.invitationExpiresAt <= new Date()) {
-      throw invalid('El enlace de invitación no es válido o ya venció.');
-    }
-    await user.update({ passwordHash, status: 'active', invitationTokenHash: null, invitationExpiresAt: null }, { transaction });
+    const now = new Date();
+    const user = await User.findOne({ where: { invitationTokenHash: tokenHash }, lock: transaction.LOCK.UPDATE, transaction });
+    if (!user) throw failure();
+    const [activated] = await User.update(
+      { passwordHash, status: 'active', invitationTokenHash: null, invitationExpiresAt: null },
+      { where: { id: user.id, invitationTokenHash: tokenHash, status: 'invited', invitationExpiresAt: { [Op.gt]: now } }, transaction },
+    );
+    if (activated !== 1) throw failure();
     await acceptPolicies(user.id, ['terms', 'privacy'], { transaction });
     await recordAudit({ actor: user, action: 'user.activated', resourceType: 'user', resourceId: user.id, transaction });
     return { email: user.email };

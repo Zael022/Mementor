@@ -3,7 +3,10 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { prepareDatabase, closeDatabase, createPlatformAdmin, loginAs, setupInstitution, setupCourse, PASSWORD, request, app } from './helpers.js';
-import { User } from '../src/models/index.js';
+import { EmailChange, User } from '../src/models/index.js';
+import { sentInTests } from '../src/services/mailService.js';
+
+const tokenFrom = (message) => message.text.match(/token=([a-f0-9]{64})/)[1];
 import { avatarDir } from '../src/middlewares/upload.js';
 
 // Datos personales, contraseña, correo y foto de perfil con datos temporales.
@@ -104,15 +107,56 @@ test('cambiar la contraseña exige la actual y cierra las demás sesiones', asyn
   await loginAs(email, NUEVA);
 });
 
-test('cambiar el correo exige la contraseña y un correo libre', async () => {
+test('cambiar el correo exige la contraseña, un correo libre y confirmar desde la nueva dirección', async () => {
   const sesion = await loginAs('companera.perfil@prueba.test', NUEVA);
   assert.equal((await sesion.post('/me/email', { currentPassword: 'equivocada', newEmail: 'nuevo.perfil@prueba.test' })).status, 422);
   const ocupado = await sesion.post('/me/email', { currentPassword: NUEVA, newEmail: ctx.org.teacher.user.email });
   assert.equal(ocupado.status, 409);
   assert.equal(ocupado.body.error.code, 'EMAIL_IN_USE');
 
+  // Una primera solicitud que luego se reemplaza: su enlace deja de servir.
+  sentInTests.length = 0;
+  assert.equal((await sesion.post('/me/email', { currentPassword: NUEVA, newEmail: 'descartado.perfil@prueba.test' })).status, 200);
+  const viejo = tokenFrom(sentInTests.find((m) => m.to === 'descartado.perfil@prueba.test'));
+
+  sentInTests.length = 0;
   const cambio = await sesion.post('/me/email', { currentPassword: NUEVA, newEmail: 'Nuevo.Perfil@Prueba.test' });
   assert.equal(cambio.status, 200, JSON.stringify(cambio.body));
-  assert.equal(cambio.body.data.email, 'nuevo.perfil@prueba.test');
+  assert.deepEqual(cambio.body.data, { pending: true, newEmail: 'nuevo.perfil@prueba.test', expiresInMinutes: 60 });
+  // Mientras no se confirme, el correo de acceso sigue siendo el anterior y se avisó a esa dirección.
+  assert.equal((await sesion.get('/auth/me')).body.data.user.email, 'companera.perfil@prueba.test');
+  assert.ok(sentInTests.some((m) => m.to === 'companera.perfil@prueba.test' && /cambio de correo/i.test(m.subject)));
+  await assert.rejects(loginAs('nuevo.perfil@prueba.test', NUEVA));
+  const token = tokenFrom(sentInTests.find((m) => m.to === 'nuevo.perfil@prueba.test'));
+
+  const anonimo = request(app);
+  assert.equal((await anonimo.post('/api/v1/auth/email/confirm').send({ token: viejo })).status, 422);
+  assert.equal((await anonimo.post('/api/v1/auth/email/confirm').send({ token: 'f'.repeat(64) })).status, 422);
+  const confirmado = await anonimo.post('/api/v1/auth/email/confirm').send({ token });
+  assert.equal(confirmado.status, 200, JSON.stringify(confirmado.body));
+  assert.equal(confirmado.body.data.email, 'nuevo.perfil@prueba.test');
+  assert.equal((await anonimo.post('/api/v1/auth/email/confirm').send({ token })).status, 422);
+  assert.ok(sentInTests.some((m) => m.to === 'companera.perfil@prueba.test' && /cambió/.test(m.subject)));
   await loginAs('nuevo.perfil@prueba.test', NUEVA);
+  await assert.rejects(loginAs('companera.perfil@prueba.test', NUEVA));
+});
+
+test('un enlace de cambio de correo no aplica si otra cuenta tomó la dirección o si venció', async () => {
+  const sesion = await loginAs('nuevo.perfil@prueba.test', NUEVA);
+  sentInTests.length = 0;
+  assert.equal((await sesion.post('/me/email', { currentPassword: NUEVA, newEmail: 'disputado.perfil@prueba.test' })).status, 200);
+  const token = tokenFrom(sentInTests.find((m) => m.to === 'disputado.perfil@prueba.test'));
+  // Otra cuenta queda con esa dirección antes de que se confirme.
+  await User.update({ email: 'disputado.perfil@prueba.test' }, { where: { id: ctx.org.teacher.user.id } });
+  const choque = await request(app).post('/api/v1/auth/email/confirm').send({ token });
+  assert.equal(choque.status, 409);
+  assert.equal((await User.findByPk(ctx.companera.user.id)).email, 'nuevo.perfil@prueba.test');
+  await User.update({ email: ctx.org.teacher.user.email }, { where: { id: ctx.org.teacher.user.id } });
+
+  sentInTests.length = 0;
+  assert.equal((await sesion.post('/me/email', { currentPassword: NUEVA, newEmail: 'tarde.perfil@prueba.test' })).status, 200);
+  const tarde = tokenFrom(sentInTests.find((m) => m.to === 'tarde.perfil@prueba.test'));
+  await EmailChange.update({ expiresAt: new Date(Date.now() - 1000) }, { where: { userId: ctx.companera.user.id, usedAt: null } });
+  assert.equal((await request(app).post('/api/v1/auth/email/confirm').send({ token: tarde })).status, 422);
+  assert.equal((await User.findByPk(ctx.companera.user.id)).email, 'nuevo.perfil@prueba.test');
 });

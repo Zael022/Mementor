@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Campo from '../Componentes/Campo.jsx';
 import EnlaceInvitacion from '../Componentes/EnlaceInvitacion.jsx';
 import EstadoVacio from '../Componentes/EstadoVacio.jsx';
@@ -20,7 +20,14 @@ const nombreRol = (rol) => ROLES.find((opcion) => opcion.valor === rol)?.texto |
 export default function AdminUsuarios() {
   const { usuario } = useSesion();
   const [pagina, setPagina] = useState(1);
-  const usuarios = useDatos(`/users?page=${pagina}&limit=20`);
+  const [busqueda, setBusqueda] = useState('');
+  const [consulta, setConsulta] = useState('');
+  // Espera a que se deje de escribir; el texto viaja codificado en la URL y el servidor lo trata como dato.
+  useEffect(() => {
+    const espera = setTimeout(() => { setConsulta(busqueda.trim()); setPagina(1); }, 300);
+    return () => clearTimeout(espera);
+  }, [busqueda]);
+  const usuarios = useDatos(`/users?page=${pagina}&limit=20${consulta ? `&q=${encodeURIComponent(consulta)}` : ''}`);
   const [formulario, setFormulario] = useState({ email: '', displayName: '', role: 'student' });
   const [invitacion, setInvitacion] = useState(null);
   const [recienInvitado, setRecienInvitado] = useState('');
@@ -58,9 +65,14 @@ export default function AdminUsuarios() {
         <Campo etiqueta="Rol" tipo="select" valor={formulario.role} alCambiar={cambiar('role')} opciones={ROLES} />
         <button type="submit" className="boton" disabled={enviando} aria-busy={enviando}>{enviando ? 'Invitando…' : 'Invitar'}</button>
       </form>
+      <form className="buscador" role="search" onSubmit={(evento) => evento.preventDefault()}>
+        <Campo etiqueta="Buscar por nombre o correo" tipo="search" valor={busqueda} alCambiar={setBusqueda} maxLength={100} />
+      </form>
       <MensajeError error={error || usuarios.error} />
       {usuarios.cargando && <Cargando />}
-      {usuarios.datos?.length === 0 && <EstadoVacio titulo="No hay usuarios todavía" detalle="Invita a docentes y estudiantes con el formulario." />}
+      {usuarios.datos?.length === 0 && (consulta
+        ? <EstadoVacio titulo="Sin resultados" detalle={`Ninguna persona coincide con «${consulta}».`} />
+        : <EstadoVacio titulo="No hay usuarios todavía" detalle="Invita a docentes y estudiantes con el formulario." />)}
       {usuarios.datos?.length > 0 && (
         <div className="tabla-contenedor">
           <table>

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isCalendarDate } from '../utils/dates.js';
 
 // Define las reglas de los datos que recibe la API.
 const text = (max, min = 1) => z.string().trim().min(min, 'Este campo es obligatorio.').max(max, `Máximo ${max} caracteres.`);
@@ -149,7 +150,7 @@ export const gradePolicySchema = z.object({
 export const classWorkItemSchema = z.object({
   title: text(180, 2),
   maxPoints: z.number().int().min(1).max(1000).default(100),
-  workDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha no válida.').nullable().optional(),
+  workDate: z.string().refine(isCalendarDate, 'Fecha no válida (esa fecha no existe en el calendario).').nullable().optional(),
 });
 export const classWorkGradesSchema = z.object({
   grades: z.array(z.object({
@@ -172,7 +173,8 @@ export const passwordChangeSchema = z.object({ currentPassword: z.string().min(1
 export const emailChangeSchema = z.object({ currentPassword: z.string().min(1).max(200), newEmail: email });
 
 // --- Personalización ---
-const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Usa el formato AAAA-MM-DD.');
+// Fecha AAAA-MM-DD que además existe en el calendario.
+const day = z.string().refine(isCalendarDate, 'Usa una fecha real en formato AAAA-MM-DD.');
 const timeZone = z.string().trim().min(1).max(64).regex(/^[A-Za-z0-9_+\-/]+$/, 'Zona horaria no válida.');
 export const preferencesSchema = z.object({
   theme: z.enum(['system', 'light', 'dark']).optional(),
@@ -184,6 +186,7 @@ export const preferencesSchema = z.object({
   timeZone: timeZone.nullable().optional(),
   dailyGoalMinutes: z.number().int().min(10).max(240).nullable().optional(),
   practiceSize: z.union([z.literal(5), z.literal(10), z.literal(15)]).optional(),
+  emailReminders: z.boolean().optional(),
 }).strict().refine((data) => Object.keys(data).length > 0, 'No hay cambios.');
 
 export const selfReviewSchema = z.object({ grade: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]) });
@@ -202,6 +205,12 @@ export const studyPlanItemSchema = z.object({
 
 // Recuperación de contraseña.
 export const forgotPasswordSchema = z.object({ email: z.string().trim().toLowerCase().email('Correo no válido.').max(190) });
+// Resultado de los recordatorios que n8n intentó enviar en una página.
+export const reminderDeliveriesSchema = z.object({
+  day,
+  results: z.array(z.object({ userId: z.number().int().positive(), status: z.enum(['sent', 'failed']) })).min(1).max(500),
+}).strict();
+export const confirmEmailSchema = z.object({ token: z.string().regex(/^[a-f0-9]{64}$/, 'Enlace no válido.') });
 export const resetPasswordSchema = z.object({ token: z.string().regex(/^[a-f0-9]{64}$/, 'Enlace no válido.'), password: z.string().min(10).max(200) });
 
 // Gobernanza de datos.
@@ -214,7 +223,7 @@ export const deletionRequestSchema = z.object({
 
 // Datos que envía n8n.
 export const exchangeRateInSchema = z.object({
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha no válida (AAAA-MM-DD).'),
+  date: z.string().refine(isCalendarDate, 'Fecha no válida (AAAA-MM-DD y que exista en el calendario).'),
   buy: z.number().positive().max(10000),
   sell: z.number().positive().max(10000),
 });

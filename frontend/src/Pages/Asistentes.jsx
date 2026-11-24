@@ -194,6 +194,12 @@ function Resultado({ agente, datos, valores }) {
       {agente === 'study_coach' && (
         <>
           <ol>{r.plan.map((paso) => <li key={paso.activity}><strong>{paso.minutes} min:</strong> {paso.activity} <span className="tenue pequeno">— {paso.why}</span></li>)}</ol>
+          {r.totalMinutes !== undefined && (
+            <p className="tenue pequeno">
+              Total: {r.totalMinutes} de {r.budgetMinutes} min disponibles.
+              {r.adjusted && ' El plan propuesto se pasaba de tu tiempo; se recortó para que quepa.'}
+            </p>
+          )}
           <p className="cita-bloque">{r.motivation}</p>
         </>
       )}

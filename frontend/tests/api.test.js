@@ -36,3 +36,30 @@ it('los comentarios «: ping» del servidor se ignoran y no interrumpen la respu
   await api.stream('/tutor', {}, { onEvento: (name, data) => events.push([name, data]) });
   expect(events).toEqual([['start', { sources: 1 }], ['final', { answer: 'listo' }]]);
 });
+
+// M14: el vencimiento de la sesión se trata igual en una petición normal y en el streaming del tutor.
+it('un 401 avisa la sesión vencida tanto en request como en stream', async () => {
+  const respuesta401 = () => new Response(JSON.stringify({ error: { code: 'UNAUTHENTICATED', message: 'Debes iniciar sesión.' } }), { status: 401, headers: { 'content-type': 'application/json' } });
+  vi.stubGlobal('fetch', vi.fn().mockImplementation(async () => respuesta401()));
+  const vencida = vi.fn();
+  window.addEventListener('mentor:sesion-vencida', vencida);
+  await expect(api.get('/courses')).rejects.toMatchObject({ status: 401 });
+  await expect(api.stream('/tutor/threads/1/messages/stream', {}, { onEvento: () => {} })).rejects.toMatchObject({ status: 401 });
+  window.removeEventListener('mentor:sesion-vencida', vencida);
+  expect(vencida).toHaveBeenCalledTimes(2);
+});
+
+it('un 403 por documentos pendientes vuelve a pedir la aceptación', async () => {
+  const pendientes = [{ document: 'privacy', version: '2026-11-23' }];
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ error: { code: 'CONSENT_REQUIRED', message: 'Antes de continuar debes aceptar.', details: pendientes } }), { status: 403 })));
+  const escucha = vi.fn();
+  window.addEventListener('mentor:consentimiento-pendiente', escucha);
+  await expect(api.post('/courses', {})).rejects.toMatchObject({ code: 'CONSENT_REQUIRED', message: 'Antes de continuar debes aceptar.' });
+  window.removeEventListener('mentor:consentimiento-pendiente', escucha);
+  expect(escucha.mock.calls[0][0].detail).toEqual(pendientes);
+});
+
+it('una página de error del proxy se explica como servicio no disponible', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('<html>Bad gateway</html>', { status: 502 })));
+  await expect(api.post('/auth/login', {})).rejects.toMatchObject({ code: 'SERVICE_UNAVAILABLE', message: expect.stringMatching(/servicio no está disponible/) });
+});

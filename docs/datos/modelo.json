@@ -3809,6 +3809,93 @@
       ]
     },
     {
+      "module": "Seguridad e identidad",
+      "table": "email_changes",
+      "purpose": "Cambios de correo pendientes de confirmar desde la nueva dirección (solo el hash del token).",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint unsigned",
+          "null": false,
+          "key": "PRI",
+          "default": null,
+          "extra": "auto_increment",
+          "purpose": "Identificador único (llave primaria).",
+          "fk": null
+        },
+        {
+          "name": "user_id",
+          "type": "bigint unsigned",
+          "null": false,
+          "key": "MUL",
+          "default": null,
+          "extra": "",
+          "purpose": "Referencia a users.id (llave foránea).",
+          "fk": "users.id"
+        },
+        {
+          "name": "new_email",
+          "type": "varchar(190)",
+          "null": false,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "Correo nuevo que se aplica al confirmar el enlace.",
+          "fk": null
+        },
+        {
+          "name": "token_hash",
+          "type": "char(64)",
+          "null": false,
+          "key": "UNI",
+          "default": null,
+          "extra": "",
+          "purpose": "Hash SHA-256 del token (nunca el token).",
+          "fk": null
+        },
+        {
+          "name": "expires_at",
+          "type": "datetime",
+          "null": false,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "Fecha de vencimiento.",
+          "fk": null
+        },
+        {
+          "name": "used_at",
+          "type": "datetime",
+          "null": true,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "Fecha en que se usó.",
+          "fk": null
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "null": false,
+          "key": "",
+          "default": "CURRENT_TIMESTAMP",
+          "extra": "DEFAULT_GENERATED",
+          "purpose": "Fecha y hora de creación.",
+          "fk": null
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "null": false,
+          "key": "",
+          "default": "CURRENT_TIMESTAMP",
+          "extra": "DEFAULT_GENERATED",
+          "purpose": "Fecha y hora de la última modificación.",
+          "fk": null
+        }
+      ]
+    },
+    {
       "module": "Cursos y contenido",
       "table": "enrollments",
       "purpose": "Relación N:M entre cursos y estudiantes (matrícula).",
@@ -5038,6 +5125,16 @@
           "fk": null
         },
         {
+          "name": "content_sha256",
+          "type": "char(64)",
+          "null": true,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "Huella SHA-256 del archivo original para comprobar que una descarga o restauración es idéntica.",
+          "fk": null
+        },
+        {
           "name": "uploaded_by",
           "type": "bigint unsigned",
           "null": false,
@@ -5209,6 +5306,210 @@
           "default": "CURRENT_TIMESTAMP",
           "extra": "DEFAULT_GENERATED",
           "purpose": "Fecha y hora de la última modificación.",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "module": "Operación",
+      "table": "platform_crm_accounts",
+      "purpose": "Persistencia institucional de platform accounts.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint unsigned",
+          "null": false,
+          "key": "PRI",
+          "default": null,
+          "extra": "auto_increment",
+          "purpose": "id",
+          "fk": null
+        },
+        {
+          "name": "institution_id",
+          "type": "bigint unsigned",
+          "null": false,
+          "key": "UNI",
+          "default": null,
+          "extra": "",
+          "purpose": "Referencia a institutions.id.",
+          "fk": "institutions.id"
+        },
+        {
+          "name": "responsible_id",
+          "type": "bigint unsigned",
+          "null": false,
+          "key": "MUL",
+          "default": null,
+          "extra": "",
+          "purpose": "Referencia a users.id.",
+          "fk": "users.id"
+        },
+        {
+          "name": "onboarding_status",
+          "type": "varchar(24)",
+          "null": false,
+          "key": "",
+          "default": "pending",
+          "extra": "",
+          "purpose": "onboarding status",
+          "fk": null
+        },
+        {
+          "name": "needs",
+          "type": "varchar(2000)",
+          "null": true,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "needs",
+          "fk": null
+        },
+        {
+          "name": "next_review_at",
+          "type": "datetime",
+          "null": true,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "next review at",
+          "fk": null
+        },
+        {
+          "name": "version",
+          "type": "int",
+          "null": false,
+          "key": "",
+          "default": "1",
+          "extra": "",
+          "purpose": "version",
+          "fk": null
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "null": false,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "created at",
+          "fk": null
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "null": false,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "updated at",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "module": "Operación",
+      "table": "platform_crm_contacts",
+      "purpose": "Persistencia institucional de platform contacts.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint unsigned",
+          "null": false,
+          "key": "PRI",
+          "default": null,
+          "extra": "auto_increment",
+          "purpose": "id",
+          "fk": null
+        },
+        {
+          "name": "account_id",
+          "type": "bigint unsigned",
+          "null": false,
+          "key": "MUL",
+          "default": null,
+          "extra": "",
+          "purpose": "Referencia a platform_crm_accounts.id.",
+          "fk": "platform_crm_accounts.id"
+        },
+        {
+          "name": "name",
+          "type": "varchar(120)",
+          "null": false,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "name",
+          "fk": null
+        },
+        {
+          "name": "position",
+          "type": "varchar(120)",
+          "null": true,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "position",
+          "fk": null
+        },
+        {
+          "name": "email",
+          "type": "varchar(190)",
+          "null": true,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "email",
+          "fk": null
+        },
+        {
+          "name": "phone",
+          "type": "varchar(30)",
+          "null": true,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "phone",
+          "fk": null
+        },
+        {
+          "name": "request_key",
+          "type": "varchar(36)",
+          "null": false,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "request key",
+          "fk": null
+        },
+        {
+          "name": "actor_id",
+          "type": "bigint unsigned",
+          "null": false,
+          "key": "MUL",
+          "default": null,
+          "extra": "",
+          "purpose": "Referencia a users.id.",
+          "fk": "users.id"
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "null": false,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "created at",
+          "fk": null
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "null": false,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "updated at",
           "fk": null
         }
       ]
@@ -5875,6 +6176,83 @@
           "default": null,
           "extra": "",
           "purpose": "Momento en que se reinicia el contador.",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "module": "Gobernanza y bitácoras",
+      "table": "reminder_deliveries",
+      "purpose": "Recordatorios diarios enviados o fallidos por persona y día (evita repetirlos al reintentar).",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint unsigned",
+          "null": false,
+          "key": "PRI",
+          "default": null,
+          "extra": "auto_increment",
+          "purpose": "Identificador único (llave primaria).",
+          "fk": null
+        },
+        {
+          "name": "user_id",
+          "type": "bigint unsigned",
+          "null": false,
+          "key": "MUL",
+          "default": null,
+          "extra": "",
+          "purpose": "Referencia a users.id (llave foránea).",
+          "fk": "users.id"
+        },
+        {
+          "name": "reminder_day",
+          "type": "date",
+          "null": false,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "Día del recordatorio (AAAA-MM-DD).",
+          "fk": null
+        },
+        {
+          "name": "status",
+          "type": "enum('sent','failed')",
+          "null": false,
+          "key": "",
+          "default": null,
+          "extra": "",
+          "purpose": "Estado del registro.",
+          "fk": null
+        },
+        {
+          "name": "attempts",
+          "type": "int unsigned",
+          "null": false,
+          "key": "",
+          "default": "1",
+          "extra": "",
+          "purpose": "Intentos de envío registrados.",
+          "fk": null
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "null": false,
+          "key": "",
+          "default": "CURRENT_TIMESTAMP",
+          "extra": "DEFAULT_GENERATED",
+          "purpose": "Fecha y hora de creación.",
+          "fk": null
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "null": false,
+          "key": "",
+          "default": "CURRENT_TIMESTAMP",
+          "extra": "DEFAULT_GENERATED",
+          "purpose": "Fecha y hora de la última modificación.",
           "fk": null
         }
       ]
@@ -7083,6 +7461,16 @@
           "extra": "DEFAULT_GENERATED",
           "purpose": "Fecha y hora de la última modificación.",
           "fk": null
+        },
+        {
+          "name": "email_reminders",
+          "type": "tinyint(1)",
+          "null": false,
+          "key": "",
+          "default": "1",
+          "extra": "",
+          "purpose": "Si la persona quiere recibir recordatorios por correo.",
+          "fk": null
         }
       ]
     },
@@ -7971,6 +8359,13 @@
       "card": "1:N"
     },
     {
+      "table": "email_changes",
+      "column": "user_id",
+      "ref": "users",
+      "refcol": "id",
+      "card": "1:N"
+    },
+    {
       "table": "enrollments",
       "column": "course_id",
       "ref": "courses",
@@ -8174,6 +8569,34 @@
       "card": "1:N"
     },
     {
+      "table": "platform_crm_accounts",
+      "column": "institution_id",
+      "ref": "institutions",
+      "refcol": "id",
+      "card": "1:N"
+    },
+    {
+      "table": "platform_crm_accounts",
+      "column": "responsible_id",
+      "ref": "users",
+      "refcol": "id",
+      "card": "1:N"
+    },
+    {
+      "table": "platform_crm_contacts",
+      "column": "account_id",
+      "ref": "platform_crm_accounts",
+      "refcol": "id",
+      "card": "1:N"
+    },
+    {
+      "table": "platform_crm_contacts",
+      "column": "actor_id",
+      "ref": "users",
+      "refcol": "id",
+      "card": "1:N"
+    },
+    {
       "table": "question_options",
       "column": "question_id",
       "ref": "questions",
@@ -8253,6 +8676,13 @@
     {
       "table": "quiz_plays",
       "column": "student_id",
+      "ref": "users",
+      "refcol": "id",
+      "card": "1:N"
+    },
+    {
+      "table": "reminder_deliveries",
+      "column": "user_id",
       "ref": "users",
       "refcol": "id",
       "card": "1:N"
@@ -8428,7 +8858,8 @@
       "exchange_rates",
       "integration_runs",
       "job_leases",
-      "rate_limit_hits"
+      "rate_limit_hits",
+      "reminder_deliveries"
     ],
     "Tutor IA, fuentes e integraciones": [
       "ai_message_sources",
@@ -8497,14 +8928,19 @@
       "crm_stage_events"
     ],
     "Seguridad e identidad": [
+      "email_changes",
       "institutions",
       "password_resets",
       "roles",
       "user_preferences",
       "user_sessions",
       "users"
+    ],
+    "Operación": [
+      "platform_crm_accounts",
+      "platform_crm_contacts"
     ]
   },
-  "tables": 70,
-  "columns": 689
+  "tables": 74,
+  "columns": 725
 }

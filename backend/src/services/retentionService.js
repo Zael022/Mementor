@@ -1,5 +1,6 @@
 import { sequelize } from '../config/database.js';
 import { retainCrmData } from './crmPrivacyService.js';
+import { reconcilePendingDeletions } from './governanceService.js';
 
 // Retención de datos: cuánto tiempo se guarda cada cosa se configura en .env (0 = no borrar).
 const days = (name, fallback) => Math.max(0, Number(process.env[name] ?? fallback));
@@ -61,6 +62,15 @@ export async function purgeOldConversations() {
   return result?.affectedRows ?? 0;
 }
 
+// Borra el registro detallado de los asistentes de IA (quién, curso, modelo y tokens) pasado el mismo plazo
+// del detalle de consumo. Las cuotas solo miran las últimas 24 horas, así que no se ven afectadas.
+export async function purgeOldAgentRuns() {
+  const keepDays = days('AI_USAGE_DETAIL_DAYS', 90);
+  if (!keepDays) return 0;
+  const [result] = await sequelize.query('DELETE FROM agent_runs WHERE created_at < NOW() - INTERVAL :keepDays DAY', { replacements: { keepDays } });
+  return result?.affectedRows ?? 0;
+}
+
 // Ejecuta todas las reglas de retención y devuelve cuántas filas tocó cada una.
 export async function runRetention() {
   await retainCrmData();
@@ -68,5 +78,7 @@ export async function runRetention() {
     versionTexts: await purgeUncitedVersionText(),
     usageRows: await rollupUsage(),
     conversations: await purgeOldConversations(),
+    agentRuns: await purgeOldAgentRuns(),
+    pendingDeletions: await reconcilePendingDeletions(),
   };
 }

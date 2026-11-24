@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { Assignment, AssignmentSubmission, Enrollment, Topic, User, sequelize } from '../models/index.js';
 import { conflict, forbidden, invalid, notFound } from '../utils/AppError.js';
 import { getCourseAccess } from './accessService.js';
@@ -67,15 +68,31 @@ export async function createAssignment(user, courseId, data) {
   return assignmentDto(assignment);
 }
 
+// El puntaje máximo es el denominador de las notas ya emitidas: con entregas calificadas no se cambia,
+// porque una entrega de 80/100 pasaría a valer 160 % sin que nadie la recalificara.
 export async function updateAssignment(user, assignmentId, changes) {
-  const { assignment } = await loadAssignment(user, assignmentId, { write: true });
-  if (changes.topicId) await assertTopic(changes.topicId, assignment.courseId);
-  const wasStatus = assignment.status;
-  await assignment.update(changes);
-  if (changes.status && changes.status !== wasStatus) {
-    await recordAudit({ actor: user, action: `assignment.${changes.status}`, resourceType: 'assignment', resourceId: assignment.id });
-  }
-  return assignmentDto(assignment);
+  const { assignment: found } = await loadAssignment(user, assignmentId, { write: true });
+  if (changes.topicId) await assertTopic(changes.topicId, found.courseId);
+  return sequelize.transaction(async (transaction) => {
+    const assignment = await Assignment.findByPk(found.id, { lock: transaction.LOCK.UPDATE, transaction });
+    const wasStatus = assignment.status;
+    const previousMax = assignment.maxPoints;
+    const maxChanges = changes.maxPoints !== undefined && changes.maxPoints !== previousMax;
+    if (maxChanges) {
+      const graded = await AssignmentSubmission.count({ where: { assignmentId: assignment.id, gradePoints: { [Op.ne]: null } }, transaction });
+      if (graded) {
+        throw conflict('GRADED_MAX_LOCKED', `Esta tarea ya tiene ${graded} ${graded === 1 ? 'entrega calificada' : 'entregas calificadas'}: el puntaje máximo no se puede cambiar. Crea una tarea nueva si necesitas otra escala.`);
+      }
+    }
+    await assignment.update(changes, { transaction });
+    if (maxChanges) {
+      await recordAudit({ actor: user, action: 'assignment.max_points_changed', resourceType: 'assignment', resourceId: assignment.id, metadata: { from: previousMax, to: changes.maxPoints }, transaction });
+    }
+    if (changes.status && changes.status !== wasStatus) {
+      await recordAudit({ actor: user, action: `assignment.${changes.status}`, resourceType: 'assignment', resourceId: assignment.id, transaction });
+    }
+    return assignmentDto(assignment);
+  });
 }
 
 export async function deleteAssignment(user, assignmentId) {
@@ -138,11 +155,15 @@ export async function submitAssignment(user, assignmentId, { body, linkUrl }) {
 export async function gradeSubmission(user, submissionId, { gradePoints, feedback }) {
   const submission = submissionId ? await AssignmentSubmission.findByPk(submissionId) : null;
   if (!submission) throw notFound('Entrega no encontrada.');
-  const { assignment } = await loadAssignment(user, submission.assignmentId, { write: true });
-  if (gradePoints > assignment.maxPoints) throw invalid(`La nota no puede superar ${assignment.maxPoints} puntos.`);
-  await submission.update({ gradePoints, feedback: feedback || null, gradedBy: user.id, gradedAt: new Date() });
-  await recordAudit({
-    actor: user, action: 'assignment.graded', resourceType: 'assignment_submission', resourceId: submission.id, metadata: { studentId: submission.studentId },
+  await loadAssignment(user, submission.assignmentId, { write: true });
+  // Se bloquea la tarea para que el máximo no cambie mientras se califica.
+  return sequelize.transaction(async (transaction) => {
+    const assignment = await Assignment.findByPk(submission.assignmentId, { lock: transaction.LOCK.UPDATE, transaction });
+    if (gradePoints > assignment.maxPoints) throw invalid(`La nota no puede superar ${assignment.maxPoints} puntos.`);
+    await submission.update({ gradePoints, feedback: feedback || null, gradedBy: user.id, gradedAt: new Date() }, { transaction });
+    await recordAudit({
+      actor: user, action: 'assignment.graded', resourceType: 'assignment_submission', resourceId: submission.id, metadata: { studentId: submission.studentId, maxPoints: assignment.maxPoints }, transaction,
+    });
+    return submissionDto(submission);
   });
-  return submissionDto(submission);
 }

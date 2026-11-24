@@ -64,6 +64,9 @@ test('el generador de preguntas usa solo material del curso, exige citas y no ll
     { prompt: '¿Puede el denominador ser cero?', options: ['Sí', 'No'], correctIndex: 1, explanation: 'No se divide en cero partes.', citations: ['S1'] },
     { prompt: 'Pregunta sin cita', options: ['a', 'b'], correctIndex: 0, citations: [] },
     { prompt: 'Cita inventada', options: ['a', 'b'], correctIndex: 0, citations: ['S9'] },
+    // M13: S0 y S01 no son identificadores entregados.
+    { prompt: 'Cita S0', options: ['a', 'b'], correctIndex: 0, citations: ['S0'] },
+    { prompt: 'Cita S01', options: ['a', 'b'], correctIndex: 0, citations: ['S01'] },
   ] }));
   const ok = await ctx.org.teacher.post('/agents/question_generator/run', { courseId: ctx.course.courseId, topic: 'denominador cero', count: 3 });
   assert.equal(ok.status, 200, JSON.stringify(ok.body));
@@ -74,6 +77,13 @@ test('el generador de preguntas usa solo material del curso, exige citas y no ll
   const sinMaterial = await ctx.org.teacher.post('/agents/question_generator/run', { courseId: ctx.course.courseId, topic: 'tectónica volcánica' });
   assert.equal(sinMaterial.body.data.status, 'no_evidence');
   assert.equal(calls.length, 1);
+
+  // Si todas las preguntas se descartan, se informa como falta de respaldo y no como resultado vacío.
+  fakeProvider(JSON.stringify({ questions: [{ prompt: 'Solo S0', options: ['a', 'b'], correctIndex: 0, citations: ['S0'] }] }));
+  const descartadas = await ctx.org.teacher.post('/agents/question_generator/run', { courseId: ctx.course.courseId, topic: 'denominador cero', count: 1 });
+  assert.equal(descartadas.status, 200, JSON.stringify(descartadas.body));
+  assert.equal(descartadas.body.data.status, 'no_evidence');
+  assert.equal(descartadas.body.data.result, null);
   assert.equal((await ctx.org.student.post('/agents/question_generator/run', { courseId: ctx.course.courseId, topic: 'fracciones' })).status, 403);
   assert.equal((await ctx.otherOrg.teacher.post('/agents/question_generator/run', { courseId: ctx.course.courseId, topic: 'fracciones' })).status, 404);
 });
@@ -81,7 +91,9 @@ test('el generador de preguntas usa solo material del curso, exige citas y no ll
 test('la retroalimentación no envía el nombre del estudiante y limita la nota sugerida', async () => {
   const tarea = await ctx.org.teacher.post(`/courses/${ctx.course.courseId}/assignments`, { title: 'Explica fracciones', instructions: 'Explica con un ejemplo.', maxPoints: 10 });
   await ctx.org.teacher.patch(`/assignments/${tarea.body.data.id}`, { status: 'published' });
-  const entrega = await ctx.org.student.post(`/assignments/${tarea.body.data.id}/submission`, { body: 'Un medio es la mitad de una pizza.' });
+  const entrega = await ctx.org.student.post(`/assignments/${tarea.body.data.id}/submission`, {
+    body: 'Un medio es la mitad de una pizza. Mi teléfono es 8888-1234.', linkUrl: 'https://drive.ejemplo.test/mi-trabajo-ana',
+  });
   const calls = fakeProvider(JSON.stringify({ strengths: ['Ejemplo claro'], improvements: ['Mencionar el denominador'], feedback: 'Buen ejemplo, agrega el papel del denominador.', suggestedPoints: 50 }));
   const res = await ctx.org.teacher.post('/agents/feedback_assistant/run', { submissionId: entrega.body.data.id });
   assert.equal(res.status, 200, JSON.stringify(res.body));
@@ -89,6 +101,9 @@ test('la retroalimentación no envía el nombre del estudiante y limita la nota 
   const enviado = JSON.stringify(calls[0]);
   assert.equal(enviado.includes(ctx.org.student.user.displayName), false);
   assert.equal(enviado.includes('@prueba.test'), false);
+  // M06: ni el teléfono escrito en la entrega ni su enlace salen hacia el proveedor.
+  assert.equal(enviado.includes('8888-1234'), false);
+  assert.equal(enviado.includes('mi-trabajo-ana'), false);
 });
 
 test('el analista solo recibe datos agregados con etiquetas, no nombres', async () => {
@@ -105,9 +120,14 @@ test('cumplimiento detecta datos personales en el servidor y la auditoría puede
   assert.deepEqual(hallazgos.map((item) => item.type).sort(), ['correo', 'cédula', 'teléfono']);
   assert.equal(JSON.stringify(hallazgos).includes('ana@correo.com'), false);
   const auditor = await ctx.org.invite(ctx.org.admin, '/users', { email: 'auditor.agentes@prueba.test', displayName: 'Auditor', role: 'auditor' });
-  fakeProvider(JSON.stringify({ riskLevel: 'alto', issues: [{ type: 'cédula', detail: 'Incluye una cédula', fix: 'Quitarla' }], summary: 'Hay datos personales.' }));
+  const calls = fakeProvider(JSON.stringify({ riskLevel: 'alto', issues: [{ type: 'cédula', detail: 'Incluye una cédula', fix: 'Quitarla' }], summary: 'Hay datos personales.' }));
   const res = await auditor.post('/agents/compliance_checker/run', { text: 'Lista del grupo: Ana, cédula 1-1234-5678, correo ana@correo.com' });
   assert.equal(res.status, 200, JSON.stringify(res.body));
+  // M06: el proveedor recibe el texto con los datos ya ocultos.
+  const enviado = JSON.stringify(calls[0]);
+  assert.equal(enviado.includes('ana@correo.com'), false);
+  assert.equal(enviado.includes('1-1234-5678'), false);
+  assert.ok(enviado.includes('[correo oculto]'));
   assert.equal(res.body.data.result.riskLevel, 'alto');
   assert.ok(res.body.data.result.automaticFindings.length >= 2);
   assert.equal((await auditor.get('/governance/agent-runs')).status, 200);
@@ -122,6 +142,19 @@ test('redactor, coach y resumen responden con su formato; una respuesta mal form
   const coach = await ctx.org.student.post('/agents/study_coach/run', { courseId: ctx.course.courseId, minutes: 30 });
   assert.equal(coach.status, 200, JSON.stringify(coach.body));
   assert.equal(JSON.stringify(calls[0]).includes(ctx.org.student.user.displayName), false);
+  assert.deepEqual([coach.body.data.result.totalMinutes, coach.body.data.result.adjusted], [15, false]);
+
+  // P2 de la revisión: con 30 minutos disponibles, un plan de 100 minutos se recorta a 30.
+  fakeProvider(JSON.stringify({ plan: [
+    { minutes: 40, activity: 'Repasar fracciones', why: 'Menor dominio' },
+    { minutes: 40, activity: 'Tarea 1', why: 'Entrega cercana' },
+    { minutes: 20, activity: 'Práctica diaria', why: 'Racha' },
+  ], motivation: '¡Tú puedes!' }));
+  const largo = await ctx.org.student.post('/agents/study_coach/run', { courseId: ctx.course.courseId, minutes: 30 });
+  const plan = largo.body.data.result;
+  assert.equal(plan.plan.reduce((total, paso) => total + paso.minutes, 0), 30);
+  assert.deepEqual([plan.totalMinutes, plan.budgetMinutes, plan.adjusted], [30, 30, true]);
+  assert.deepEqual(plan.plan.map((paso) => paso.activity), ['Repasar fracciones']);
 
   fakeProvider(JSON.stringify({ summary: 'Las fracciones son partes de un entero.', keyPoints: ['Numerador', 'Denominador'], selfCheck: [{ question: '¿Puede el denominador ser cero?', answer: 'No' }] }));
   const resumen = await ctx.org.student.post('/agents/lesson_summarizer/run', { lessonId: ctx.lessonId });

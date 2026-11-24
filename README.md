@@ -9,7 +9,7 @@ Plataforma educativa adaptativa: cursos, lecciones, cuestionarios con correcció
 
 **Seguimiento institucional de plataforma (avance parcial):** módulo separado de admisiones para `platform_admin`. Permite listar instituciones, configurar una ficha y registrar contactos profesionales; aún faltan tareas, soporte, incorporación verificable y políticas de conservación. Requiere la migración `20261124000100`; véase [la decisión y pendientes](docs/adr/0007-crm-instituciones.md). No aplicar la migración en producción como parte de esta entrega.
 
-**Destinos previstos (sin despliegue confirmado):** frontend https://mentor-ai.vercel.app · API https://mentor-api.onrender.com/api/v1 (ver `docs/despliegue.md`).
+**Despliegue:** pendiente de verificar. Las direcciones previstas son https://mentor-ai.vercel.app (frontend) y https://mentor-api.onrender.com/api/v1 (API), pero no cuentan como publicadas hasta completar el registro de aceptación de `docs/despliegue.md` (sección 6) sobre la URL pública.
 
 ## Entregables del Proyecto Final (FWD Costa Rica)
 | Documento | Word y PDF |
@@ -24,7 +24,7 @@ Plataforma educativa adaptativa: cursos, lecciones, cuestionarios con correcció
 Seguridad: contraseñas con **bcrypt**, sesión con **JWT** (secreto y expiración en `.env`) en cookie httpOnly, roles validados en el backend (administración de plataforma, administración de institución, docente, estudiante y auditoría). Ramas: `main`, `develop`, `feature/…` y `fix/…` con pull requests.
 
 ## Requisitos
-- Node.js **22.12 o superior** (22 LTS recomendado). El SDK de Anthropic y las librerías de Google lo exigen.
+- Node.js **22.22.2 o superior en la línea 22, o 24.15 o superior** (22 LTS recomendado). El SDK de Anthropic y las librerías de Google piden 22.12+, y jsdom (pruebas del frontend) pide 22.22.2+.
 - MySQL 8.0 u 8.4.
 - Opcional: un proyecto de Google Cloud (modo `vertex`) y una clave de Anthropic u OpenAI (tutor).
 
@@ -74,7 +74,8 @@ AI_PROVIDER=anthropic            # o openai
 AI_API_KEY=tu_clave
 AI_MODEL=identificador_disponible_en_tu_cuenta   # por ejemplo claude-opus-5-5
 ```
-- Con `anthropic` el chat usa **streaming real** (SDK oficial) y se puede detener. Con `openai` la respuesta llega completa.
+- Con `anthropic` el chat usa **streaming** (SDK oficial) y se puede detener, pero el servidor **retiene el texto hasta validarlo**: el navegador solo ve el avance. Con `openai` la respuesta llega completa.
+- Validación: cada oración con contenido se compara con el pasaje que cita (números presentes en la fuente y términos en común). Una frase como «dos más dos son nueve» citando «dos más dos son cuatro» se rechaza. No es una garantía pedagógica: por eso cada cita abre su pasaje.
 - Si el curso no cubre la pregunta, el estudiante recibe un aviso de material insuficiente y **no se llama al modelo**.
 - Cada respuesta se valida en el servidor: formato correcto y citas a fragmentos entregados. Sin cita válida, la respuesta no se muestra.
 
@@ -137,7 +138,7 @@ Una falla de Google Cloud se muestra como `RAG_UNAVAILABLE` («no significa que 
    - En *Novedades*, arrastra un **PDF con texto, DOCX o TXT** (por ejemplo un reglamento), revisa nombre y tamaño y pulsa **Subir archivo**. Verás su estado de indexación.
    - En *Fuentes del tutor*, comprueba que dice **Listo**. Sube un PDF escaneado para ver el motivo del error y el botón **Reintentar**.
 4. **Estudiante:**
-   - Abre el curso y entra a **Tutor IA**. Pregunta con tus palabras por algo del reglamento: la respuesta se escribe en vivo y, al final, aparecen las fuentes validadas. Abre la cita: verás el pasaje, el título, la página o sección y la versión.
+   - Abre el curso y entra a **Tutor IA**. Pregunta con tus palabras por algo del reglamento: mientras se prepara ves el avance; la respuesta aparece completa, con sus fuentes, cuando pasó la validación. Abre la cita: verás el pasaje, el título, la página o sección y la versión.
    - Pregunta algo que el curso no cubre: aparece el aviso de material insuficiente.
    - Prueba **Dame una pista**, **Detener** y **Nueva conversación**.
 5. **Docente:** en *Fuentes del tutor*, abre *Versiones* para ver qué versión se usó y en cuántas respuestas. Retira la fuente: el estudiante verá la cita como «fuente retirada».
@@ -160,12 +161,12 @@ Recorrido: el docente crea un quiz en *Quizzes*, le agrega preguntas y lo public
 ## 5. Pruebas
 
 ```powershell
-# Backend: 139 pruebas en mentor_ai_test (crean y borran sus datos). Google Cloud, la IA y las APIs externas son dobles.
+# Backend: 176 pruebas en mentor_ai_test (crean y borran sus datos). Google Cloud, la IA y las APIs externas son dobles.
 cd backend
 npm run lint
 npm test
 
-# Frontend: lint, 50 pruebas de componentes y hooks (Vitest + jsdom) y compilación
+# Frontend: lint, 58 pruebas de componentes y hooks (Vitest + jsdom) y compilación
 cd ..\frontend
 npm run lint
 npm test
@@ -182,7 +183,7 @@ cd frontend
 npx playwright install chromium
 npm run test:e2e
 ```
-Son 24 pruebas. Usan los datos de conexión de `backend/.env`.
+Son 38 pruebas, incluidas 12 revisiones automáticas de accesibilidad con axe-core (WCAG 2.2 AA) en tres anchos. Usan los datos de conexión de `backend/.env`.
 
 Las capturas de los mockups (escritorio y móvil) se generan con `npx playwright test -c playwright.capturas.config.js` sobre la misma base `_e2e` y quedan en `frontend/capturas/salida/` (no se versionan; las optimizadas están en `docs/mockups/`). Para cambiar puertos o base: `E2E_DB_NAME`, `E2E_API_PORT` (3101), `E2E_WEB_PORT` (5174) y `E2E_FAKE_AI_PORT` (4599).
 
@@ -201,9 +202,18 @@ Despliegue paso a paso (TiDB Cloud, Render, Vercel y n8n) en `docs/despliegue.md
 - **Proxy o balanceador.** Define `TRUST_PROXY` con la cantidad de proxies delante del backend (normalmente `1`) o sus direcciones. Sin esto, todas las peticiones parecen venir de la IP del proxy y los límites de intentos se comparten entre todos los usuarios. El valor `true` se rechaza porque permitiría falsificar la IP.
 - **Varias instancias.** Con `RATE_LIMIT_STORE=mysql` los límites por IP se cuentan en MySQL y valen para todas las instancias. Las tareas periódicas (importaciones, limpieza, retención y Drive) solo las ejecuta la instancia que tiene el turno en `job_leases`; si se apaga, otra lo toma en 90 segundos. La cuota diaria del tutor ya se reserva en MySQL.
 - **Chat en vivo.** El servidor envía `: ping` cada `SSE_PING_MS` (15 s) para que los proxies no corten la conexión. Si usas nginx, mantén `proxy_buffering off` para `/api/v1/tutor/`.
-- **Archivos.** Además de la extensión y el tipo, se revisan los primeros bytes de cada archivo (PDF, DOCX/PPTX/XLSX, PNG, JPEG y texto UTF-8). Un archivo renombrado se rechaza.
-- **Retención.** Una vez al día se borra el texto de versiones antiguas que ninguna respuesta cita, se resume por mes el consumo con más de 90 días y se borran las conversaciones sin actividad por más de 365 días. Los plazos se cambian en `backend/.env` (0 = no borrar).
-- **Monitoreo.** `GET /api/v1/health` informa si MySQL responde y si el tutor y Google Cloud están configurados, sin exponer claves, proyectos ni proveedores.
+- **Originales duraderos.** Con `STORAGE_DRIVER=gcs` los materiales y fotos de perfil se copian a un bucket privado de Cloud Storage (ADC) y el disco solo se usa como paso temporal; `materials.content_sha256` guarda la huella y la descarga la envía en `X-Content-SHA256`. Una carga se registra con su auditoría en una sola transacción: si algo falla antes de confirmar, el original se descarta y no queda fila huérfana; si falla la indexación, el material queda guardado y la fuente se reintenta. Guía en `docs/despliegue.md` (sección 2).
+- **Consentimiento.** Con términos o privacidad pendientes, el servidor rechaza cualquier operación nueva (`403 CONSENT_REQUIRED`) salvo aceptar, cerrar sesión, leer y pedir la baja; la interfaz vuelve a mostrar el diálogo.
+- **Notas emitidas.** El puntaje máximo de una tarea con entregas calificadas no se puede cambiar (`409 GRADED_MAX_LOCKED`).
+- **Seguridad web.** Inyección SQL, XSS (CSP en `frontend/vercel.json`), CSRF y CORS estricto (`403 ORIGIN_NOT_ALLOWED`): medidas, investigación, laboratorio y evidencias en `docs/seguridad/`.
+- **Archivos.** Además de la extensión y el tipo, se revisan los primeros bytes de cada archivo (PDF, PNG, JPEG y texto UTF-8). Los DOCX/PPTX/XLSX se abren como ZIP y se revisa su estructura antes de extraer texto: partes obligatorias, rutas seguras, sin cifrado, sin archivos anidados y con límites de entradas, tamaño descomprimido y razón de compresión. Un archivo renombrado, truncado o una «bomba ZIP» se rechazan.
+- **Cambio de correo.** El correo de acceso solo cambia al abrir el enlace enviado a la nueva dirección (60 minutos, un solo uso); la dirección anterior recibe un aviso al pedirlo y al confirmarlo. Requiere SMTP configurado.
+- **Fechas.** Las fechas `AAAA-MM-DD` se validan contra el calendario (un 31 de febrero se rechaza con 422).
+- **Retención.** Una vez al día se borra el texto de versiones antiguas que ninguna respuesta cita, se resume por mes el consumo con más de 90 días, se borra el registro detallado de los asistentes con más de 90 días y se borran las conversaciones sin actividad por más de 365 días. Los plazos se cambian en `backend/.env` (0 = no borrar).
+- **Monitoreo.** `GET /api/v1/health` informa si MySQL responde y si el tutor y Google Cloud están configurados, sin exponer claves, proyectos ni proveedores. Cada solicitud deja una línea JSON con su `requestId`, la plantilla de la ruta, el estado y la duración; `GET /api/v1/ops/metrics` (solo la cuenta de la plataforma) muestra p50/p95/p99 y errores de la instancia.
+- **Baja de cuenta.** Se completa en el servidor, en una transacción, antes de responder; n8n solo envía el correo de confirmación. Las solicitudes que hubieran quedado pendientes se completan en la conciliación diaria.
+- **Recordatorios.** Se recorren por páginas con cursor y se registra el envío por persona y día, así nadie queda fuera y un reintento no repite correos. Cada estudiante puede apagarlos en Configuración.
+- **Tutor.** La revisión automática rechaza números que no están en la fuente, números asociados a otra cosa y negaciones que contradicen el pasaje. Es una revisión por palabras, no una prueba de verdad (ADR 0008).
 
 ## Scripts
 | Carpeta | Comando | Qué hace |
@@ -215,6 +225,8 @@ Despliegue paso a paso (TiDB Cloud, Render, Vercel y n8n) en `docs/despliegue.md
 | frontend | `npm run dev` · `npm run build` · `npm test` | Desarrollo, compilación y pruebas de componentes |
 | frontend | `npm run test:e2e` | Pruebas en navegador con Playwright (base `_e2e`) |
 | ambas | `npm run lint` | Revisión de estilo |
+| backend | `npm run lab:sqli` | Laboratorio local de inyección SQL (vulnerable frente a protegida) en una base `_lab` efímera; ver `docs/seguridad/README.md` |
+| raíz | `scripts/empaquetar.sh` | ZIP de entrega con solo los archivos versionados (sin `.env`, `node_modules` ni archivos subidos); imprime commit y fecha |
 
 ## Estructura
 ```

@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { User, Institution, UserSession, sequelize } from '../models/index.js';
 import { conflict, forbidden, invalid, notFound } from '../utils/AppError.js';
 import { createToken } from '../utils/security.js';
@@ -34,9 +35,19 @@ export async function createInvitedUser(actor, { institutionId, email, displayNa
 }
 
 // Lista los usuarios de la institución del administrador.
-export async function listUsers(actor, { role, pagination }) {
+// Escapa los comodines de LIKE para que «%» o «_» se busquen como texto y no como patrón.
+export const escapeLike = (text) => String(text).replace(/[\\%_]/g, (char) => `\\${char}`);
+
+// Lista y busca personas de la institución. El texto de búsqueda viaja como parámetro de la consulta
+// (Sequelize lo envía aparte del SQL), así que un intento de inyección se busca como texto literal.
+export async function listUsers(actor, { role, q, pagination }) {
   const where = { institutionId: actor.institutionId };
   if (role && INSTITUTION_ROLES.includes(role)) where.role = role;
+  const search = typeof q === 'string' ? q.trim().slice(0, 100) : '';
+  if (search) {
+    const pattern = `%${escapeLike(search)}%`;
+    where[Op.or] = [{ displayName: { [Op.like]: pattern } }, { email: { [Op.like]: pattern } }];
+  }
   const { rows, count } = await User.findAndCountAll({
     where,
     order: [['displayName', 'ASC']],

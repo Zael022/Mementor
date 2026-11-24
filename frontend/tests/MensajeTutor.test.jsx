@@ -37,12 +37,12 @@ describe('Citas del tutor con Motion', () => {
     expect(screen.queryByText(/Fuente/)).toBeNull();
   });
 
-  it('el texto en curso no muestra citas hasta que llegan validadas', () => {
-    const { rerender } = pintar(mensaje([], { estado: 'escribiendo', content: 'Una fracción es [S1]' }));
-    expect(screen.getByText(/citas por validar/)).toBeTruthy();
+  it('mientras se escribe no muestra texto ni citas; aparecen juntos al validarse', () => {
+    const { rerender } = pintar(mensaje([], { estado: 'escribiendo', content: 'Dos más dos son nueve [S1]', progreso: 26 }));
+    expect(screen.getByText(/revisando las fuentes/)).toBeTruthy();
+    expect(screen.queryByText(/nueve/)).toBeNull();
     expect(screen.queryByRole('link')).toBeNull();
     rerender(<MemoryRouter><MensajeTutor mensaje={mensaje([cita(1, 'Reglamento')], { content: 'Una fracción es [S1]', estado: 'final' })} esEstudiante /></MemoryRouter>);
-    // El texto que se estaba leyendo se conserva igual; la marca se muestra como referencia.
     expect(screen.getByText(/Una fracción es/)).toBeTruthy();
     expect(document.querySelector('.marca-cita').textContent).toBe('1');
     expect(screen.getByRole('link', { name: 'Reglamento' })).toBeTruthy();

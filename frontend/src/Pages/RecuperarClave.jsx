@@ -32,7 +32,7 @@ export default function RecuperarClave() {
           <Campo etiqueta="Correo" tipo="email" valor={email} alCambiar={setEmail} autoComplete="username" required />
           <MensajeError error={error} />
           <button type="submit" className="boton" disabled={enviando} aria-busy={enviando}>{enviando ? 'Enviando…' : 'Enviar enlace'}</button>
-          <p className="pequeno"><Link to="/login">Volver a iniciar sesión</Link></p>
+          <p className="pequeno"><Link className="enlace-tactil" to="/login">Volver a iniciar sesión</Link></p>
         </form>
       )}
     </Portada>

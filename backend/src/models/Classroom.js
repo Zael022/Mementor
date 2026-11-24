@@ -49,6 +49,7 @@ export const Material = sequelize.define('Material', {
   storedName: { type: DataTypes.STRING(120), allowNull: true },
   mimeType: { type: DataTypes.STRING(120), allowNull: true },
   sizeBytes: { type: DataTypes.INTEGER, allowNull: true },
+  contentSha256: { type: DataTypes.CHAR(64), allowNull: true },
   uploadedBy: ref(),
 }, { tableName: 'materials', underscored: true });
 

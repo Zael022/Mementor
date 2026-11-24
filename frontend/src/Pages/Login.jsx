@@ -30,7 +30,7 @@ export default function Login() {
         <Campo etiqueta="Contraseña" tipo="password" valor={password} alCambiar={setPassword} autoComplete="current-password" required />
         <MensajeError error={error} />
         <button type="submit" className="boton" disabled={enviando} aria-busy={enviando}>{enviando ? 'Ingresando…' : 'Ingresar'}</button>
-        <p className="pequeno"><Link to="/recuperar">¿Olvidaste tu contraseña?</Link></p>
+        <p className="pequeno"><Link className="enlace-tactil" to="/recuperar">¿Olvidaste tu contraseña?</Link></p>
         <p className="tenue pequeno">Las cuentas se crean por invitación de la administración de tu institución.</p>
       </form>
     </Portada>

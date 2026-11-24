@@ -43,11 +43,12 @@ async function reserve(user, agent, courseId, inputChars) {
     await User.findByPk(user.id, { lock: transaction.LOCK.UPDATE, transaction });
     const since = new Date(clock.now() - DAY_MS);
     const used = await AgentRun.count({
-      where: { userId: user.id, agent: { [Op.ne]: 'tutor' }, status: { [Op.ne]: 'no_evidence' }, createdAt: { [Op.gte]: since } },
+      // Cuentan las ejecuciones que llamaron al modelo, aunque su resultado se descartara por falta de respaldo.
+      where: { userId: user.id, agent: { [Op.ne]: 'tutor' }, [Op.or]: [{ status: { [Op.ne]: 'no_evidence' } }, { model: { [Op.ne]: null } }], createdAt: { [Op.gte]: since } },
       transaction,
     });
     if (used >= dailyLimit()) throw new AppError(429, 'RATE_LIMITED', 'Alcanzaste el límite diario de uso de los asistentes de IA.');
-    const shared = await AgentRun.count({ where: { institutionId: user.institutionId, agent: { [Op.ne]: 'tutor' }, status: { [Op.ne]: 'no_evidence' }, createdAt: { [Op.gte]: since } }, transaction });
+    const shared = await AgentRun.count({ where: { institutionId: user.institutionId, agent: { [Op.ne]: 'tutor' }, [Op.or]: [{ status: { [Op.ne]: 'no_evidence' } }, { model: { [Op.ne]: null } }], createdAt: { [Op.gte]: since } }, transaction });
     if (shared >= Number(process.env.AGENT_DAILY_LIMIT_PER_INSTITUTION || 500)) throw new AppError(429, 'INSTITUTION_QUOTA', 'La institución alcanzó su límite diario de asistentes de IA.');
     return AgentRun.create({ institutionId: user.institutionId, userId: user.id, courseId, agent, inputChars }, { transaction });
   });
@@ -88,6 +89,14 @@ export async function runAgent(user, key, rawInput, { workflow = false } = {}) {
     const output = parseJson(response.text, agent.outputSchema);
     if (!output) throw new AppError(502, 'AGENT_INVALID_OUTPUT', 'El asistente devolvió una respuesta con formato inesperado. Intenta de nuevo.');
     const result = agent.finalize ? agent.finalize(output, context) : output;
+    // Si la validación descartó todo, se informa como falta de respaldo y no como resultado.
+    if (typeof result?.noEvidence === 'string') {
+      await run.update({
+        status: 'no_evidence', provider: response.provider ?? config.provider, model: response.model ?? config.model, latencyMs: Date.now() - startedAt,
+        inputTokens: response.usage?.inputTokens ?? null, outputTokens: response.usage?.outputTokens ?? null,
+      });
+      return { runId: run.id, status: 'no_evidence', message: result.noEvidence, result: null };
+    }
     await run.update({
       status: 'completed', provider: response.provider ?? config.provider, model: response.model ?? config.model,
       outputChars: JSON.stringify(result).length, latencyMs: Date.now() - startedAt,

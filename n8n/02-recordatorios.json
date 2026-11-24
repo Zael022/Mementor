@@ -57,8 +57,39 @@
         "url": "={{ $('Configuración').item.json.apiUrl }}/integrations/daily-reminders",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "after",
+              "value": "0"
+            },
+            {
+              "name": "limit",
+              "value": "200"
+            }
+          ]
+        },
         "options": {
-          "timeout": 15000
+          "timeout": 15000,
+          "pagination": {
+            "pagination": {
+              "paginationMode": "updateAParameterInEachRequest",
+              "parameters": {
+                "parameters": [
+                  {
+                    "type": "qs",
+                    "name": "after",
+                    "value": "={{ $response.body.meta.nextCursor }}"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ $response.body.meta.nextCursor === null }}",
+              "limitPagesFetched": true,
+              "maxRequests": 500
+            }
+          }
         }
       }
     },
@@ -87,7 +118,7 @@
       ],
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Arma el texto del correo con las tareas y la racha pendientes.\nconst lineas = $json.items.map((i) => i.type === 'racha' ? `• ${i.course}: ${i.title}` : `• ${i.course}: «${i.title}» vence ${new Date(i.dueAt).toLocaleString('es-CR', { timeZone: 'America/Costa_Rica' })}`);\nreturn { json: { email: $json.email, asunto: 'Tus pendientes de hoy en MENTOR AI', texto: `Hola, ${$json.name}:\\n\\nTe recordamos:\\n${lineas.join('\\n')}\\n\\n¡Tú puedes!` } };"
+        "jsCode": "// Arma el texto del correo con las tareas y la racha pendientes; conserva a quién va para registrar el envío.\nconst lineas = $json.items.map((i) => i.type === 'racha' ? `• ${i.course}: ${i.title}` : `• ${i.course}: «${i.title}» vence ${new Date(i.dueAt).toLocaleString('es-CR', { timeZone: 'America/Costa_Rica' })}`);\nreturn { json: { userId: $json.userId, day: $json.day, email: $json.email, asunto: 'Tus pendientes de hoy en MENTOR AI', texto: `Hola, ${$json.name}:\\n\\nTe recordamos:\\n${lineas.join('\\n')}\\n\\nPuedes desactivar estos correos en Configuración.\\n\\n¡Tú puedes!` } };"
       }
     },
     {
@@ -106,7 +137,114 @@
         "emailFormat": "text",
         "text": "={{ $json.texto }}",
         "options": {}
-      }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "Marcar enviado-u",
+              "name": "userId",
+              "value": "={{ $('Redactar mensaje').item.json.userId }}",
+              "type": "number"
+            },
+            {
+              "id": "Marcar enviado-d",
+              "name": "day",
+              "value": "={{ $('Redactar mensaje').item.json.day }}",
+              "type": "string"
+            },
+            {
+              "id": "Marcar enviado-s",
+              "name": "status",
+              "value": "sent",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Marcar enviado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1340,
+        -100
+      ],
+      "id": "rec-sent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "Marcar fallido-u",
+              "name": "userId",
+              "value": "={{ $('Redactar mensaje').item.json.userId }}",
+              "type": "number"
+            },
+            {
+              "id": "Marcar fallido-d",
+              "name": "day",
+              "value": "={{ $('Redactar mensaje').item.json.day }}",
+              "type": "string"
+            },
+            {
+              "id": "Marcar fallido-s",
+              "name": "status",
+              "value": "failed",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Marcar fallido",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1340,
+        100
+      ],
+      "id": "rec-failed"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Agrupa los resultados del día en lotes de 500 para registrarlos en MENTOR AI.\nconst filas = $input.all().map((item) => item.json);\nconst lotes = [];\nfor (let i = 0; i < filas.length; i += 500) {\n  const lote = filas.slice(i, i + 500);\n  lotes.push({ json: { day: lote[0].day, results: lote.map((f) => ({ userId: Number(f.userId), status: f.status })) } });\n}\nreturn lotes;"
+      },
+      "name": "Agrupar resultados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        0
+      ],
+      "id": "rec-agrupar"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuración').first().json.apiUrl }}/integrations/daily-reminders/deliveries",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "name": "Registrar envíos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1820,
+        0
+      ],
+      "id": "rec-registrar"
     }
   ],
   "connections": {
@@ -159,6 +297,57 @@
         [
           {
             "node": "Enviar recordatorio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar recordatorio": {
+      "main": [
+        [
+          {
+            "node": "Marcar enviado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Marcar fallido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar enviado": {
+      "main": [
+        [
+          {
+            "node": "Agrupar resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar fallido": {
+      "main": [
+        [
+          {
+            "node": "Agrupar resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agrupar resultados": {
+      "main": [
+        [
+          {
+            "node": "Registrar envíos",
             "type": "main",
             "index": 0
           }

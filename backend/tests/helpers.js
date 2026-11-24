@@ -58,11 +58,16 @@ export async function createPlatformAdmin(email) {
 }
 
 // Inicia sesión y devuelve un cliente que envía cookie y token CSRF.
-export async function loginAs(email, password = PASSWORD) {
+// Como haría la persona en el diálogo, acepta los documentos pendientes salvo que se pida lo contrario.
+export async function loginAs(email, password = PASSWORD, { acceptPending = true } = {}) {
   const agent = request.agent(app);
   const response = await agent.post('/api/v1/auth/login').send({ email, password });
   if (response.status !== 200) throw new Error(`Login falló para ${email}: ${response.status}`);
   const csrf = response.body.data.csrfToken;
+  const pending = response.body.data.pendingConsents || [];
+  if (acceptPending && pending.length) {
+    await agent.post('/api/v1/me/consents').set('x-csrf-token', csrf).send({ documents: pending.map((item) => item.document) });
+  }
   const send = (method, path, body) => {
     const call = agent[method](`/api/v1${path}`).set('x-csrf-token', csrf);
     return body === undefined ? call : call.send(body);

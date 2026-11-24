@@ -1,6 +1,6 @@
-import { Op } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import {
-  Assignment, AssignmentSubmission, Course, CourseStreak, DataDeletionRequest, Enrollment, QuickQuiz, User,
+  Assignment, AssignmentSubmission, Course, CourseStreak, DataDeletionRequest, Enrollment, QuickQuiz, sequelize,
 } from '../models/index.js';
 import { notFound } from '../utils/AppError.js';
 import { addDays, dayKey } from '../utils/clock.js';
@@ -16,49 +16,91 @@ export async function receiveExchangeRate({ date, buy, sell }) {
 }
 
 // Workflow 2 (n8n): estudiantes con tareas que vencen en 36 horas o con la racha en riesgo hoy.
-export async function dailyReminders() {
+// Se recorre por páginas ordenadas por id (cursor `after`): nadie queda fuera aunque haya muchas personas.
+// No se incluye a quien ya recibió el recordatorio hoy ni a quien lo desactivó en su configuración.
+export const REMINDER_PAGE_MAX = 500;
+export async function dailyReminders({ after = 0, limit = 200 } = {}) {
   const now = new Date();
   const soon = new Date(now.getTime() + 36 * 3600000);
-  const enrollments = await Enrollment.findAll({
-    where: { status: 'active' },
-    include: [
-      { model: User, as: 'student', where: { status: 'active', anonymizedAt: null }, attributes: ['id', 'email', 'displayName'] },
-      { model: Course, as: 'course', where: { status: 'published' }, attributes: ['id', 'title'] },
-    ],
-    limit: 5000,
-  });
+  const day = dayKey();
+  const size = Math.min(Math.max(1, Number(limit) || 200), REMINDER_PAGE_MAX);
+  const students = await sequelize.query(
+    `SELECT DISTINCT u.id, u.email, u.display_name AS displayName
+       FROM users u
+       JOIN enrollments e ON e.student_id = u.id AND e.status = 'active'
+       JOIN courses c ON c.id = e.course_id AND c.status = 'published'
+       LEFT JOIN user_preferences p ON p.user_id = u.id
+       LEFT JOIN reminder_deliveries d ON d.user_id = u.id AND d.reminder_day = :day AND d.status = 'sent'
+      WHERE u.status = 'active' AND u.anonymized_at IS NULL AND COALESCE(p.email_reminders, 1) = 1
+        AND d.id IS NULL AND u.id > :after
+      ORDER BY u.id
+      LIMIT :take`,
+    { replacements: { day, after: Number(after) || 0, take: size + 1 }, type: QueryTypes.SELECT },
+  );
+  const hasMore = students.length > size;
+  const page = students.slice(0, size);
+  const byId = new Map(page.map((student) => [student.id, student]));
+  const enrollments = page.length ? await Enrollment.findAll({
+    where: { status: 'active', studentId: [...byId.keys()] },
+    include: [{ model: Course, as: 'course', where: { status: 'published' }, attributes: ['id', 'title'] }],
+    order: [['studentId', 'ASC'], ['courseId', 'ASC']],
+  }) : [];
   const courseIds = [...new Set(enrollments.map((row) => row.courseId))];
   const assignments = courseIds.length ? await Assignment.findAll({
     where: { courseId: courseIds, status: 'published', dueAt: { [Op.between]: [now, soon] } },
     attributes: ['id', 'courseId', 'title', 'dueAt'],
-    include: [{ model: AssignmentSubmission, as: 'submissions', required: false, attributes: ['studentId'] }],
+    include: [{ model: AssignmentSubmission, as: 'submissions', required: false, attributes: ['studentId'], where: { studentId: [...byId.keys()] } }],
+    order: [['dueAt', 'ASC'], ['id', 'ASC']],
   }) : [];
-  const withBank = new Set((await QuickQuiz.findAll({ where: { courseId: courseIds, status: 'published' }, attributes: ['courseId'] })).map((row) => row.courseId));
-  const yesterday = addDays(dayKey(), -1);
-  const atRisk = await CourseStreak.findAll({ where: { lastDay: yesterday, courseId: [...withBank] } });
+  const withBank = courseIds.length
+    ? new Set((await QuickQuiz.findAll({ where: { courseId: courseIds, status: 'published' }, attributes: ['courseId'] })).map((row) => row.courseId))
+    : new Set();
+  const yesterday = addDays(day, -1);
+  const atRisk = withBank.size
+    ? await CourseStreak.findAll({ where: { lastDay: yesterday, courseId: [...withBank], studentId: [...byId.keys()] } })
+    : [];
 
-  const byStudent = new Map();
-  const add = (student, item) => {
-    const entry = byStudent.get(student.id) || { email: student.email, name: student.displayName, items: [] };
+  const reminders = new Map();
+  const add = (studentId, item) => {
+    const student = byId.get(studentId);
+    const entry = reminders.get(studentId) || { userId: studentId, day, email: student.email, name: student.displayName, items: [] };
     entry.items.push(item);
-    byStudent.set(student.id, entry);
+    reminders.set(studentId, entry);
   };
   for (const enrollment of enrollments) {
     for (const assignment of assignments.filter((row) => row.courseId === enrollment.courseId)) {
       if (!assignment.submissions.some((sub) => sub.studentId === enrollment.studentId)) {
-        add(enrollment.student, { type: 'tarea', course: enrollment.course.title, title: assignment.title, dueAt: assignment.dueAt });
+        add(enrollment.studentId, { type: 'tarea', course: enrollment.course.title, title: assignment.title, dueAt: assignment.dueAt });
       }
     }
     if (atRisk.some((row) => row.courseId === enrollment.courseId && row.studentId === enrollment.studentId)) {
-      add(enrollment.student, { type: 'racha', course: enrollment.course.title, title: 'Completa la práctica de hoy para no perder tu racha' });
+      add(enrollment.studentId, { type: 'racha', course: enrollment.course.title, title: 'Completa la práctica de hoy para no perder tu racha' });
     }
   }
-  const reminders = [...byStudent.values()].slice(0, 500);
-  await logIntegration({ integration: 'n8n:recordatorios', direction: 'inbound', status: 'ok', detail: `${reminders.length} personas` });
-  return reminders;
+  const list = [...reminders.values()];
+  const nextCursor = hasMore ? page[page.length - 1].id : null;
+  await logIntegration({ integration: 'n8n:recordatorios', direction: 'inbound', status: 'ok', detail: `${list.length} con pendientes de ${page.length} revisadas` });
+  return { day, reminders: list, scanned: page.length, nextCursor };
 }
 
-// Workflow 3 (n8n): n8n procesa la baja y luego envía el correo de confirmación.
+// n8n informa qué recordatorios salieron. Un «enviado» no se vuelve «fallido» al repetir el aviso.
+export async function recordReminderDeliveries({ day, results }) {
+  const rows = results.map(({ userId, status }) => [userId, day, status]);
+  await sequelize.query(
+    `INSERT INTO reminder_deliveries (user_id, reminder_day, status, attempts) VALUES ${rows.map(() => '(?, ?, ?, 1)').join(', ')}
+     ON DUPLICATE KEY UPDATE status = IF(status = 'sent', 'sent', VALUES(status)), attempts = attempts + 1, updated_at = CURRENT_TIMESTAMP`,
+    { replacements: rows.flat() },
+  );
+  const sent = results.filter((item) => item.status === 'sent').length;
+  await logIntegration({
+    integration: 'n8n:recordatorios', direction: 'inbound', status: sent === results.length ? 'ok' : 'error',
+    detail: `${sent} enviados, ${results.length - sent} fallidos (${day})`,
+  });
+  return { recorded: results.length, sent, failed: results.length - sent };
+}
+
+// Workflow 3 (n8n): la baja ya se completó en el servidor; esta llamada es idempotente y confirma el estado
+// antes de que n8n envíe el correo. Una solicitud antigua que siguiera pendiente se completa aquí.
 export async function processDeletionFromN8n(requestId) {
   if (!(await DataDeletionRequest.findByPk(requestId))) throw notFound('Solicitud no encontrada.');
   const result = await processDeletion(requestId, 'n8n', { notify: false });

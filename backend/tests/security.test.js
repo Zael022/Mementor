@@ -143,3 +143,35 @@ test('una invitación solo se consume una vez con solicitudes simultáneas', asy
   ]);
   assert.deepEqual(results.map((result) => result.status).sort(), [200, 422]);
 });
+
+// M08: dos solicitudes simultáneas con el mismo enlace: una sola contraseña queda vigente.
+test('un enlace de recuperación usado dos veces a la vez solo confirma una operación', async () => {
+  await createPlatformAdmin('carrera@prueba.test');
+  const abierta = await loginAs('carrera@prueba.test');
+  sentInTests.length = 0;
+  await request(app).post('/api/v1/auth/password/forgot').send({ email: 'carrera@prueba.test' });
+  const token = sentInTests[0].text.match(/token=([a-f0-9]{64})/)[1];
+  const [a, b] = await Promise.all([
+    request(app).post('/api/v1/auth/password/reset').send({ token, password: 'PrimeraClave2026' }),
+    request(app).post('/api/v1/auth/password/reset').send({ token, password: 'SegundaClave2026' }),
+  ]);
+  assert.deepEqual([a.status, b.status].sort(), [200, 422]);
+  const ganadora = a.status === 200 ? 'PrimeraClave2026' : 'SegundaClave2026';
+  const perdedora = ganadora === 'PrimeraClave2026' ? 'SegundaClave2026' : 'PrimeraClave2026';
+  await loginAs('carrera@prueba.test', ganadora);
+  await assert.rejects(() => loginAs('carrera@prueba.test', perdedora));
+  assert.equal((await abierta.get('/auth/me')).status, 401);
+});
+
+test('una invitación activada dos veces a la vez solo fija una contraseña', async () => {
+  await createPlatformAdmin('operador.carrera@prueba.test');
+  const plataforma = await loginAs('operador.carrera@prueba.test');
+  const institucion = await plataforma.post('/institutions', { name: 'Carrera de prueba' });
+  const invitado = await plataforma.post(`/institutions/${institucion.body.data.id}/admins`, { email: 'admin.carrera@prueba.test', displayName: 'Admin Carrera' });
+  const token = invitado.body.data.invitationToken;
+  const activar = (password) => request(app).post('/api/v1/auth/activate').send({ token, password, acceptTerms: true, acceptPrivacy: true });
+  const [a, b] = await Promise.all([activar('PrimeraClave2026'), activar('SegundaClave2026')]);
+  assert.deepEqual([a.status, b.status].sort(), [200, 422]);
+  const ganadora = a.status === 200 ? 'PrimeraClave2026' : 'SegundaClave2026';
+  await loginAs('admin.carrera@prueba.test', ganadora);
+});
