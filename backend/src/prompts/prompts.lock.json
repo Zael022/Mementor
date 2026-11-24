@@ -1,0 +1,42 @@
+{
+  "tutor": {
+    "version": "1.0.0",
+    "sha256": "78e7405934d0388b46effe0344223d154e94703c0682f877cafae554477f9087"
+  },
+  "agentes-comun": {
+    "version": "1.0.0",
+    "sha256": "ad1183fa5a1738ddfa50bfdd3ab23a470362fe4a969e542b6de77790fa4f6f34"
+  },
+  "question_generator": {
+    "version": "1.0.0",
+    "sha256": "fdafd59f1ab880d223d9a75dc333e14cabdfa4831340a43f77e66cdcb7a7975d"
+  },
+  "feedback_assistant": {
+    "version": "1.0.0",
+    "sha256": "c82c68d891aa9fda062d29b313f6ca72645d8d3bd1d72294d4b151645541e6ab"
+  },
+  "course_analyst": {
+    "version": "1.0.0",
+    "sha256": "25f6ec76122edbdf6b0fcc00083de9ecb4d8e97eb14a4b42628aaa9e8a2ffa44"
+  },
+  "compliance_checker": {
+    "version": "1.0.0",
+    "sha256": "75cbb133a6d662e5c3a05bc084b07fe081d92bd15546be5430d546c4318727a0"
+  },
+  "announcement_writer": {
+    "version": "1.0.0",
+    "sha256": "55523c7a74fbb5467abc1f8a551e8c68c367d6c8c0cf7d7368076d72332ecd8e"
+  },
+  "study_coach": {
+    "version": "1.0.0",
+    "sha256": "45cdcfad060f9124007ae25b1802f9f3f7cb347a1d6f13e6148c9bb139ebe56b"
+  },
+  "lesson_summarizer": {
+    "version": "1.0.0",
+    "sha256": "fce8aff974c053ffa5c66087b7251705d99846497f9831f56c9c24ec164997df"
+  },
+  "admissions_writer": {
+    "version": "1.0.0",
+    "sha256": "45058c990770154e595f0331e40d91ac8bd078c54a2a237a735022e20538e89a"
+  }
+}

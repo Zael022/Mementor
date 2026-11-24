@@ -5,6 +5,7 @@ import { getCourseAccess } from './accessService.js';
 import { recordAudit } from './auditService.js';
 import { removeStoredFiles } from './fileCleanup.js';
 import { retireLessonSources, syncLessonSource } from './knowledgeService.js';
+import { invalidateSource } from './agents/responseCache.js';
 
 // Calcula la siguiente posición dentro de un grupo.
 async function nextPosition(model, where) {
@@ -155,6 +156,8 @@ export async function updateLesson(user, lessonId, changes) {
   const wasStatus = record.status;
   if ('videoUrl' in changes) changes.videoUrl = cleanVideoUrl(changes.videoUrl);
   await record.update(changes);
+  // Un resumen guardado de esta lección deja de valer si cambió su contenido o su estado.
+  await invalidateSource(`lesson:${record.id}`);
   if (changes.status && changes.status !== wasStatus) {
     await recordAudit({ actor: user, action: `lesson.${changes.status}`, resourceType: 'lesson', resourceId: record.id });
   }
@@ -168,6 +171,7 @@ export async function updateLesson(user, lessonId, changes) {
 export async function deleteLesson(user, lessonId) {
   const { record } = await loadWithAccess(Lesson, lessonId, user, { write: true, label: 'Lección' });
   await retireLessonSources(record, 'lesson_deleted', { actor: user });
+  await invalidateSource(`lesson:${record.id}`);
   const files = await Material.findAll({ where: { lessonId: record.id, kind: 'file' }, attributes: ['storedName'] });
   await record.destroy();
   await removeStoredFiles(files.map((file) => file.storedName));

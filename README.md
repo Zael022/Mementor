@@ -161,12 +161,12 @@ Recorrido: el docente crea un quiz en *Quizzes*, le agrega preguntas y lo public
 ## 5. Pruebas
 
 ```powershell
-# Backend: 176 pruebas en mentor_ai_test (crean y borran sus datos). Google Cloud, la IA y las APIs externas son dobles.
+# Backend: 241 pruebas (incluye las evals rápidas de IA de tests/evals) en mentor_ai_test (crean y borran sus datos). Google Cloud, la IA y las APIs externas son dobles.
 cd backend
 npm run lint
 npm test
 
-# Frontend: lint, 58 pruebas de componentes y hooks (Vitest + jsdom) y compilación
+# Frontend: lint, 65 pruebas de componentes y hooks (Vitest + jsdom) y compilación
 cd ..\frontend
 npm run lint
 npm test
@@ -183,7 +183,7 @@ cd frontend
 npx playwright install chromium
 npm run test:e2e
 ```
-Son 38 pruebas, incluidas 12 revisiones automáticas de accesibilidad con axe-core (WCAG 2.2 AA) en tres anchos. Usan los datos de conexión de `backend/.env`.
+Son 44 pruebas, incluidas 12 revisiones automáticas de accesibilidad con axe-core (WCAG 2.2 AA) en tres anchos. Usan los datos de conexión de `backend/.env`.
 
 Las capturas de los mockups (escritorio y móvil) se generan con `npx playwright test -c playwright.capturas.config.js` sobre la misma base `_e2e` y quedan en `frontend/capturas/salida/` (no se versionan; las optimizadas están en `docs/mockups/`). Para cambiar puertos o base: `E2E_DB_NAME`, `E2E_API_PORT` (3101), `E2E_WEB_PORT` (5174) y `E2E_FAKE_AI_PORT` (4599).
 
@@ -214,6 +214,13 @@ Despliegue paso a paso (TiDB Cloud, Render, Vercel y n8n) en `docs/despliegue.md
 - **Baja de cuenta.** Se completa en el servidor, en una transacción, antes de responder; n8n solo envía el correo de confirmación. Las solicitudes que hubieran quedado pendientes se completan en la conciliación diaria.
 - **Recordatorios.** Se recorren por páginas con cursor y se registra el envío por persona y día, así nadie queda fuera y un reintento no repite correos. Cada estudiante puede apagarlos en Configuración.
 - **Tutor.** La revisión automática rechaza números que no están en la fuente, números asociados a otra cosa y negaciones que contradicen el pasaje. Es una revisión por palabras, no una prueba de verdad (ADR 0008).
+- **Capas de IA (ADR 0009).**
+  - Prompts versionados en `backend/src/prompts/`: una prueba falla si cambian sin subir la versión.
+  - Router de modelos por tarea: `AI_MODEL_RAPIDO` y `AI_MODEL_AVANZADO`, con `AI_MODEL` como respaldo.
+  - Guardrails de salida: datos personales, enlaces externos, cifras sin respaldo, temas ajenos y claves de evaluaciones abiertas.
+  - Caché por institución del resumen de lección.
+  - Bitácora con versión del prompt, modelo, caché y resultado de los guardrails.
+  - Evals: rápidas dentro de `npm test`, y con modelo real en `npm run evals`. Ver `docs/agentes-ia.md`.
 
 ## Scripts
 | Carpeta | Comando | Qué hace |

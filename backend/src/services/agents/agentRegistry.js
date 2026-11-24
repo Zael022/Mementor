@@ -11,11 +11,28 @@ import { retrievePassages } from '../retrievalService.js';
 import { streakView } from '../streakService.js';
 import { asData } from '../tutorService.js';
 import { detectPersonalData, redactPersonalData } from '../../utils/personalData.js';
+import {
+  externalLinks, looksLikeInjection, numbersOutside, personalDataLeaks, textsOf, topicCoverage, unsupportedFacts,
+} from '../../utils/outputGuard.js';
+import { AGENT_PROMPTS, fill } from '../../prompts/index.js';
 
-// Catálogo de los 8 agentes de IA: propósito, roles, entradas, contexto autorizado y formato de salida.
+// Catálogo de los 8 agentes de IA: propósito, roles, entradas, contexto autorizado, formato de salida,
+// nivel de modelo (router), guardrails de salida y, solo donde la entrada no es personal, caché.
+// Los textos que se envían al modelo están en src/prompts/ (versionados).
+const P = AGENT_PROMPTS;
+
+// Revisiones de salida comunes: datos personales y enlaces que no vienen de la entrada autorizada.
+function baseGuard(output, allowedText) {
+  if (personalDataLeaks(output, allowedText).length) return { block: 'personal_data' };
+  if (externalLinks(output, allowedText).length) return { block: 'external_link' };
+  return null;
+}
+// Alerta de inyección cuando la entrada trae frases típicas («ignora tus instrucciones»).
+const injectionAlert = (...texts) => (texts.some(looksLikeInjection) ? { alert: 'injection_suspected' } : {});
+const passagesText = (passages) => passages.map((passage) => passage.text).join('\n');
 
 const id = z.coerce.number().int().positive();
-const PROVIDER = 'Proveedor configurado en AI_PROVIDER/AI_MODEL (Anthropic Claude por defecto)';
+const PROVIDER = 'Proveedor configurado en AI_PROVIDER; modelo según el nivel de la tarea (AI_MODEL_RAPIDO o AI_MODEL_AVANZADO, con AI_MODEL como respaldo)';
 
 // Pasajes del curso numerados [S1], [S2]… para exigir citas verificables.
 function sourcesBlock(passages) {
@@ -62,8 +79,10 @@ export const AGENTS = {
       if (!passages.length) return { courseId: input.courseId, noEvidence: 'No hay material del curso sobre ese tema. Sube o publica material antes de generar preguntas.' };
       return { courseId: input.courseId, data: { topic: input.topic, count: input.count }, passages, sources: sourceList(passages) };
     },
-    system: 'Eres un diseñador de evaluaciones. Creas preguntas claras, con una sola opción correcta y distractores plausibles, basadas solo en las fuentes.',
-    prompt: ({ data, passages }) => `${sourcesBlock(passages)}\n<dato>Tema: ${asData(data.topic)}</dato>\nGenera ${data.count} preguntas. Formato: {"questions":[{"prompt":"...","options":["a","b","c","d"],"correctIndex":0,"explanation":"...","citations":["S1"]}]}`,
+    tier: 'avanzado',
+    system: P.question_generator.text.system,
+    prompt: ({ data, passages }) => `${sourcesBlock(passages)}\n<dato>Tema: ${asData(data.topic)}</dato>\n${fill(P.question_generator.text.task, { count: data.count })}`,
+    guard: (output, { passages, data }) => baseGuard(output, `${passagesText(passages)}\n${data.topic}`) ?? injectionAlert(passagesText(passages)),
     outputSchema: z.object({
       questions: z.array(z.object({
         prompt: z.string().min(3).max(500),
@@ -74,10 +93,15 @@ export const AGENTS = {
       })).min(1).max(8),
     }),
     // Se descartan preguntas sin cita válida o con índice fuera de rango; si no queda ninguna, no hay respaldo.
+    // También se descartan las explicaciones con cifras o negaciones que sus fuentes no respaldan.
     finalize: (result, { passages }) => {
       const questions = result.questions
         .map((question) => ({ ...question, citations: validCitations(question.citations, passages) }))
-        .filter((question) => question.citations.length && question.correctIndex < question.options.length);
+        .filter((question) => question.citations.length && question.correctIndex < question.options.length)
+        .filter((question) => {
+          const cited = question.citations.map((cite) => passages[Number(cite.slice(1)) - 1].text).join('\n');
+          return unsupportedFacts([question.explanation], cited).length === 0;
+        });
       return questions.length ? { questions } : { noEvidence: 'Ninguna pregunta propuesta citaba una fuente entregada, así que no se muestran. Prueba con un tema más concreto.' };
     },
   },
@@ -103,15 +127,18 @@ export const AGENTS = {
         data: { title: assignment.title, instructions: assignment.instructions, maxPoints: assignment.maxPoints, body: redactPersonalData(submission.body), hasLink: Boolean(submission.linkUrl) },
       };
     },
-    system: 'Eres un docente que da retroalimentación formativa: específica, respetuosa y accionable. Sugieres una nota orientativa, nunca definitiva.',
-    prompt: ({ data }) => `<dato>Tarea: ${asData(data.title)}\nInstrucciones: ${asData(data.instructions)}\nPuntaje máximo: ${data.maxPoints}</dato>\n<dato>Entrega del estudiante:\n${asData(data.body)}${data.hasLink ? '\n(La entrega incluye un enlace que el docente revisa directamente.)' : ''}</dato>\nFormato: {"strengths":["..."],"improvements":["..."],"feedback":"texto para el estudiante","suggestedPoints":0}`,
+    tier: 'avanzado',
+    system: P.feedback_assistant.text.system,
+    prompt: ({ data }) => `<dato>Tarea: ${asData(data.title)}\nInstrucciones: ${asData(data.instructions)}\nPuntaje máximo: ${data.maxPoints}</dato>\n<dato>Entrega del estudiante:\n${asData(data.body)}${data.hasLink ? `\n${P.feedback_assistant.text.linkNote}` : ''}</dato>\n${P.feedback_assistant.text.task}`,
+    // La entrega es texto del estudiante: puede intentar manipular la nota. La nota sugerida igual queda entre 0 y el máximo.
+    guard: (output, { data }) => baseGuard(output, `${data.title}\n${data.instructions}\n${data.body}`) ?? injectionAlert(data.body),
     outputSchema: z.object({
       strengths: z.array(z.string().max(300)).max(5),
       improvements: z.array(z.string().max(300)).max(5),
       feedback: z.string().min(10).max(2000),
       suggestedPoints: z.number().min(0),
     }),
-    finalize: (result, { data }) => ({ ...result, suggestedPoints: Math.min(Math.round(result.suggestedPoints), data.maxPoints), maxPoints: data.maxPoints }),
+    finalize: (result, { data }) => ({ ...result, suggestedPoints: Math.max(0, Math.min(Math.round(result.suggestedPoints), data.maxPoints)), maxPoints: data.maxPoints }),
   },
 
   // 4. Analista del curso: informe en lenguaje natural con datos agregados.
@@ -133,8 +160,11 @@ export const AGENTS = {
       }));
       return { courseId: input.courseId, data: { assessments: analytics.assessments, topics: analytics.topics, students } };
     },
-    system: 'Eres un analista educativo. Interpretas números con prudencia, señalas temas débiles y propones acciones concretas para el docente.',
-    prompt: ({ data }) => `<dato>${asData(JSON.stringify(data))}</dato>\nFormato: {"summary":"...","highlights":["..."],"risks":["..."],"recommendations":["..."]}`,
+    tier: 'rapido',
+    system: P.course_analyst.text.system,
+    prompt: ({ data }) => `<dato>${asData(JSON.stringify(data))}</dato>\n${P.course_analyst.text.task}`,
+    // Los porcentajes y conteos pueden salir de cálculos válidos: una cifra ausente en los datos solo genera alerta.
+    guard: (output, { data }) => baseGuard(output, JSON.stringify(data)) ?? (numbersOutside(output, JSON.stringify(data)).length ? { alert: 'unsupported_number' } : {}),
     outputSchema: z.object({
       summary: z.string().min(10).max(1500),
       highlights: z.array(z.string().max(300)).max(6),
@@ -157,8 +187,11 @@ export const AGENTS = {
       // El modelo recibe el texto ya sin los datos detectados; los hallazgos viajan solo como tipo y muestra enmascarada.
       return { data: { text: redactPersonalData(input.text, { links: false }) }, findings: detectPersonalData(input.text) };
     },
-    system: 'Eres un oficial de cumplimiento de la Ley 8968 de Costa Rica. Detectas datos personales y sensibles y explicas el riesgo y cómo corregirlo.',
-    prompt: ({ data, findings }) => `<dato>Hallazgos automáticos: ${asData(JSON.stringify(findings))}</dato>\n<dato>Texto:\n${asData(data.text)}</dato>\nFormato: {"riskLevel":"bajo|medio|alto","issues":[{"type":"...","detail":"...","fix":"..."}],"summary":"..."}`,
+    tier: 'avanzado',
+    system: P.compliance_checker.text.system,
+    prompt: ({ data, findings }) => `<dato>Hallazgos automáticos: ${asData(JSON.stringify(findings))}</dato>\n<dato>Texto:\n${asData(data.text)}</dato>\n${P.compliance_checker.text.task}`,
+    // El texto revisado puede traer enlaces propios; los datos personales ya salieron ocultos.
+    guard: (output, { data }) => (personalDataLeaks(output, data.text).length ? { block: 'personal_data' } : injectionAlert(data.text)),
     outputSchema: z.object({
       riskLevel: z.enum(['bajo', 'medio', 'alto']),
       issues: z.array(z.object({ type: z.string().max(80), detail: z.string().max(400), fix: z.string().max(400) })).max(10),
@@ -186,8 +219,17 @@ export const AGENTS = {
       const { course } = await getCourseAccess(user, input.courseId, { write: true });
       return { courseId: course.id, data: { course: course.title, ...input, brief: redactPersonalData(input.brief, { links: false }) } };
     },
-    system: 'Eres un redactor educativo. Escribes textos breves, claros e inclusivos, sin inventar fechas ni datos que no estén en la indicación.',
-    prompt: ({ data }) => `<dato>Curso: ${asData(data.course)}\nIndicación: ${asData(data.brief)}\nTono: ${data.tone}\nFormato: ${data.format === 'redes' ? 'publicación para redes (máximo 280 caracteres) con 2 o 3 etiquetas' : 'anuncio para el curso'}</dato>\nFormato: {"title":"...","body":"...","hashtags":["..."]}`,
+    tier: 'rapido',
+    system: P.announcement_writer.text.system,
+    prompt: ({ data }) => `<dato>Curso: ${asData(data.course)}\nIndicación: ${asData(data.brief)}\nTono: ${data.tone}\nFormato: ${data.format === 'redes' ? P.announcement_writer.text.formatSocial : P.announcement_writer.text.formatAnnouncement}</dato>\n${P.announcement_writer.text.task}`,
+    // Fechas y cifras solo de la indicación; el texto debe tratar del curso o de la indicación.
+    guard: (output, { data }) => {
+      const allowed = `${data.course}\n${data.brief}`;
+      const text = { title: output.title, body: output.body };
+      return baseGuard(output, allowed)
+        ?? (numbersOutside(text, allowed).length ? { block: 'unsupported_number' } : null)
+        ?? (topicCoverage(text, allowed) < 0.2 ? { block: 'off_topic' } : injectionAlert(data.brief));
+    },
     outputSchema: z.object({ title: z.string().min(3).max(180), body: z.string().min(10).max(3000), hashtags: z.array(z.string().max(40)).max(5).default([]) }),
   },
 
@@ -221,8 +263,15 @@ export const AGENTS = {
         },
       };
     },
-    system: 'Eres un coach de estudio amable y concreto. Priorizas temas con menor dominio y entregas cercanas, y respetas el tiempo disponible.',
-    prompt: ({ data }) => `<dato>${asData(JSON.stringify(data))}</dato>\nLa suma de los minutos del plan no puede superar ${data.minutes}.\nFormato: {"plan":[{"minutes":10,"activity":"...","why":"..."}],"motivation":"..."}`,
+    tier: 'rapido',
+    system: P.study_coach.text.system,
+    prompt: ({ data }) => `<dato>${asData(JSON.stringify(data))}</dato>\n${fill(P.study_coach.text.task, { minutes: data.minutes })}`,
+    // Las cifras del texto que no salen de los datos ni de los minutos del plan solo generan alerta.
+    guard: (output, { data }) => {
+      const allowed = `${JSON.stringify(data)} ${output.plan.map((item) => item.minutes).join(' ')}`;
+      const prose = textsOf({ plan: output.plan.map(({ activity, why }) => ({ activity, why })), motivation: output.motivation });
+      return baseGuard(output, JSON.stringify(data)) ?? (numbersOutside(prose, allowed).length ? { alert: 'unsupported_number' } : {});
+    },
     outputSchema: z.object({
       plan: z.array(z.object({ minutes: z.number().int().min(1).max(240), activity: z.string().max(300), why: z.string().max(300) })).min(1).max(8),
       motivation: z.string().max(500),
@@ -247,10 +296,24 @@ export const AGENTS = {
       const { canEdit } = await getCourseAccess(user, lesson.courseId);
       if (!canEdit && lesson.status !== 'published') throw forbidden('La lección no está publicada.');
       if (!lesson.bodyMd || lesson.bodyMd.trim().length < 80) return { courseId: lesson.courseId, noEvidence: 'La lección tiene muy poco contenido para resumir.' };
-      return { courseId: lesson.courseId, data: { title: lesson.title, body: lesson.bodyMd.slice(0, 20000) } };
+      // La lección sale sin cédulas, teléfonos ni correos: el resumen no los necesita.
+      return {
+        courseId: lesson.courseId,
+        data: { title: lesson.title, body: redactPersonalData(lesson.bodyMd.slice(0, 20000), { links: false }) },
+        // Misma lección, mismo contenido y misma versión del prompt: la respuesta se puede reutilizar.
+        cache: { sourceRef: `lesson:${lesson.id}` },
+      };
     },
-    system: 'Eres un tutor que sintetiza. Resumes con fidelidad a la lección, sin agregar información externa.',
-    prompt: ({ data }) => `<fuente id="S1" titulo="${asData(data.title)}">\n${asData(data.body)}\n</fuente>\nFormato: {"summary":"...","keyPoints":["..."],"selfCheck":[{"question":"...","answer":"..."}]}`,
+    tier: 'rapido',
+    system: P.lesson_summarizer.text.system,
+    // La lección es el bloque largo y estable: se marca para el prompt caching del proveedor si está activo.
+    prompt: ({ data }) => [
+      { text: `<fuente id="S1" titulo="${asData(data.title)}">\n${asData(data.body)}\n</fuente>`, cache: true },
+      { text: P.lesson_summarizer.text.task },
+    ],
+    // Cada afirmación del resumen se revisa contra la lección (cifras y negaciones).
+    guard: (output, { data }) => baseGuard(output, data.body)
+      ?? (unsupportedFacts(textsOf(output), `${data.title}\n${data.body}`).length ? { block: 'unsupported_claim' } : injectionAlert(data.body)),
     outputSchema: z.object({
       summary: z.string().min(20).max(1500),
       keyPoints: z.array(z.string().max(300)).min(1).max(8),

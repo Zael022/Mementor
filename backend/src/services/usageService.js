@@ -8,12 +8,12 @@ import { readAiConfig } from './aiProvider.js';
 
 const DAY_MS = 24 * 3600000;
 // Resultados que consumen cuota: los avisos sin llamada al modelo y las fallas del proveedor no cuentan.
-const COUNTED = ['reserved', 'completed', 'no_citations', 'invalid_format', 'cancelled'];
+const COUNTED = ['reserved', 'completed', 'no_citations', 'invalid_format', 'cancelled', 'guard_blocked'];
 const userLimit = () => Number(process.env.AI_DAILY_LIMIT_PER_USER || 40);
 const institutionDefault = () => Number(process.env.AI_DAILY_LIMIT_PER_INSTITUTION || 2000);
 
 // Reserva una consulta dentro de una transacción con bloqueo: dos pedidos simultáneos no superan el límite.
-export async function reserveQuestion(user, courseId, { streamed = false } = {}) {
+export async function reserveQuestion(user, courseId, { streamed = false, promptVersion = null, modelTier = null } = {}) {
   return sequelize.transaction(async (transaction) => {
     // Orden fijo de bloqueo (institución y luego usuario) para evitar bloqueos cruzados.
     const institution = await Institution.findByPk(user.institutionId, { lock: transaction.LOCK.UPDATE, transaction });
@@ -28,31 +28,40 @@ export async function reserveQuestion(user, courseId, { streamed = false } = {})
     if (shared >= institutionLimit) {
       throw new AppError(429, 'INSTITUTION_QUOTA', 'Tu institución alcanzó su tope diario de consultas al tutor. Intenta mañana o avisa a la administración.');
     }
-    return AiUsageEvent.create({ institutionId: user.institutionId, userId: user.id, courseId, streamed }, { transaction });
+    return AiUsageEvent.create({ institutionId: user.institutionId, userId: user.id, courseId, streamed, promptVersion, modelTier }, { transaction });
   });
 }
 
 // Cierra la reserva con el resultado, el modelo, la latencia y los tokens que informó el proveedor.
-export async function finishQuestion(event, { outcome, provider = null, model = null, retrievalMode = null, startedAt = null, usage = null }) {
+// También guarda la versión del prompt, el nivel de modelo, el resultado de los guardrails y los tokens de la caché del proveedor.
+export async function finishQuestion(event, { outcome, provider = null, model = null, retrievalMode = null, startedAt = null, usage = null, guardOutcome = null }) {
   if (!event) return;
+  const count = (value) => (Number.isFinite(value) ? value : null);
   await event.update({
     outcome,
     provider,
     model,
     retrievalMode,
     latencyMs: startedAt ? Date.now() - startedAt : null,
-    inputTokens: Number.isFinite(usage?.inputTokens) ? usage.inputTokens : null,
-    outputTokens: Number.isFinite(usage?.outputTokens) ? usage.outputTokens : null,
+    inputTokens: count(usage?.inputTokens),
+    outputTokens: count(usage?.outputTokens),
+    cacheReadTokens: count(usage?.cacheReadTokens),
+    cacheWriteTokens: count(usage?.cacheWriteTokens),
+    guardOutcome,
   });
   // El tutor también queda en la bitácora común de agentes (sin contenido).
   await AgentRun.create({
     institutionId: event.institutionId, userId: event.userId, courseId: event.courseId, agent: 'tutor',
     status: { completed: 'completed', no_evidence: 'no_evidence' }[outcome] ?? 'failed',
     provider, model, latencyMs: event.latencyMs, inputTokens: event.inputTokens, outputTokens: event.outputTokens, errorCode: outcome === 'completed' ? null : outcome,
+    promptVersion: event.promptVersion, modelTier: event.modelTier, guardOutcome, cacheReadTokens: event.cacheReadTokens, cacheWriteTokens: event.cacheWriteTokens,
   });
   if (process.env.NODE_ENV !== 'test') {
     // Registro técnico sin credenciales, preguntas, respuestas ni contenido de documentos.
-    console.info(JSON.stringify({ evento: 'tutor.consulta', id: event.id, outcome, model, latencyMs: event.latencyMs, inputTokens: event.inputTokens, outputTokens: event.outputTokens }));
+    console.info(JSON.stringify({
+      evento: 'tutor.consulta', id: event.id, outcome, model, promptVersion: event.promptVersion, modelTier: event.modelTier, guardOutcome,
+      latencyMs: event.latencyMs, inputTokens: event.inputTokens, outputTokens: event.outputTokens, cacheReadTokens: event.cacheReadTokens,
+    }));
   }
 }
 
@@ -104,7 +113,9 @@ export async function listUsageEvents(user, pagination) {
   return {
     data: rows.map((row) => ({
       id: row.id, userId: row.userId, courseId: row.courseId, provider: row.provider, model: row.model, outcome: row.outcome,
-      streamed: row.streamed, latencyMs: row.latencyMs, inputTokens: row.inputTokens, outputTokens: row.outputTokens, createdAt: row.createdAt,
+      streamed: row.streamed, latencyMs: row.latencyMs, inputTokens: row.inputTokens, outputTokens: row.outputTokens,
+      promptVersion: row.promptVersion, modelTier: row.modelTier, cacheHit: row.cacheHit, guardOutcome: row.guardOutcome, cacheReadTokens: row.cacheReadTokens,
+      createdAt: row.createdAt,
     })),
     meta: pageMeta(pagination, count),
   };
