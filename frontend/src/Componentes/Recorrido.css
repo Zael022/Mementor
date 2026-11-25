@@ -1,0 +1,243 @@
+/* ===== Recorrido del curso: mascotas, rango, mapa, Parejas y sticker =====
+   Se carga junto con las páginas que lo usan (no pesa en la carga inicial). */
+
+/* --- Mascotas (Orbi y Pausa) --- */
+.mascota { display: flex; align-items: center; gap: 14px; }
+.mascota > svg { flex: none; overflow: visible; }
+.burbuja-mascota {
+  position: relative; margin: 0; padding: 10px 15px; max-width: 36ch;
+  background: var(--panel); color: var(--tinta); border: 1.5px solid var(--linea); border-radius: 16px;
+  font-weight: 600; line-height: 1.4; box-shadow: 0 10px 22px -16px rgba(35, 56, 176, 0.55);
+}
+.burbuja-mascota::before {
+  content: ''; position: absolute; left: -7.5px; top: 50%; width: 12px; height: 12px;
+  background: inherit; border-left: 1.5px solid var(--linea); border-bottom: 1.5px solid var(--linea);
+  transform: translateY(-50%) rotate(45deg);
+}
+/* Vacía sigue montada (región viva), pero no se ve. */
+.burbuja-mascota:empty { padding: 0; border: 0; box-shadow: none; background: none; }
+.burbuja-mascota:empty::before { display: none; }
+.mascota-pequeno .burbuja-mascota { font-weight: 500; font-size: 0.93rem; padding: 8px 12px; }
+.mascota-grande { flex-direction: column; text-align: center; }
+.mascota-grande .burbuja-mascota::before { left: 50%; top: -7.5px; transform: translateX(-50%) rotate(135deg); }
+.mascota-texto { margin: 0; color: var(--tenue); }
+/* En tema oscuro, un halo claro mantiene visible el contorno tinta de la marca. */
+:root[data-tema="oscuro"] :is(.orbi, .pausa, .sticker-capas) { filter: drop-shadow(0 0 1px rgba(232, 235, 255, 0.9)) drop-shadow(0 0 7px rgba(232, 235, 255, 0.22)); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) :is(.orbi, .pausa, .sticker-capas) { filter: drop-shadow(0 0 1px rgba(232, 235, 255, 0.9)) drop-shadow(0 0 7px rgba(232, 235, 255, 0.22)); }
+}
+/* Debajo de «Menos movimiento», alineado con el texto del interruptor. */
+.interruptores li.aviso-mascota { display: block; margin: 0 0 6px 34px; padding: 8px 12px; border: 0; border-radius: var(--radio); background: var(--fondo); }
+.tutor-pensando { padding: 6px 0; }
+.figura-mascota { display: block; width: 96px; }
+.figura-mascota svg { width: 100%; height: auto; }
+
+/* Bienvenida de regreso con Pausa. */
+.bienvenida-regreso {
+  display: grid; grid-template-columns: auto 1fr; gap: 10px 24px; align-items: center;
+  padding: 18px 26px; margin-bottom: 24px; border-radius: var(--radio-grande);
+  background: var(--suave-exito); border: 1.5px solid var(--borde-exito);
+}
+.bienvenida-regreso h2 { font-size: 1.35rem; margin-bottom: 4px; }
+.bienvenida-regreso p { margin: 0 0 12px; }
+.bienvenida-regreso .acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 640px) { .bienvenida-regreso { grid-template-columns: 1fr; text-align: center; } .bienvenida-regreso .mascota, .bienvenida-regreso .acciones { justify-content: center; } }
+
+/* --- Mapa del curso --- */
+.mapa { margin-top: 6px; }
+.mapa-completo { margin: 0 0 12px; font-weight: 700; color: var(--lima-hondo); }
+.mapa-ventana {
+  position: relative; scroll-margin-top: 90px; max-height: min(74vh, 780px); overflow-y: auto; overscroll-behavior: contain;
+  border: 1.5px solid var(--linea); border-radius: var(--radio-grande);
+  background:
+    radial-gradient(circle at 1px 1px, var(--patron-2) 1.2px, transparent 1.6px) 0 0 / 22px 22px,
+    var(--panel);
+  scroll-padding-block: 90px;
+}
+.mapa-lienzo { position: relative; padding: 18px clamp(12px, 3vw, 28px) 36px; }
+.mapa-camino { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+.camino-base { fill: none; stroke: var(--linea-fuerte); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 0.1 14; opacity: 0.7; }
+.camino-borde { fill: none; stroke: var(--lima-hondo); stroke-width: 13; stroke-linecap: round; }
+.camino-avance { fill: none; stroke: var(--lima); stroke-width: 8; stroke-linecap: round; }
+.mapa-modulos, .mapa-paradas { list-style: none; margin: 0; padding: 0; }
+.mapa-modulo { position: relative; }
+.mapa-modulo + .mapa-modulo { margin-top: 10px; }
+/* Cartel de cada módulo: el camino pasa por detrás. */
+.mapa-cartel {
+  position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 4px 12px;
+  width: fit-content; max-width: 100%; margin: 14px auto 12px; padding: 9px 20px;
+  background: var(--tinta); color: var(--panel); border-radius: 999px; box-shadow: 0 10px 22px -16px rgba(20, 25, 61, 0.8);
+}
+:root[data-tema="oscuro"] .mapa-cartel { background: var(--cielo); color: var(--tinta); }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .mapa-cartel { background: var(--cielo); color: var(--tinta); } }
+.mapa-cartel h3 { font-size: 1.08rem; margin: 0; }
+.mapa-cartel span { font-size: 0.86rem; opacity: 0.85; }
+.mapa-modulo.final .mapa-cartel { background: var(--azul-hondo); }
+
+/* Paradas: en escritorio el nodo zigzaguea en la columna central y la tarjeta queda afuera. */
+.parada { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 190px minmax(0, 1fr); align-items: center; min-height: 96px; }
+.parada-nodo {
+  grid-column: 2; grid-row: 1; justify-self: start; margin-left: 22px; z-index: 1;
+  display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%;
+  background: var(--panel); color: var(--tenue); border: 3px solid var(--linea-fuerte);
+  font-family: var(--titulos); font-weight: 700; font-size: 1.15rem;
+  box-shadow: 0 6px 0 -1px var(--linea);
+  transition: transform 0.22s var(--suave);
+}
+.parada.lado-der .parada-nodo { justify-self: end; margin: 0 22px 0 0; }
+.parada-cuerpo { grid-row: 1; min-width: 0; z-index: 1; width: min(100%, 340px); }
+.parada.lado-izq .parada-cuerpo { grid-column: 1; justify-self: end; padding-right: 4px; }
+.parada.lado-der .parada-cuerpo { grid-column: 3; justify-self: start; padding-left: 4px; }
+.parada-tarjeta {
+  display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 12px 16px;
+  border-radius: var(--radio); background: var(--panel); border: 1.5px solid var(--linea); color: var(--tinta);
+}
+.parada-enlace { text-decoration: none; transition: transform 0.22s var(--suave), border-color 0.22s, box-shadow 0.22s; }
+.parada-enlace:hover, .parada-enlace:focus-visible { border-color: var(--azul); box-shadow: var(--sombra-alta); transform: translateY(-2px); }
+.parada:hover .parada-nodo, .parada:focus-within .parada-nodo { transform: scale(1.07); }
+.parada-tipo { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.02em; color: var(--tenue); text-transform: uppercase; }
+.parada-tarjeta strong { font-family: var(--titulos); font-size: 1.06rem; line-height: 1.25; }
+.parada-tarjeta small { color: var(--tenue); }
+.parada-tema { margin: 0 0 6px; font-size: 0.88rem; font-weight: 700; color: var(--azul-hondo); }
+.parada-tema small { font-weight: 500; color: var(--tenue); }
+
+/* Estados: forma del ícono + texto, además del color. */
+.parada.completada .parada-nodo { background: var(--lima); border-color: var(--lima-hondo); color: var(--sobre-claro); box-shadow: 0 6px 0 -1px var(--lima-hondo); }
+.parada.completada .parada-estado { color: var(--lima-hondo); font-weight: 700; }
+.parada.siguiente .parada-nodo { border-color: var(--naranja-visible); color: var(--naranja-visible); border-width: 4px; animation: pulso 1.8s ease-out 3; }
+.parada.siguiente .parada-tarjeta { border: 2.5px solid var(--naranja-visible); box-shadow: 0 14px 30px -20px rgba(184, 61, 11, 0.7); }
+.parada.siguiente .parada-estado { color: var(--naranja-hondo); font-weight: 800; }
+:root[data-tema="oscuro"] .parada.siguiente .parada-estado { color: var(--naranja-visible); }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .parada.siguiente .parada-estado { color: var(--naranja-visible); } }
+.parada-parejas .parada-nodo { color: var(--azul-hondo); border-color: var(--azul); background: var(--cielo); }
+.parada-parejas.sin-preguntas .parada-nodo { border-style: dashed; color: var(--tenue); background: var(--panel); }
+.parada-inactiva { border-style: dashed; background: transparent; }
+.parada-vacio .parada-nodo { width: 30px; height: 30px; margin-left: 36px; box-shadow: none; }
+.parada-vacio.lado-der .parada-nodo { margin: 0 36px 0 0; }
+.parada-vacia { flex-direction: row; align-items: center; gap: 10px; color: var(--tenue); border-style: dashed; background: transparent; }
+
+/* Orbi camina sobre el camino; GSAP lo ubica con transform. */
+.mapa-orbi { position: absolute; left: 0; top: 0; z-index: 2; width: 64px; pointer-events: none; will-change: auto; }
+.mapa-orbi svg { display: block; width: 100%; height: auto; }
+
+/* Móvil: el camino es vertical a la izquierda y las tarjetas ocupan el resto. */
+@media (max-width: 720px) {
+  .mapa-lienzo { padding: 14px 12px 28px 8px; }
+  .parada { padding-block: 5px; }
+  .parada { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; min-height: 84px; }
+  .parada-nodo, .parada.lado-der .parada-nodo { grid-column: 1; justify-self: center; margin: 0; width: 52px; height: 52px; }
+  .parada-vacio .parada-nodo, .parada-vacio.lado-der .parada-nodo { margin: 0; }
+  .parada.lado-izq .parada-cuerpo, .parada.lado-der .parada-cuerpo { grid-column: 2; justify-self: stretch; width: auto; padding: 0; }
+  .parada-tarjeta { width: 100%; }
+  .mapa-cartel { margin-left: 0; justify-content: flex-start; }
+  .mapa-orbi { width: 52px; }
+}
+
+/* --- Sticker de papel (OrbiSticker) --- */
+.sticker { position: relative; flex: none; aspect-ratio: 256 / 206; }
+.sticker-hoja { position: absolute; inset: 0; perspective: 900px; transform-origin: 50% 60%; }
+.sticker-mitad { position: absolute; inset: 0; }
+.sticker-mitad.izq { display: none; clip-path: inset(-30% 50% -30% -30%); }
+.sticker-mitad.der { transform-style: preserve-3d; transform-origin: 50% 50%; }
+.sticker-cara { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.sticker-cara.dorso { display: none; transform: rotateY(180deg); }
+.sticker-hoja.doblando .sticker-mitad.izq, .sticker-hoja.doblando .sticker-cara.dorso { display: block; }
+.sticker-capas { display: block; width: 100%; height: 100%; overflow: visible; }
+
+/* --- Rango de avance --- */
+.rango { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.rango-texto { min-width: 0; flex: 1; }
+.rango p { margin: 0; }
+.rango-nombre strong { font-family: var(--titulos); font-size: 1.15rem; }
+.rango-porcentaje { color: var(--tenue); font-weight: 600; }
+.rango-falta { font-size: 0.92rem; }
+.rango-detalle { font-size: 0.86rem; }
+.rango .barra-avance { margin: 6px 0 4px; }
+.icono-rango { flex: none; color: var(--tenue); }
+.rango-tabla { gap: 8px; }
+.rango-tabla .rango-nombre strong { font-family: var(--texto); font-size: 0.95rem; }
+/* En el banner azul del curso. */
+/* Un velo oscuro (no claro) mantiene el texto blanco sobre 6.5:1 con cualquier color de curso. */
+.banner-rango { display: flex; align-items: center; gap: 6px 16px; margin-top: 14px; padding: 10px 16px 10px 6px; max-width: 560px;
+  border-radius: var(--radio); background: rgba(0, 0, 0, 0.16); outline: 1px solid rgba(255, 255, 255, 0.22); }
+.banner-rango, .banner-rango p, .banner-rango .rango-porcentaje, .banner-rango .icono-rango { color: #fff; }
+.banner-rango .rango-falta { font-weight: 600; }
+.banner-rango a { color: #fff; font-weight: 700; font-size: 0.9rem; text-underline-offset: 3px; }
+.banner-rango .barra-avance { max-width: none; background: rgba(255, 255, 255, 0.28); }
+.tarjeta .rango .barra-avance { background: var(--cielo); }
+.tarjeta .rango-falta { color: var(--tenue); font-size: 0.88rem; }
+
+/* --- Celebración (subir de rango o terminar un módulo) --- */
+.celebracion {
+  position: relative; display: grid; grid-template-columns: auto 1fr; gap: 6px 20px; align-items: center;
+  margin: 16px 0; padding: 16px 22px; border-radius: var(--radio-grande);
+  background: var(--suave-exito); border: 1.5px solid var(--borde-exito); color: var(--tinta); overflow: visible;
+}
+.celebracion h2 { font-size: 1.3rem; margin: 0 0 4px; }
+.celebracion p { margin: 0 0 10px; }
+.celebracion .acciones { display: flex; flex-wrap: wrap; gap: 8px; }
+/* El confeti cae dentro de la tarjeta y detrás del texto (no tapa el título ni los botones de arriba). */
+.celebracion .confeti, .parejas-final .confeti { inset: 0; height: auto; overflow: hidden; border-radius: inherit; z-index: 0; }
+.celebracion > :not(.confeti), .parejas-final > :not(.confeti) { position: relative; z-index: 1; }
+.celebracion.discreta { grid-template-columns: 1fr; padding: 12px 18px; }
+@media (max-width: 560px) { .celebracion { grid-template-columns: 1fr; justify-items: center; text-align: center; } .celebracion .acciones { justify-content: center; } }
+
+/* --- Parejas --- */
+.parejas-cabecera { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px 28px; margin-bottom: 18px; }
+.parejas-cabecera > div:first-child { flex: 1 1 320px; }
+.parejas-orbi { display: flex; align-items: center; gap: 14px; flex: 0 1 420px; }
+.parejas-orbi.sin-mascota { flex-basis: auto; }
+.parejas-inicio .acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+.parejas-marcador { display: flex; flex-wrap: wrap; gap: 6px 22px; list-style: none; margin: 0 0 14px; padding: 0; color: var(--tenue); }
+.parejas-marcador strong { color: var(--tinta); font-family: var(--titulos); }
+.tablero-parejas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.tablero-parejas li { min-width: 0; }
+.carta {
+  display: block; width: 100%; aspect-ratio: 4 / 2.6; min-height: 120px; padding: 0; border: 0; background: none;
+  font: inherit; color: inherit; cursor: pointer; perspective: 800px; border-radius: var(--radio);
+}
+.carta:focus-visible { outline: 3px solid var(--foco); outline-offset: 4px; }
+.carta[aria-disabled="true"] { cursor: default; }
+.carta-interior { position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d; }
+.carta-cara {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 12px 14px;
+  border-radius: var(--radio); backface-visibility: hidden; -webkit-backface-visibility: hidden; text-align: left;
+  box-shadow: 0 6px 0 -1px var(--linea-fuerte);
+}
+/* Boca abajo: patrón de la marca con el número de la carta. */
+.carta-oculta {
+  align-items: center; background:
+    radial-gradient(circle at 18px 18px, rgba(197, 239, 106, 0.95) 0 6px, transparent 7px),
+    radial-gradient(circle at calc(100% - 18px) calc(100% - 18px), rgba(197, 239, 106, 0.95) 0 6px, transparent 7px),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.09) 0 10px, transparent 10px 20px),
+    var(--azul);
+  border: 2px solid var(--azul-hondo); color: #fff;
+}
+.carta:hover .carta-oculta, .carta:focus-visible .carta-oculta { background-color: var(--azul-hondo); }
+.carta-numero { font-family: var(--titulos); font-weight: 700; font-size: 1.6rem; }
+.carta-visible { transform: rotateY(180deg); background: var(--panel); border: 2px solid var(--linea-fuerte); color: var(--tinta); overflow: auto; }
+.carta-visible.answer { background: var(--cielo); }
+.carta-tipo { display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--azul-hondo); }
+.carta-texto { font-weight: 600; font-size: 0.95rem; line-height: 1.3; overflow-wrap: anywhere; }
+.carta.pareja .carta-visible { border-color: var(--lima-hondo); box-shadow: 0 6px 0 -1px var(--lima-hondo); background: var(--suave-exito); }
+.carta.pareja .carta-tipo { color: var(--texto-exito); }
+.parejas-final { position: relative; margin-top: 22px; overflow: visible; }
+.parejas-final .acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 860px) { .tablero-parejas { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) {
+  .tablero-parejas { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .carta { aspect-ratio: 4 / 3.3; min-height: 0; }
+  .carta-cara { padding: 10px 11px; }
+  .carta-texto { font-size: 0.9rem; }
+  .parejas-orbi { flex-basis: 100%; }
+}
+.rango-nombre { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 8px; }
+.rango-nombre .icono-rango { margin-right: 2px; }
+.rango-nombre { flex-wrap: nowrap; }
+@media (max-width: 560px) {
+  .banner-rango { flex-wrap: wrap; padding: 10px 12px 12px 4px; }
+  .banner-rango .rango { flex: 1 1 100%; gap: 8px; }
+  .banner-rango .sticker { width: 76px !important; }
+  .banner-rango > a { margin-left: 84px; }
+}
+.practica-orbi { margin-left: auto; margin-right: 16px; }

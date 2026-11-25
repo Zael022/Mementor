@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { TarjetaInteractiva } from '../Componentes/Animaciones.jsx';
 import Anuncios from '../Componentes/Anuncios.jsx';
+import BienvenidaRegreso from '../Componentes/BienvenidaRegreso.jsx';
 import { CuentaRegresiva, TarjetaSesion, useEntrarClase } from '../Componentes/ClasesEnVivo.jsx';
 import EstadoVacio from '../Componentes/EstadoVacio.jsx';
 import { Cargando, Insignia, MensajeError } from '../Componentes/Estados.jsx';
+import RangoAvance from '../Componentes/RangoAvance.jsx';
 import { useSesion } from '../context/SesionContext.jsx';
 import { useEstadoClase } from '../hooks/useEstadoClase.js';
 import { useDatos } from '../hooks/useDatos.js';
@@ -45,12 +47,15 @@ export default function EstudianteInicio() {
 
   if (inicio.cargando && !inicio.datos) return <Cargando texto="Cargando tu página principal…" forma="tarjetas" />;
   if (inicio.error) return <MensajeError error={inicio.error} />;
-  const { courses: cursos, sessions: sesiones, assignments: tareas, announcements: anuncios } = inicio.datos;
+  const { courses: cursos, sessions: sesiones, assignments: tareas, announcements: anuncios, activity: actividad } = inicio.datos;
   const [proxima, ...otras] = sesiones;
   const nombre = usuario.displayName.split(' ')[0];
+  // Para «seguir donde lo dejaste»: el primer curso con paradas pendientes.
+  const paraSeguir = cursos.find((curso) => curso.rank?.next) || cursos[0];
 
   return (
     <>
+      <BienvenidaRegreso actividad={actividad} curso={paraSeguir} />
       {proxima ? (
         <ClasePrincipal sesion={proxima} nombre={nombre} alEntrar={inicio.recargar} />
       ) : (
@@ -66,7 +71,7 @@ export default function EstudianteInicio() {
       )}
 
       {cursos.length === 0 && (
-        <EstadoVacio titulo="Todavía no hay nada por aquí" detalle="Cuando te matriculen en un curso publicado verás tus clases, tareas y anuncios en esta página." />
+        <EstadoVacio mascota="leyendo" titulo="Todavía no hay nada por aquí" detalle="Cuando te matriculen en un curso publicado verás tus clases, tareas y anuncios en esta página." />
       )}
 
       {cursos.length > 0 && (
@@ -95,19 +100,16 @@ export default function EstudianteInicio() {
 
           <h2>Clases</h2>
           <div className="rejilla">
-            {cursos.map((curso) => {
-              const avance = curso.totalLessons ? Math.round((curso.completedLessons / curso.totalLessons) * 100) : 0;
-              return (
-                <TarjetaInteractiva key={curso.id} to={`/estudiante/cursos/${curso.id}`} color={colorDeCurso(curso.id)}>
-                  <span className="codigo">{curso.code}</span>
-                  <h3>{curso.title}</h3>
-                  <div className="pie">
-                    <div className="barra-avance" role="img" aria-label={`Avance ${avance} por ciento`}><div style={{ width: `${avance}%` }} /></div>
-                    <span className="tenue pequeno">{curso.completedLessons} de {curso.totalLessons} lecciones completadas</span>
-                  </div>
-                </TarjetaInteractiva>
-              );
-            })}
+            {cursos.map((curso) => (
+              <TarjetaInteractiva key={curso.id} to={`/estudiante/cursos/${curso.id}`} color={colorDeCurso(curso.id)}>
+                <span className="codigo">{curso.code}</span>
+                <h3>{curso.title}</h3>
+                <div className="pie">
+                  <RangoAvance rango={curso.rank} variante="tarjeta" />
+                  <span className="tenue pequeno">{curso.completedLessons} de {curso.totalLessons} lecciones completadas</span>
+                </div>
+              </TarjetaInteractiva>
+            ))}
           </div>
         </>
       )}

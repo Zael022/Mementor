@@ -1,10 +1,12 @@
 import { memo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Aviso, Cargando, MensajeError } from '../Componentes/Estados.jsx';
+import Mascota from '../Componentes/Mascota.jsx';
 import MensajeTutor from '../Componentes/MensajeTutor.jsx';
 import { useSesion } from '../context/SesionContext.jsx';
 import { useChatTutor } from '../hooks/useChatTutor.js';
 import { useDatos } from '../hooks/useDatos.js';
+import { MENSAJE_TUTOR_PENSANDO } from '../utils/mensajesMascota.js';
 
 // El historial conserva sus referencias mientras llega texto al borrador.
 const HistorialTutor = memo(function HistorialTutor({ mensajes, esEstudiante }) {
@@ -68,7 +70,12 @@ function ChatTutor({ courseId }) {
         {!chat.cargandoHistorial && chat.mensajes.length === 0 && <p className="tenue">Aún no hay mensajes en esta conversación.</p>}
         <HistorialTutor mensajes={chat.mensajes} esEstudiante={esEstudiante} />
         {chat.borrador && <MensajeTutor mensaje={chat.borrador} esEstudiante={esEstudiante} />}
-        {chat.enviando && !chat.borrador?.content && <Cargando texto="Buscando en el material del curso…" />}
+        {/* Orbi piensa mientras el tutor busca en el material; el texto sigue visible aunque se oculten las mascotas. */}
+        {chat.enviando && !chat.borrador?.content && (
+          <div className="tutor-pensando" role="status">
+            <Mascota personaje="orbi" estado="pensando" tamano="pequeno" animacion={1} siOculta="mensaje" mensaje={MENSAJE_TUTOR_PENSANDO} />
+          </div>
+        )}
       </section>
 
       <MensajeError error={chat.error} />

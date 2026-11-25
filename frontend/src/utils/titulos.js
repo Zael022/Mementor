@@ -3,6 +3,7 @@ const TITULOS = [
   [/^\/admisiones/, 'Admisiones'],
   [/\/quizzes\/\d+$/, 'Quiz rápido'],
   [/\/racha$/, 'Práctica del día'],
+  [/\/parejas\/\d+$/, 'Parejas'],
   [/\/quizzes$/, 'Quizzes'],
   [/\/calificaciones$/, 'Calificaciones'],
   [/^\/calendario$/, 'Calendario'],
