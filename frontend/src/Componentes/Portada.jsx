@@ -69,7 +69,14 @@ export default function Portada({ titulo, children }) {
 
   return (
     <div className="portada">
-      <header className="cabecera"><Logo como="p" /></header>
+      <header className="cabecera">
+        <Logo como="p" />
+        {/* Pausa se agarra del borde inferior de esta barra y saluda una vez; es decorativa y respeta
+            «Mostrar mascotas» y «Menos movimiento». */}
+        <Suspense fallback={null}>
+          <Mascota personaje="pausa" estado="bienvenida" rama={false} animacion={1} mensaje={MENSAJE_PORTADA} className="pausa-colgada" />
+        </Suspense>
+      </header>
 
       <section className="portada-hero">
         {/* Capa decorativa: oculta al lector de pantalla y sin eventos del puntero. */}
@@ -84,15 +91,9 @@ export default function Portada({ titulo, children }) {
             <li>Pregunta al tutor IA, que cita el material del curso</li>
           </ul>
         </div>
-        <div className="portada-acceso">
-          {/* Pausa cuelga sobre el formulario y saluda una vez; es decorativa y respeta «Mostrar mascotas» y «Menos movimiento». */}
-          <Suspense fallback={null}>
-            <Mascota personaje="pausa" estado="bienvenida" tamano="mediano" animacion={1} mensaje={MENSAJE_PORTADA} className="mascota-portada" />
-          </Suspense>
-          <div className="tarjeta formulario-portada">
-            <h2>{titulo}</h2>
-            <div className="formulario-cuerpo">{children}</div>
-          </div>
+        <div className="tarjeta formulario-portada">
+          <h2>{titulo}</h2>
+          <div className="formulario-cuerpo">{children}</div>
         </div>
         <a className="flecha-abajo" href="#detalles" aria-label="Ver más sobre la plataforma">↓</a>
       </section>

@@ -38,9 +38,9 @@ Ejecutado el 2026-11-25:
 - Modelo de datos: 76 tablas, 765 columnas y 159 llaves foráneas; entregables en Word y PDF regenerados.
 
 Después del PR #19 (mismo día):
-- Pausa saluda en la portada pública (iniciar sesión, recuperar y activar): cuelga de su rama sobre el formulario, saluda una vez y dice «¡Hola! Qué bueno verte por aquí.».
-- Se carga aparte con `lazy`, así que el formulario no espera a GSAP. Carga inicial comprimida: 99 008 bytes.
-- Se revisó en 1440, 1000 y 390 px, en claro y oscuro. Al lado del título dejaba el título en una columna demasiado angosta a 1000 px, por eso va sobre la tarjeta.
+- Pausa saluda en la portada pública (iniciar sesión, recuperar y activar). Se agarra con una mano del borde inferior de la barra del logo, sin su rama (`Pausa rama={false}`, con palma y garras sobre el borde), saluda una vez con la otra mano y dice «¡Hola! Qué bueno verte por aquí.».
+- Se carga aparte con `lazy`, así que el formulario no espera a GSAP. Carga inicial comprimida: 99 009 bytes.
+- Se revisó en 1440, 1000 y 390 px, en claro y oscuro. Al lado del título dejaba el título en una columna demasiado angosta a 1000 px; por eso cuelga de la barra, sobre la columna del formulario.
 - Lint; frontend 85/85; Playwright `accesibilidad` y `acceso` 15/15; mockups 01–03 regenerados.
 
 Pendiente:

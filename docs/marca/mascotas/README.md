@@ -24,7 +24,7 @@ En la app se dibujan con `Componentes/Orbi.jsx`, `Pausa.jsx`, `OrbiSticker.jsx` 
 | Orbi | Pensando | Tutor IA, mientras busca en el material |
 | Orbi | Celebrando | Subir de rango, terminar un módulo, recorrido completo |
 | Orbi | Descanso | Reservado, aún sin uso en pantalla |
-| Pausa | Bienvenida | Portada pública (iniciar sesión, recuperar y activar), colgada sobre el formulario; inicio del estudiante tras 7 días o más sin actividad de aprendizaje |
+| Pausa | Bienvenida | Portada pública (iniciar sesión, recuperar y activar), agarrada con una mano del borde inferior de la barra del logo y sin su rama (`rama={false}`); inicio del estudiante tras 7 días o más sin actividad de aprendizaje |
 | Pausa | Leyendo | Estados vacíos (sin cursos, curso sin lecciones) y Configuración |
 | Pausa | Dormido | Sin novedades, módulo sin lecciones o sin preguntas de práctica; Configuración con «Menos movimiento» |
 

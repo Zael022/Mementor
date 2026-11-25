@@ -6,6 +6,8 @@ import { gsap, useGSAP } from '../utils/gsap.js';
 // Cada estado cambia partes del mismo dibujo: brazo derecho, ojos, boca y accesorios.
 export const ESTADOS_PAUSA = ['bienvenida', 'leyendo', 'dormido'];
 export const VISTA_PAUSA = '362 30 276 215';
+// Sin rama: el dibujo empieza en las garras, para colgarse de un borde de la página.
+const VISTA_SIN_RAMA = '362 36 276 209';
 
 const TINTA = '#181B3E';
 const GRIS = '#6B7494';
@@ -95,17 +97,17 @@ function Zetas() {
   );
 }
 
-// Dibujo completo de Pausa.
-export function DibujoPausa({ estado = 'leyendo' }) {
+// Dibujo completo de Pausa. Con «rama» en falso se cuelga de lo que tenga encima (por ejemplo, la barra superior).
+export function DibujoPausa({ estado = 'leyendo', rama = true }) {
   return (
     <g data-parte="pausa" stroke={TINTA} strokeWidth="4" strokeLinejoin="round" strokeLinecap="round">
-      <g data-parte="rama">
+      {rama && <g data-parte="rama">
         <path d="M378 62 q120 -14 246 6" fill="none" strokeWidth="16" />
         <path d="M378 62 q120 -14 246 6" fill="none" stroke={CAFE} strokeWidth="9" />
         <ellipse cx="396" cy="48" rx="16" ry="8" fill={LIMA} transform="rotate(-25 396 48)" />
         <ellipse cx="604" cy="52" rx="16" ry="8" fill={LIMA} transform="rotate(25 604 52)" />
         <ellipse cx="582" cy="76" rx="12" ry="6" fill={LIMA} transform="rotate(40 582 76)" />
-      </g>
+      </g>}
       <g data-parte="brazo-rama">
         <path d="M456 128 q-20 -30 -14 -66" fill="none" strokeWidth="24" />
         <path d="M456 128 q-20 -30 -14 -66" fill="none" stroke={GRIS} strokeWidth="16" />
@@ -132,10 +134,17 @@ export function DibujoPausa({ estado = 'leyendo' }) {
         <ellipse cx="465" cy="138" rx="7" ry="4" fill={NARANJA} opacity="0.4" stroke="none" />
         <ellipse cx="515" cy="138" rx="7" ry="4" fill={NARANJA} opacity="0.4" stroke="none" />
       </g>
+      {/* Sin rama, la mano izquierda se apoya sobre el borde (y = 58) con las garras encima. */}
+      {!rama && (
+        <g data-parte="agarre">
+          <ellipse cx="442" cy="58" rx="15" ry="10" fill={GRIS} />
+          <path d="M429 54 q0 -11 9 -10 M438 50 q0 -11 9 -10 M447 54 q0 -11 9 -10" fill="none" strokeWidth="3.6" />
+        </g>
+      )}
       {/* Garras sobre la rama: el brazo derecho solo se agarra cuando duerme. */}
-      <path d={estado === 'dormido'
+      {rama && <path d={estado === 'dormido'
         ? 'M436 58 q4 -8 10 -4 M442 60 q4 -8 10 -4 M532 58 q4 -8 10 -2 M538 60 q4 -8 10 -2'
-        : 'M436 58 q4 -8 10 -4 M442 60 q4 -8 10 -4'} fill="none" strokeWidth="3" />
+        : 'M436 58 q4 -8 10 -4 M442 60 q4 -8 10 -4'} fill="none" strokeWidth="3" />}
       {estado === 'dormido' && <Zetas />}
     </g>
   );
@@ -159,7 +168,7 @@ export function animarEstadoPausa(raiz, estado) {
 }
 
 // Pausa como SVG en línea. «animacion» es un contador: cada cambio reproduce el estado una vez.
-export default function Pausa({ estado = 'leyendo', animacion = 0, ancho = 120, parpadeo = true, className = '', alTerminar }) {
+export default function Pausa({ estado = 'leyendo', animacion = 0, ancho = 120, parpadeo = true, rama = true, className = '', alTerminar }) {
   const raiz = useRef(null);
   const pose = ESTADOS_PAUSA.includes(estado) ? estado : 'leyendo';
 
@@ -181,9 +190,9 @@ export default function Pausa({ estado = 'leyendo', animacion = 0, ancho = 120, 
   }, { scope: raiz, dependencies: [pose, parpadeo, ancho] });
 
   return (
-    <svg ref={raiz} className={`pausa ${className}`.trim()} viewBox={VISTA_PAUSA} width={ancho} height={Math.round((ancho * 215) / 276)}
-      aria-hidden="true" focusable="false" overflow="visible" data-estado={pose}>
-      <DibujoPausa estado={pose} />
+    <svg ref={raiz} className={`pausa ${className}`.trim()} viewBox={rama ? VISTA_PAUSA : VISTA_SIN_RAMA} width={ancho}
+      height={Math.round((ancho * (rama ? 215 : 209)) / 276)} aria-hidden="true" focusable="false" overflow="visible" data-estado={pose}>
+      <DibujoPausa estado={pose} rama={rama} />
     </svg>
   );
 }

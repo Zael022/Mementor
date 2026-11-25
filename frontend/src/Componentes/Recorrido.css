@@ -243,14 +243,18 @@
 .practica-orbi { margin-left: auto; margin-right: 16px; }
 
 /* --- Pausa saluda en la portada (inicio de sesión, recuperar y activar) --- */
-/* Cuelga de su rama justo encima del formulario, con la burbuja a la izquierda. */
-.portada-acceso { position: relative; z-index: 2; display: flex; flex-direction: column; min-width: 0; }
-.mascota-portada { flex-direction: row-reverse; justify-content: flex-start; align-items: center; gap: 4px; margin: 0 6px -14px 0; position: relative; z-index: 3; }
-.mascota-portada > svg { width: clamp(120px, 11vw, 150px); height: auto; filter: drop-shadow(0 10px 12px rgba(10, 16, 60, 0.3)); }
-.mascota-portada .burbuja-mascota { max-width: 20ch; font-size: 0.95rem; margin-bottom: 18px; }
+/* Cuelga con una mano del borde inferior de la barra del logo, sobre la columna del formulario. */
+.portada .cabecera { position: relative; z-index: 3; }
+.pausa-colgada {
+  --ancho-pausa: clamp(84px, 9vw, 128px);
+  /* El borde de la barra cae a media palma (22 de 276 unidades desde arriba del dibujo): la mano queda agarrada. */
+  position: absolute; top: calc(100% - var(--ancho-pausa) * 22 / 276); right: calc(clamp(16px, 6vw, 90px) + 20px);
+  flex-direction: row-reverse; align-items: center; gap: 2px; pointer-events: none;
+}
+.pausa-colgada > svg { width: var(--ancho-pausa); height: auto; }
+.pausa-colgada .burbuja-mascota { max-width: 20ch; font-size: 0.95rem; margin-top: 10px; }
 /* La flecha de la burbuja apunta a Pausa, que queda a la derecha. */
-.mascota-portada .burbuja-mascota::before { left: auto; right: -7.5px; transform: translateY(-50%) rotate(-135deg); }
+.pausa-colgada .burbuja-mascota::before { left: auto; right: -7.5px; transform: translateY(-50%) rotate(-135deg); }
 @media (max-width: 560px) {
-  .mascota-portada > svg { width: 104px; }
-  .mascota-portada .burbuja-mascota { font-size: 0.9rem; padding: 8px 12px; margin-bottom: 12px; }
+  .pausa-colgada .burbuja-mascota { font-size: 0.86rem; padding: 6px 10px; }
 }

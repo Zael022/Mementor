@@ -15,7 +15,7 @@ export function useMascotasVisibles() {
 // Envoltorio común de Orbi y Pausa: dibujo decorativo, burbuja de texto y preferencia de ocultar.
 // El dibujo nunca lleva información: el mensaje es texto visible y, si es importante, se anuncia.
 export default function Mascota({
-  personaje = 'orbi', estado, mensaje, tamano = 'mediano', anunciar = false, animacion = 0, siOculta = null, className = '', alTerminar,
+  personaje = 'orbi', estado, mensaje, tamano = 'mediano', anunciar = false, animacion = 0, siOculta = null, className = '', alTerminar, rama = true,
 }) {
   const visible = useMascotasVisibles();
   // Pausa cuelga de una rama ancha: se dibuja un poco más grande para que el personaje mida lo mismo que Orbi.
@@ -32,7 +32,7 @@ export default function Mascota({
   const Dibujo = personaje === 'pausa' ? Pausa : Orbi;
   return (
     <div className={`mascota mascota-${tamano} ${className}`.trim()} data-personaje={personaje}>
-      <Dibujo estado={estado} ancho={ancho} animacion={animacion} alTerminar={alTerminar} />
+      <Dibujo estado={estado} ancho={ancho} animacion={animacion} alTerminar={alTerminar} {...(personaje === 'pausa' ? { rama } : {})} />
       {/* La región viva queda montada aunque esté vacía, para que el siguiente mensaje sí se anuncie. */}
       {mensaje !== undefined && <p className="burbuja-mascota" aria-live={anunciar ? 'polite' : undefined}>{mensaje}</p>}
     </div>
