@@ -34,6 +34,7 @@ export const MENSAJES_PAREJAS = {
 };
 
 // Pausa: regreso y estados tranquilos.
+export const MENSAJE_PORTADA = '¡Hola! Qué bueno verte por aquí.';
 export const MENSAJE_REGRESO = '¡Qué bueno verte! Seguimos donde lo dejaste.';
 export const MENSAJE_RITMO = 'Aprende a tu ritmo.';
 export const mensajeMovimiento = (reducido) => (reducido

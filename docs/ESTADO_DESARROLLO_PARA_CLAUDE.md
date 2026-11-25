@@ -37,6 +37,12 @@ Ejecutado el 2026-11-25:
 - Mockups regenerados: 49 por formato, con el mapa (13b), Parejas (18b) y la celebración de rango (27b).
 - Modelo de datos: 76 tablas, 765 columnas y 159 llaves foráneas; entregables en Word y PDF regenerados.
 
+Después del PR #19 (mismo día):
+- Pausa saluda en la portada pública (iniciar sesión, recuperar y activar): cuelga de su rama sobre el formulario, saluda una vez y dice «¡Hola! Qué bueno verte por aquí.».
+- Se carga aparte con `lazy`, así que el formulario no espera a GSAP. Carga inicial comprimida: 99 008 bytes.
+- Se revisó en 1440, 1000 y 390 px, en claro y oscuro. Al lado del título dejaba el título en una columna demasiado angosta a 1000 px, por eso va sobre la tarjeta.
+- Lint; frontend 85/85; Playwright `accesibilidad` y `acceso` 15/15; mockups 01–03 regenerados.
+
 Pendiente:
 - La bienvenida de Pausa no está en los mockups, porque necesita 7 días sin actividad. Se revisó en una base efímera con fechas movidas.
 - El estado «descanso» de Orbi está dibujado pero todavía no tiene una pantalla.

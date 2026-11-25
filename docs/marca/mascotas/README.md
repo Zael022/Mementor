@@ -4,7 +4,7 @@
 
 ## Quiénes son
 - **Orbi** (principal): un planeta con birrete, cinturón con hebilla lima y un mapa con el camino punteado. Acompaña el recorrido del curso: el mapa, el rango, Parejas, las celebraciones y el tutor.
-- **Pausa** (bienestar): un perezoso colgado de una rama, con bufanda lima. Aparece en los momentos tranquilos: la bienvenida de regreso, los estados vacíos y el aviso de «Menos movimiento».
+- **Pausa** (bienestar): un perezoso colgado de una rama, con bufanda lima. Aparece en los momentos tranquilos: el saludo de la portada, la bienvenida de regreso, los estados vacíos y el aviso de «Menos movimiento».
 
 ## Archivos
 | Archivo | Uso |
@@ -24,7 +24,7 @@ En la app se dibujan con `Componentes/Orbi.jsx`, `Pausa.jsx`, `OrbiSticker.jsx` 
 | Orbi | Pensando | Tutor IA, mientras busca en el material |
 | Orbi | Celebrando | Subir de rango, terminar un módulo, recorrido completo |
 | Orbi | Descanso | Reservado, aún sin uso en pantalla |
-| Pausa | Bienvenida | Inicio, tras 7 días o más sin actividad de aprendizaje |
+| Pausa | Bienvenida | Portada pública (iniciar sesión, recuperar y activar), colgada sobre el formulario; inicio del estudiante tras 7 días o más sin actividad de aprendizaje |
 | Pausa | Leyendo | Estados vacíos (sin cursos, curso sin lecciones) y Configuración |
 | Pausa | Dormido | Sin novedades, módulo sin lecciones o sin preguntas de práctica; Configuración con «Menos movimiento» |
 
