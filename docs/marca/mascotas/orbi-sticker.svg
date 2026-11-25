@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="62 28 256 206" width="512" height="412">
+<title>Orbi sticker, mascota de MENTOR AI</title>
+<!-- Sombra del sticker sobre la superficie -->
+<g id="sombra" transform="translate(6 7)" opacity="0.2" fill="#181B3E" stroke="#181B3E" stroke-linejoin="round" stroke-linecap="round"><path d="M128 146 q-24 -6 -30 -28" fill="none" stroke-width="34"/><path d="M234 150 q22 -4 28 -22" fill="none" stroke-width="34"/><circle cx="97" cy="113" r="19.0"/><circle cx="262" cy="130" r="18.0"/><rect x="248" y="92" width="40" height="32" rx="3" stroke-width="22" transform="rotate(10 268 108)"/><ellipse cx="162" cy="196" rx="21.0" ry="16.0"/><ellipse cx="198" cy="196" rx="21.0" ry="16.0"/><circle cx="180" cy="132" r="64.0"/><path d="M158 82 q22 -8 46 2 q-4 8 -22 8 q-18 0 -24 -10 z" stroke-width="22"/><path d="M142 72 l42 -18 l40 16 l-42 18 z" stroke-width="22"/><path d="M220 70 q6 10 4 24" fill="none" stroke-width="18"/><circle cx="224" cy="97" r="13.0"/></g>
+<!-- Papel: borde blanco troquelado -->
+<g id="papel" fill="#FFFFFF" stroke="#FFFFFF" stroke-linejoin="round" stroke-linecap="round"><path d="M128 146 q-24 -6 -30 -28" fill="none" stroke-width="34"/><path d="M234 150 q22 -4 28 -22" fill="none" stroke-width="34"/><circle cx="97" cy="113" r="19.0"/><circle cx="262" cy="130" r="18.0"/><rect x="248" y="92" width="40" height="32" rx="3" stroke-width="22" transform="rotate(10 268 108)"/><ellipse cx="162" cy="196" rx="21.0" ry="16.0"/><ellipse cx="198" cy="196" rx="21.0" ry="16.0"/><circle cx="180" cy="132" r="64.0"/><path d="M158 82 q22 -8 46 2 q-4 8 -22 8 q-18 0 -24 -10 z" stroke-width="22"/><path d="M142 72 l42 -18 l40 16 l-42 18 z" stroke-width="22"/><path d="M220 70 q6 10 4 24" fill="none" stroke-width="18"/><circle cx="224" cy="97" r="13.0"/></g>
+<!-- Dibujo impreso sobre el papel -->
+<g id="orbi" stroke="#181B3E" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+<g id="brazo-saludo"><path d="M128 146 q-24 -6 -30 -28" fill="none" stroke-width="16"/><path d="M128 146 q-24 -6 -30 -28" fill="none" stroke="#6F86FF" stroke-width="9"/><circle cx="97" cy="113" r="10" fill="#6F86FF"/></g>
+<g id="brazo-mapa"><path d="M234 150 q22 -4 28 -22" fill="none" stroke-width="16"/><path d="M234 150 q22 -4 28 -22" fill="none" stroke="#6F86FF" stroke-width="9"/>
+<g id="mapa"><rect x="248" y="92" width="40" height="32" rx="3" fill="#EAEEFF" transform="rotate(10 268 108)"/><path d="M254 114 q8 -12 16 -4 q8 8 14 -6" fill="none" stroke="#F0591A" stroke-width="2.5" stroke-dasharray="4 4" transform="rotate(10 268 108)"/></g>
+<circle cx="262" cy="130" r="9" fill="#6F86FF"/></g>
+<g id="pies"><ellipse cx="162" cy="196" rx="12" ry="7" fill="#3452E1"/><ellipse cx="198" cy="196" rx="12" ry="7" fill="#3452E1"/></g>
+<g id="cuerpo"><circle cx="180" cy="132" r="55" fill="#6F86FF"/><circle cx="146" cy="108" r="6" fill="#3452E1" stroke="none"/><circle cx="214" cy="104" r="4" fill="#3452E1" stroke="none"/></g>
+<g id="cinturon"><path d="M126 146 q54 24 108 0" fill="none" stroke-width="10"/><path d="M126 146 q54 24 108 0" fill="none" stroke="#3452E1" stroke-width="4"/><circle id="hebilla" cx="180" cy="158" r="8" fill="#C5EF6A"/></g>
+<g id="ojos"><ellipse cx="162" cy="124" rx="11" ry="13" fill="#fff"/><ellipse cx="198" cy="124" rx="11" ry="13" fill="#fff"/><circle cx="165" cy="126" r="6.5" fill="#181B3E" stroke="none"/><circle cx="201" cy="126" r="6.5" fill="#181B3E" stroke="none"/><circle cx="167" cy="122" r="2.3" fill="#fff" stroke="none"/><circle cx="203" cy="122" r="2.3" fill="#fff" stroke="none"/></g>
+<g id="mejillas"><ellipse cx="146" cy="140" rx="7" ry="4" fill="#F0591A" opacity="0.4" stroke="none"/><ellipse cx="214" cy="140" rx="7" ry="4" fill="#F0591A" opacity="0.4" stroke="none"/></g>
+<path id="boca" d="M170 140 q10 10 20 0 z" fill="#181B3E"/>
+<g id="birrete"><path d="M158 82 q22 -8 46 2 q-4 8 -22 8 q-18 0 -24 -10 z" fill="#181B3E"/><path d="M142 72 l42 -18 l40 16 l-42 18 z" fill="#181B3E"/><g id="borla"><path d="M220 70 q6 10 4 24" fill="none" stroke="#F0591A" stroke-width="3"/><circle cx="224" cy="97" r="4" fill="#F0591A" stroke="#F0591A"/></g></g>
+</g>
+</svg>

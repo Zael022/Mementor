@@ -5,9 +5,9 @@ import { prepararCurso, sesion, entrar } from '../e2e/support/datos.mjs';
 
 const SALIDA = 'capturas/salida';
 
-async function foto(page, nombre, testInfo) {
+async function foto(page, nombre, testInfo, espera = 400) {
   await page.waitForLoadState('networkidle').catch(() => {});
-  await page.waitForTimeout(400);
+  await page.waitForTimeout(espera);
   await page.screenshot({ path: `${SALIDA}/${testInfo.project.name}/${nombre}.png`, fullPage: false });
 }
 
@@ -43,6 +43,23 @@ test.beforeAll(async () => {
   await docente.post(`/assessments/${evaluacion.id}/questions`, { stem: '¿Cuántos grados tiene un ángulo recto?', options: [{ body: '90', isCorrect: true }, { body: '45', isCorrect: false }, { body: '180', isCorrect: false }] });
   await docente.post(`/assessments/${evaluacion.id}/publish`);
   extra.evaluacionId = evaluacion.id;
+  // Repaso de un intento en el módulo Números: al enviarlo, su clave queda visible y alimenta Parejas.
+  const numeros = (await docente.get(`/courses/${curso.cursoId}`)).modules[0];
+  extra.moduloNumeros = numeros.id;
+  const repaso = await docente.post(`/courses/${curso.cursoId}/assessments`, { title: 'Repaso de fracciones', topicId: numeros.topics[0].id, maxAttempts: 1 });
+  for (const [stem, correcta] of [
+    ['¿Qué indica el denominador?', 'En cuántas partes iguales se divide el entero'],
+    ['¿Cuánto es 1/2 + 1/4?', '3/4'],
+    ['¿Cómo se llama el número de arriba?', 'Numerador'],
+    ['¿Qué fracción es equivalente a 1/2?', '2/4'],
+    ['¿Cuál es mayor: 3/5 o 2/5?', '3/5'],
+    ['¿Cuántos cuartos hay en un entero?', 'Cuatro'],
+  ]) {
+    await docente.post(`/assessments/${repaso.id}/questions`, { stem, options: [{ body: correcta, isCorrect: true }, { body: 'Ninguna', isCorrect: false }] });
+  }
+  await docente.post(`/assessments/${repaso.id}/publish`);
+  const intento = await estudiante.post(`/assessments/${repaso.id}/attempts`);
+  await estudiante.post(`/attempts/${intento.attemptId}/submit`, { answers: [] });
   // Busca la primera lección publicada dentro del detalle del curso.
   const detalle = await estudiante.get(`/courses/${curso.cursoId}`).catch(() => null);
   const buscar = (nodo) => {
@@ -88,6 +105,34 @@ test('pantallas del estudiante', async ({ page }, testInfo) => {
   for (const [ruta, nombre] of rutas) {
     await page.goto(ruta);
     await foto(page, nombre, testInfo);
+  }
+  // Mapa del curso con Orbi junto a la parada siguiente.
+  await page.goto(`/estudiante/cursos/${id}?seccion=trabajo&ver=lecciones`);
+  await page.locator('.mapa-orbi').waitFor();
+  await page.locator('.mapa').scrollIntoViewIfNeeded();
+  await foto(page, '13b-mapa-del-curso', testInfo);
+  // Parejas del módulo, con una pareja encontrada.
+  await page.goto(`/estudiante/cursos/${id}/parejas/${extra.moduloNumeros}`);
+  await page.getByRole('button', { name: /Empezar/ }).first().click();
+  const cartas = page.locator('.carta');
+  await cartas.first().waitFor();
+  const textos = [];
+  for (let i = 0; i < 12; i += 1) {
+    await cartas.nth(i).click();
+    await page.waitForFunction((n) => document.querySelectorAll('.carta')[n].getAttribute('aria-label').includes(':'), i);
+    textos[i] = await cartas.nth(i).locator('.carta-texto').textContent();
+  }
+  await page.waitForTimeout(1500);
+  await cartas.nth(textos.indexOf('¿Cuánto es 1/2 + 1/4?')).click();
+  await cartas.nth(textos.indexOf('3/4')).click();
+  await foto(page, '18b-parejas', testInfo, 1200);
+  // Celebración al subir de rango (la lección ya se capturó antes sin completar).
+  if (extra.leccionId) {
+    await page.goto(`/estudiante/lecciones/${extra.leccionId}`);
+    await page.getByRole('button', { name: 'Marcar como completada' }).click();
+    await page.locator('.celebracion').waitFor();
+    await page.locator('.celebracion').scrollIntoViewIfNeeded();
+    await foto(page, '27b-celebracion-rango', testInfo, 2600);
   }
   // Flujo de eliminación de cuenta dentro de Configuración.
   await page.goto('/configuracion');

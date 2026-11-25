@@ -132,3 +132,28 @@ Errores adicionales: `STALE_VERSION`, `INVALID_TRANSITION`, `PROCESS_CLOSED`, `A
 ## Seguimiento institucional de plataforma (parcial)
 
 Exclusivo `platform_admin`, bajo `/api/v1/platform-crm`: `GET /institutions` (búsqueda `search`, `page`, `limit`), `GET /institutions/:institutionId`, `POST /institutions/:institutionId/account` (cuerpo vacío, idempotente), `PATCH /institutions/:institutionId/account` (versión obligatoria, `needs`, `onboardingStatus`, `nextReviewAt`) y `GET/POST /institutions/:institutionId/contacts`. El alta de contacto exige `requestKey` UUID, `name` y opcionalmente `position`, `email`, `phone`; repetir la clave con datos diferentes devuelve 409. Las escrituras usan CSRF. La ficha no se crea con GET. La incorporación completada, contactos editables, tareas, casos y panel aún no están implementados.
+
+## Mapa del curso, rango de avance y Parejas (2026-11-25)
+
+Detalle de las decisiones en [ADR 0010](adr/0010-mapa-rango-mascotas-parejas.md).
+
+**Rango de avance** (objeto `rank`, calculado al consultar; no se guarda): `{ key, name, level, percent, done, total, lessons: { done, total }, assignments: { done, total }, next: { key, name, threshold, remaining } | null }`. Avance = (lecciones completadas + tareas entregadas) ÷ (lecciones publicadas + tareas publicadas). Rangos: Destello 0–19 %, Brillo 20–44 %, Luz 45–69 %, Estrella 70–99 %, Constelación 100 %. Sin lecciones ni tareas publicadas: `name: "Sin rango todavía"`, `percent: null`. Mide avance, no rendimiento: no cambia la nota, el dominio ni la racha.
+
+| Método | Ruta | Acceso | Cambio |
+|---|---|---|---|
+| GET | `/courses/:courseId` | Matriculado/teacher/admin | El estudiante recibe `rank` propio y `practicePairs` por módulo (0 si no hay al menos 3 parejas) |
+| GET | `/me/home` | Estudiante | `courses[].rank` y `activity: { lastActivityAt, daysAway }` (actividad de aprendizaje real, no el inicio de sesión) |
+| GET | `/teacher/courses/:id/analytics` | Docente asignado | `students[].rank`, lista en orden alfabético (no es un ranking) |
+| POST | `/lessons/:lessonId/complete` | Estudiante matriculado | Además: `rank: { before, after, rankedUp }` y `module: { id, title, done, total, completed, justCompleted }` |
+| POST | `/assignments/:assignmentId/submission` | Estudiante matriculado | Igual que arriba; corregir una entrega no suma avance ni repite `justCompleted` |
+| POST/PATCH | `/courses/:courseId/assignments`, `/assignments/:id` | Docente asignado | `topicId` opcional ubica la tarea en el mapa (tema del mismo curso) |
+| GET/PATCH | `/me/preferences` | Propias | `showMascots` y `showBigCelebrations` (booleanos, por defecto `true`) |
+
+**Parejas** (práctica del módulo; sin nota, sin bono y sin racha). Solo estudiantes, sobre módulos de cursos donde están matriculados y de su institución. Fuente: preguntas de evaluaciones del módulo cuya clave ya es visible para ese estudiante (evaluación cerrada o intentos agotados), con respuestas distintas entre sí. El tablero vive en el servidor; el cliente nunca recibe qué cartas forman pareja. Límite: 120 solicitudes por minuto.
+
+| Método | Ruta | Cuerpo | Respuesta |
+|---|---|---|---|
+| POST | `/modules/:moduleId/memory-games` | `{ pairs?: 6 \| 8 }` | Partida nueva `{ id, courseId, moduleId, moduleTitle, status, pairCount, matchedPairs, attempts, elapsedSeconds, startedAt, finishedAt, cards: [{ id, position, matched }] }` (solo las cartas emparejadas traen `kind` y `text`); `409 NOT_ENOUGH_QUESTIONS` con menos de 3 parejas |
+| GET | `/memory-games/:gameId` | — | Estado de la partida propia (`404` si es de otra persona) |
+| POST | `/memory-games/:gameId/reveal` | `{ cardId }` | `{ id, position, kind: "question" \| "answer", text }` |
+| POST | `/memory-games/:gameId/match` | `{ cardIds: [a, b] }` | `{ match, cards, attempts, matchedPairs, pairCount, finished, elapsedSeconds }`; `409 GAME_FINISHED` o `ALREADY_MATCHED` |

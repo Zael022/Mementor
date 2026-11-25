@@ -1,6 +1,46 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-24. Las 8 capas de la IA (rama `feature/capas-ia`, con `main` integrado: CRM de admisiones y de plataforma); antes, CRM institucional y seguridad OWASP (PR #13); antes, correcciones de la auditoría de salida a producción (rama `fix/auditoria-produccion`); antes, correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+**Última actualización** — 2026-11-25. Mapa del curso, rango de avance, mascotas Orbi y Pausa, sticker de papel y Parejas (rama `feature/mapa-mascota-parejas`); antes, las 8 capas de la IA (rama `feature/capas-ia`, con `main` integrado: CRM de admisiones y de plataforma); antes, CRM institucional y seguridad OWASP (PR #13); antes, correcciones de la auditoría de salida a producción (rama `fix/auditoria-produccion`); antes, correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+
+## Sesión 2026-11-25 · Mapa del curso, rango, mascotas y Parejas
+Rama `feature/mapa-mascota-parejas` desde `main` (04af749). Reúne tres encargos aprobados: mapa con rango y Parejas, mascotas oficiales Orbi y Pausa, y animaciones de papel del sticker de Orbi. Decisiones en `docs/adr/0010-mapa-rango-mascotas-parejas.md`; contrato en `docs/07_CONTRATOS_API.md`; ficha de marca en `docs/marca/mascotas/`.
+
+| Pieza | Dónde | Cómo se comprobó |
+| --- | --- | --- |
+| Migración `20261125000100-mascotas-y-parejas` (`show_mascots`, `show_big_celebrations`, tabla `memory_games`) | `backend/database/migrations/` | Subir, bajar y volver a subir en una base aislada |
+| Rango de avance (Destello, Brillo, Luz, Estrella, Constelación) calculado al consultar; antes y después en completar lección y entregar tarea; avance del módulo con `justCompleted` | `progressRankService.js`, `courseService`, `homeService`, `analyticsService`, `contentService`, `assignmentService` | `tests/mapaParejas.test.js` |
+| Última actividad real y días sin actividad (`/me/home`) | `homeService.js` | `mapaParejas.test.js` |
+| Parejas: fuente segura (claves ya visibles), tablero en el servidor, tiempo con `clock.js`, sin bono ni racha; copia de datos y baja | `memoryGameService.js`, `gamificationRoutes.js`, `governanceService.js` | `mapaParejas.test.js`, `Parejas.test.jsx`, e2e `recorrido.spec.js` |
+| Tema opcional de una tarea (ubicación en el mapa) | `CursoTareas.jsx` | Unitarias y e2e |
+| Orbi, Pausa y `Mascota` (estados por partes del mismo SVG, burbuja de texto, preferencia de ocultar) y mensajes centralizados | `Componentes/Orbi.jsx`, `Pausa.jsx`, `Mascota.jsx`, `utils/mensajesMascota.js` | `Mascotas.test.jsx`, `Preferencias.test.jsx` |
+| Mapa del curso: paradas reales (lecciones, tareas, Parejas, «Tareas del curso»), camino SVG en zigzag o vertical, Orbi con `MotionPathPlugin` | `RutaLecciones.jsx`, `utils/caminoMapa.js`, `utils/avanceMapa.js`, `utils/gsapMapa.js`, `Recorrido.css` | `Mapa.test.jsx`, e2e con axe |
+| Rango en el encabezado (sticker que se despega con el mouse o el foco), inicio y analítica; celebración (pegar, doblar, volar) | `RangoAvance.jsx`, `Celebracion.jsx` | Unitarias, e2e y revisión visual |
+| Bienvenida de Pausa (7 días), estados vacíos y aviso junto a «Menos movimiento»; «Mostrar mascotas» y «Celebraciones grandes» en Configuración | `BienvenidaRegreso.jsx`, `EstadoVacio.jsx`, `Configuracion.jsx` | Unitarias y revisión visual |
+| `OrbiSticker`: pegar, despegar, soltar, doblar, desdoblar, arrugar, alisar, saltar y volar | `OrbiSticker.jsx` | `OrbiSticker.test.jsx`; medición con CPU 4× |
+
+Pulido después de la revisión visual (escritorio y móvil, claro y oscuro, con y sin mascotas):
+- Contraste del encabezado del curso. Con el color verde azulado, morado o azul medio, el texto lavanda quedaba bajo 4.5:1. Ahora el texto es blanco y la caja del rango usa un velo oscuro.
+- Nombres accesibles de las tarjetas del mapa y de las cartas. axe pega las partes del texto visible sin espacios, así que ahora llevan un espacio real entre ellas (WCAG 2.5.3).
+- Foco en la primera carta al empezar Parejas, sin depender del orden de pintado.
+- Tarjetas del mapa con ancho parejo; «0 de 1 parada» en singular; «Continúa aquí» legible en oscuro cuando el tema sigue al sistema.
+- El mapa se acerca antes del viaje de Orbi; el confeti queda dentro de la tarjeta; ícono del rango sin duplicar cuando las mascotas están ocultas.
+- Cartas más bajas (el tablero de 12 cabe en escritorio); el sticker se pega al completar el tablero.
+- `MotionPathPlugin` en su propio bloque (`vendor-gsap-camino`, 9,35 kB comprimidos): el bloque común de GSAP vuelve a medir lo mismo que en `main`.
+- El e2e de accesibilidad de las pantallas públicas mide con «menos movimiento» para no evaluar a mitad de un fundido.
+
+Ejecutado el 2026-11-25:
+- Backend: lint y 250/250.
+- Frontend: lint, 85/85 y build.
+- Playwright: 47/47 (también 30/30 al repetir dos veces `recorrido` y `accesibilidad`).
+- Peso del JS inicial (comprimido): 97 983 bytes en `main` frente a 98 314 en esta rama.
+- Sticker con la CPU reducida 4× (Chrome sin pantalla, servidor de desarrollo): todas las animaciones a 55–61 cuadros por segundo y menos de 1 s; el peor cuadro fue de 33 ms, en «pegar».
+- Mockups regenerados: 49 por formato, con el mapa (13b), Parejas (18b) y la celebración de rango (27b).
+- Modelo de datos: 76 tablas, 765 columnas y 159 llaves foráneas; entregables en Word y PDF regenerados.
+
+Pendiente:
+- La bienvenida de Pausa no está en los mockups, porque necesita 7 días sin actividad. Se revisó en una base efímera con fechas movidas.
+- El estado «descanso» de Orbi está dibujado pero todavía no tiene una pantalla.
+- Validar con estudiantes que las mascotas no distraen.
 
 ## Sesión 2026-11-24 · Las 8 capas de la IA
 Rama `feature/capas-ia` (desde `main`; luego se integró el PR #13 del CRM y el agente `admissions_writer` pasó también por las capas: prompt versionado, nivel rápido y guardrails de datos personales, enlaces y cifras). Decisiones en `docs/adr/0009-capas-ia.md`; guía en `docs/agentes-ia.md`.

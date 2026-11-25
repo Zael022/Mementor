@@ -1,6 +1,6 @@
 # Diccionario de datos de MENTOR AI
 
-Generado desde las migraciones de Sequelize (75 tablas, 749 columnas, 155 llaves foráneas). Motor: MySQL 8 (utf8mb4).
+Generado desde las migraciones de Sequelize (76 tablas, 765 columnas, 159 llaves foráneas). Motor: MySQL 8 (utf8mb4).
 
 Convenciones: PK = llave primaria, FK = llave foránea, UQ = valor único. Todas las tablas tienen `created_at` y `updated_at` salvo las indicadas.
 
@@ -123,6 +123,8 @@ Preferencias de apariencia, accesibilidad y metas de cada persona.
 | `created_at` | `datetime` | No |  | Fecha y hora de creación. |
 | `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
 | `email_reminders` | `tinyint(1)` | No |  | Si la persona quiere recibir recordatorios por correo. |
+| `show_mascots` | `tinyint(1)` | No |  | Si la persona quiere ver a Orbi y Pausa. |
+| `show_big_celebrations` | `tinyint(1)` | No |  | Si quiere celebraciones grandes (confeti y stickers) al subir de rango o terminar un módulo. |
 
 ## Gobernanza y bitácoras
 
@@ -744,6 +746,27 @@ Respuestas de la práctica diaria.
 | `question_id` | `bigint unsigned` | No | FK → quick_quiz_questions.id | Referencia a quick_quiz_questions.id (llave foránea). |
 | `option_id` | `bigint unsigned` | Sí | FK → quick_quiz_options.id | Referencia a quick_quiz_options.id (llave foránea). |
 | `is_correct` | `tinyint(1)` | No |  | Indica si la opción o respuesta es correcta. |
+| `created_at` | `datetime` | No |  | Fecha y hora de creación. |
+| `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
+
+### `memory_games`
+
+Partidas de Parejas (práctica del módulo sin nota ni bono): el tablero vive solo en el servidor.
+
+| Campo | Tipo | Nulo | Llave | Propósito |
+| --- | --- | --- | --- | --- |
+| `id` | `bigint unsigned` | No | PK | Identificador único (llave primaria). |
+| `institution_id` | `bigint unsigned` | No | FK → institutions.id | Referencia a institutions.id (llave foránea). |
+| `course_id` | `bigint unsigned` | No | FK → courses.id | Referencia a courses.id (llave foránea). |
+| `module_id` | `bigint unsigned` | No | FK → modules.id | Referencia a modules.id (llave foránea). |
+| `student_id` | `bigint unsigned` | No | FK → users.id | Referencia a users.id (llave foránea). |
+| `status` | `enum('in_progress','finished')` | No |  | Estado de la partida (en curso o terminada). |
+| `pair_count` | `tinyint unsigned` | No |  | Cantidad de parejas del tablero (3 a 8). |
+| `board` | `json` | No |  | Tablero de la partida: cartas, textos y parejas (solo en el servidor). |
+| `matched_pairs` | `tinyint unsigned` | No |  | Parejas encontradas. |
+| `attempts` | `smallint unsigned` | No |  | Intentos de la partida (cada par de cartas comparadas). |
+| `started_at` | `datetime(3)` | No |  | Fecha y hora de inicio. |
+| `finished_at` | `datetime(3)` | Sí |  | Fecha y hora de finalización. |
 | `created_at` | `datetime` | No |  | Fecha y hora de creación. |
 | `updated_at` | `datetime` | No |  | Fecha y hora de la última modificación. |
 
