@@ -21,7 +21,7 @@ import { AgentRun, AiResponseCache } from './AgentRun.js';
 import { ExchangeRate, IntegrationRun, ReminderDelivery } from './Integration.js';
 import {
   CourseGradePolicy, ClassWorkItem, ClassWorkGrade, QuickQuiz, QuickQuizQuestion, QuickQuizOption, QuizPlay, QuizPlayAnswer,
-  DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent,
+  DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent, MemoryGame,
 } from './Gamification.js';
 import { UserPreference, TopicReview, TopicReviewLog, StudyPlan, StudyPlanItem } from './Personalization.js';
 
@@ -65,6 +65,7 @@ Assessment.belongsTo(Topic, { foreignKey: 'topicId', as: 'topic' });
 Assessment.hasMany(Question, { foreignKey: 'assessmentId', as: 'questions' });
 Question.belongsTo(Assessment, { foreignKey: 'assessmentId', as: 'assessment' });
 Question.hasMany(QuestionOption, { foreignKey: 'questionId', as: 'options' });
+Question.belongsTo(Topic, { foreignKey: 'topicId', as: 'topic' });
 Assessment.hasMany(AssessmentAttempt, { foreignKey: 'assessmentId', as: 'attempts' });
 AssessmentAttempt.belongsTo(Assessment, { foreignKey: 'assessmentId', as: 'assessment' });
 AssessmentAttempt.belongsTo(User, { foreignKey: 'studentId', as: 'student' });
@@ -119,6 +120,7 @@ QuizPlay.belongsTo(QuickQuiz, { foreignKey: 'quizId', as: 'quiz' });
 QuizPlay.belongsTo(User, { foreignKey: 'studentId', as: 'student' });
 QuizPlay.hasMany(QuizPlayAnswer, { foreignKey: 'playId', as: 'answers' });
 DailyPractice.hasMany(DailyPracticeAnswer, { foreignKey: 'practiceId', as: 'answers' });
+MemoryGame.belongsTo(Module, { foreignKey: 'moduleId', as: 'module' });
 
 // Personalización: preferencias, repaso espaciado y planes de estudio.
 User.hasOne(UserPreference, { foreignKey: 'userId', as: 'preferences' });
@@ -139,6 +141,6 @@ export {
   Assessment, Question, QuestionOption, AssessmentAttempt, AttemptAnswer,
   TopicMastery, LearningRecommendation, AiThread, AiMessage, AuditLog,
   CourseGradePolicy, ClassWorkItem, ClassWorkGrade, QuickQuiz, QuickQuizQuestion, QuickQuizOption, QuizPlay, QuizPlayAnswer,
-  DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent, PasswordReset, EmailChange,
+  DailyPractice, DailyPracticeAnswer, CourseStreak, GradeBonusEvent, MemoryGame, PasswordReset, EmailChange,
   ConsentRecord, DataDeletionRequest, AgentRun, AiResponseCache, ExchangeRate, IntegrationRun, ReminderDelivery, Role,
 };

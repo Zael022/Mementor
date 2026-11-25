@@ -128,3 +128,19 @@ export const GradeBonusEvent = sequelize.define('GradeBonusEvent', {
   reference: { type: DataTypes.STRING(40), allowNull: false },
   amount: { type: DataTypes.DECIMAL(5, 2), allowNull: false },
 }, { tableName: 'grade_bonus_events', underscored: true });
+
+// Partida de Parejas (práctica sin nota ni bono). El tablero con las parejas nunca sale completo del servidor.
+export const MemoryGame = sequelize.define('MemoryGame', {
+  id: id(),
+  institutionId: ref(),
+  courseId: ref(),
+  moduleId: ref(),
+  studentId: ref(),
+  status: { type: DataTypes.ENUM('in_progress', 'finished'), allowNull: false, defaultValue: 'in_progress' },
+  pairCount: { type: DataTypes.TINYINT.UNSIGNED, allowNull: false },
+  board: { type: DataTypes.JSON, allowNull: false },
+  matchedPairs: { type: DataTypes.TINYINT.UNSIGNED, allowNull: false, defaultValue: 0 },
+  attempts: { type: DataTypes.SMALLINT.UNSIGNED, allowNull: false, defaultValue: 0 },
+  startedAt: { type: DataTypes.DATE(3), allowNull: false },
+  finishedAt: { type: DataTypes.DATE(3), allowNull: true },
+}, { tableName: 'memory_games', underscored: true });
