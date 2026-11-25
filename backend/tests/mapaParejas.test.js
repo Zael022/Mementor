@@ -156,6 +156,7 @@ test('rango del curso: sube al completar y entregar, sin duplicar ni contar lo d
   assert.equal(entrega.status, 200, JSON.stringify(entrega.body));
   assert.equal(entrega.body.data.rank.after.percent, 40);
   assert.equal(entrega.body.data.rank.rankedUp, false);
+  assert.deepEqual([entrega.body.data.module.done, entrega.body.data.module.total, entrega.body.data.module.justCompleted], [2, 3, false]);
   // Corregir la entrega no suma otro paso.
   const correccion = await student.post(`/assignments/${ctx.taskId}/submission`, { body: 'Mi entrega corregida.' });
   assert.equal(correccion.body.data.rank.after.done, 2);
@@ -167,6 +168,15 @@ test('rango del curso: sube al completar y entregar, sin duplicar ni contar lo d
   assert.equal(despublicada.done, 1);
   assert.equal(despublicada.percent, 25);
   await ctx.a.teacher.patch(`/lessons/${ctx.lessons[0]}`, { status: 'published' });
+
+  // La última parada pendiente del módulo (lección 2) lo cierra: se celebra una sola vez.
+  const cierre = await student.post(`/lessons/${ctx.lessons[1]}/complete`);
+  assert.equal(cierre.body.data.module.title, 'Fracciones');
+  assert.equal(cierre.body.data.module.completed, true);
+  assert.equal(cierre.body.data.module.justCompleted, true);
+  assert.equal(cierre.body.data.rank.after.name, 'Luz');
+  assert.equal(cierre.body.data.rank.rankedUp, true);
+  assert.equal((await student.post(`/lessons/${ctx.lessons[1]}/complete`)).body.data.module.justCompleted, false);
 
   // Cada estudiante ve solo su propio avance.
   assert.equal((await ctx.beto.get(`/courses/${ctx.courseId}`)).body.data.rank.done, 0);
@@ -182,7 +192,7 @@ test('rango en inicio y analítica, con permisos por curso e institución', asyn
   const inicio = await ctx.a.student.get('/me/home');
   assert.equal(inicio.status, 200);
   const tarjeta = inicio.body.data.courses.find((curso) => curso.id === ctx.courseId);
-  assert.equal(tarjeta.rank.name, 'Brillo');
+  assert.equal(tarjeta.rank.name, 'Luz');
   assert.equal(inicio.body.data.courses.find((curso) => curso.id === ctx.emptyCourseId).rank.name, 'Sin rango todavía');
   // La actividad real (lección completada hoy) define los días sin actividad.
   assert.ok(inicio.body.data.activity.lastActivityAt);
@@ -197,7 +207,7 @@ test('rango en inicio y analítica, con permisos por curso e institución', asyn
   assert.equal(analitica.status, 200);
   const nombres = analitica.body.data.students.map((fila) => fila.displayName);
   assert.deepEqual(nombres, [...nombres].sort((x, y) => x.localeCompare(y)));
-  assert.equal(analitica.body.data.students.find((fila) => fila.id === ctx.a.student.user.id).rank.name, 'Brillo');
+  assert.equal(analitica.body.data.students.find((fila) => fila.id === ctx.a.student.user.id).rank.name, 'Luz');
   assert.equal((await ctx.a.student.get(`/teacher/courses/${ctx.courseId}/analytics`)).status, 403);
   assert.equal((await ctx.b.teacher.get(`/teacher/courses/${ctx.courseId}/analytics`)).status, 404);
   assert.equal((await ctx.b.student.get(`/courses/${ctx.courseId}`)).status, 404);

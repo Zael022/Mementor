@@ -118,3 +118,25 @@ export async function getCourseRanks(courseId, studentIds) {
   const ranks = await getProgressRanks({ courseIds: [courseId], studentIds });
   return new Map(studentIds.map((studentId) => [Number(studentId), ranks.get(key(courseId, studentId))]));
 }
+
+// Avance de un módulo: lecciones publicadas y tareas publicadas ligadas a sus temas.
+// «justCompleted» permite celebrar «¡Terminaste el módulo!» solo en la acción que lo completa.
+export async function getModuleProgress(studentId, moduleId, { transaction } = {}) {
+  const [row] = await sequelize.query(
+    `SELECT m.id, m.title,
+            (SELECT COUNT(*) FROM lessons l JOIN topics t ON t.id = l.topic_id
+              WHERE t.module_id = m.id AND l.status = 'published') AS lessonsTotal,
+            (SELECT COUNT(*) FROM lesson_progress lp JOIN lessons l ON l.id = lp.lesson_id AND l.status = 'published'
+               JOIN topics t ON t.id = l.topic_id WHERE t.module_id = m.id AND lp.student_id = :studentId) AS lessonsDone,
+            (SELECT COUNT(*) FROM assignments a JOIN topics t ON t.id = a.topic_id
+              WHERE t.module_id = m.id AND a.status = 'published') AS assignmentsTotal,
+            (SELECT COUNT(*) FROM assignment_submissions s JOIN assignments a ON a.id = s.assignment_id AND a.status = 'published'
+               JOIN topics t ON t.id = a.topic_id WHERE t.module_id = m.id AND s.student_id = :studentId) AS assignmentsDone
+       FROM modules m WHERE m.id = :moduleId`,
+    { replacements: { studentId, moduleId }, type: QueryTypes.SELECT, transaction },
+  );
+  if (!row) return null;
+  const total = Number(row.lessonsTotal) + Number(row.assignmentsTotal);
+  const done = Number(row.lessonsDone) + Number(row.assignmentsDone);
+  return { id: Number(row.id), title: row.title, done, total, completed: total > 0 && done >= total };
+}

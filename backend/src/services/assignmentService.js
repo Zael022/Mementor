@@ -3,7 +3,7 @@ import { Assignment, AssignmentSubmission, Enrollment, Topic, User, sequelize } 
 import { conflict, forbidden, invalid, notFound } from '../utils/AppError.js';
 import { getCourseAccess } from './accessService.js';
 import { recordAudit } from './auditService.js';
-import { getStudentCourseRank, rankWentUp } from './progressRankService.js';
+import { getModuleProgress, getStudentCourseRank, rankWentUp } from './progressRankService.js';
 
 const assignmentDto = (row) => ({
   id: row.id,
@@ -150,7 +150,15 @@ export async function submitAssignment(user, assignmentId, { body, linkUrl }) {
     await recordAudit({ actor: user, action: 'assignment.submitted', resourceType: 'assignment', resourceId: assignment.id, transaction });
     const late = Boolean(assignment.dueAt) && submission.submittedAt > assignment.dueAt;
     const after = await getStudentCourseRank(user.id, assignment.courseId, { transaction });
-    return { ...submissionDto(submission), late, rank: { before, after, rankedUp: rankWentUp(before, after) } };
+    // Una tarea ligada a un tema también puede cerrar su módulo.
+    const topic = assignment.topicId ? await Topic.findByPk(assignment.topicId, { attributes: ['moduleId'], transaction }) : null;
+    const module = topic ? await getModuleProgress(user.id, topic.moduleId, { transaction }) : null;
+    return {
+      ...submissionDto(submission),
+      late,
+      rank: { before, after, rankedUp: rankWentUp(before, after) },
+      module: module && { ...module, justCompleted: !existing && module.completed },
+    };
   });
 }
 
