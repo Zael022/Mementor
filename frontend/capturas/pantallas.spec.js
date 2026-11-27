@@ -145,8 +145,9 @@ test('pantallas del estudiante', async ({ page }, testInfo) => {
 
 async function usarAgente(page, titulo, nombre, testInfo, rellenar = async () => {}) {
   await page.goto('/asistentes');
-  const tarjeta = page.locator('.tarjeta, article, li').filter({ hasText: titulo }).filter({ has: page.getByRole('button', { name: 'Usar' }) }).first();
-  await tarjeta.getByRole('button', { name: 'Usar' }).click();
+  // La página de cada asistente se abre en su propia ruta (en la app, en otra pestaña).
+  const tarjeta = page.locator('.tarjeta-agente').filter({ hasText: titulo }).first();
+  await page.goto(await tarjeta.getByRole('link', { name: /^Usar/ }).getAttribute('href'));
   const curso = page.getByLabel('Curso', { exact: true });
   if (await curso.count()) await curso.selectOption({ index: 1 });
   await rellenar();

@@ -17,6 +17,7 @@ const Privacidad = lazy(() => import('../Pages/Privacidad.jsx'));
 const CuentaEliminada = lazy(() => import('../Pages/CuentaEliminada.jsx'));
 const Gobernanza = lazy(() => import('../Pages/Gobernanza.jsx'));
 const Asistentes = lazy(() => import('../Pages/Asistentes.jsx'));
+const Asistente = lazy(() => import('../Pages/Asistente.jsx'));
 const RestablecerClave = lazy(() => import('../Pages/RestablecerClave.jsx'));
 const ConfirmarCorreo = lazy(() => import('../Pages/ConfirmarCorreo.jsx'));
 const PlataformaInstituciones = lazy(() => import('../Pages/PlataformaInstituciones.jsx'));
@@ -108,6 +109,7 @@ export default function Rutas() {
           </Route>
           <Route element={<RutaProtegida roles={['institution_admin', 'teacher', 'student', 'auditor']} />}>
             <Route path="/asistentes" element={<Asistentes />} />
+            <Route path="/asistentes/:clave" element={<Asistente />} />
           </Route>
 
           {/* Vistas de trabajo diario para quien tiene clases. */}
