@@ -13,6 +13,9 @@ export const DEFAULT_PREFERENCES = {
   dailyGoalMinutes: null,
   practiceSize: 5,
   emailReminders: true,
+  // Mascotas (Orbi y Pausa) y celebraciones grandes: visibles salvo que la persona las oculte.
+  showMascots: true,
+  showBigCelebrations: true,
 };
 const FIELDS = Object.keys(DEFAULT_PREFERENCES);
 

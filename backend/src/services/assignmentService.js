@@ -3,6 +3,7 @@ import { Assignment, AssignmentSubmission, Enrollment, Topic, User, sequelize } 
 import { conflict, forbidden, invalid, notFound } from '../utils/AppError.js';
 import { getCourseAccess } from './accessService.js';
 import { recordAudit } from './auditService.js';
+import { getModuleProgress, getStudentCourseRank, rankWentUp } from './progressRankService.js';
 
 const assignmentDto = (row) => ({
   id: row.id,
@@ -141,13 +142,23 @@ export async function submitAssignment(user, assignmentId, { body, linkUrl }) {
     if (existing?.gradePoints !== null && existing?.gradePoints !== undefined) {
       throw conflict('ALREADY_GRADED', 'Esta entrega ya fue calificada y no se puede cambiar.');
     }
+    const before = await getStudentCourseRank(user.id, assignment.courseId, { transaction });
     const values = { body, linkUrl: linkUrl || null, submittedAt: new Date() };
     const submission = existing
       ? await existing.update(values, { transaction })
       : await AssignmentSubmission.create({ ...values, assignmentId: assignment.id, studentId: user.id }, { transaction });
     await recordAudit({ actor: user, action: 'assignment.submitted', resourceType: 'assignment', resourceId: assignment.id, transaction });
     const late = Boolean(assignment.dueAt) && submission.submittedAt > assignment.dueAt;
-    return { ...submissionDto(submission), late };
+    const after = await getStudentCourseRank(user.id, assignment.courseId, { transaction });
+    // Una tarea ligada a un tema también puede cerrar su módulo.
+    const topic = assignment.topicId ? await Topic.findByPk(assignment.topicId, { attributes: ['moduleId'], transaction }) : null;
+    const module = topic ? await getModuleProgress(user.id, topic.moduleId, { transaction }) : null;
+    return {
+      ...submissionDto(submission),
+      late,
+      rank: { before, after, rankedUp: rankWentUp(before, after) },
+      module: module && { ...module, justCompleted: !existing && module.completed },
+    };
   });
 }
 

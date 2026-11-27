@@ -2,6 +2,7 @@ import * as quizService from '../services/quickQuizService.js';
 import * as streakService from '../services/streakService.js';
 import * as gradeService from '../services/gradeService.js';
 import * as classWorkService from '../services/classWorkService.js';
+import * as memoryGameService from '../services/memoryGameService.js';
 import { readId } from '../utils/http.js';
 
 // --- Quizzes rápidos (docente) ---
@@ -98,4 +99,21 @@ export async function deleteClassWork(req, res) {
 
 export async function saveClassWorkGrades(req, res) {
   res.json({ data: await classWorkService.saveGrades(req.user, readId(req.params.itemId), req.body.grades) });
+}
+
+// --- Parejas (práctica del módulo, sin nota ni bono) ---
+export async function startMemoryGame(req, res) {
+  res.status(201).json({ data: await memoryGameService.startGame(req.user, readId(req.params.moduleId), req.body) });
+}
+
+export async function getMemoryGame(req, res) {
+  res.json({ data: await memoryGameService.getGame(req.user, readId(req.params.gameId)) });
+}
+
+export async function revealMemoryCard(req, res) {
+  res.json({ data: await memoryGameService.revealCard(req.user, readId(req.params.gameId), req.body) });
+}
+
+export async function matchMemoryCards(req, res) {
+  res.json({ data: await memoryGameService.matchCards(req.user, readId(req.params.gameId), req.body) });
 }

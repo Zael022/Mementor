@@ -1,6 +1,7 @@
 import { QueryTypes } from 'sequelize';
 import { sequelize } from '../models/index.js';
 import { getCourseAccess } from './accessService.js';
+import { getCourseRanks } from './progressRankService.js';
 
 const num = (value) => (value === null || value === undefined ? null : Number(value));
 
@@ -64,6 +65,9 @@ export async function getCourseAnalytics(user, courseId) {
     ),
   ]);
 
+  // Rango de avance de cada estudiante: se muestra en orden alfabético, sin ordenar ni comparar por rango.
+  const ranks = await getCourseRanks(course.id, students.map((row) => row.id));
+
   return {
     course: { id: course.id, title: course.title, status: course.status },
     enrolledStudents: students.length,
@@ -91,6 +95,7 @@ export async function getCourseAnalytics(user, courseId) {
       submittedAttempts: Number(row.submittedAttempts),
       averageScorePct: num(row.averageScorePct),
       lastSubmittedAt: row.lastSubmittedAt,
+      rank: ranks.get(Number(row.id)),
     })),
   };
 }

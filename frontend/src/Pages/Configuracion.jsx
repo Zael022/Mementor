@@ -1,11 +1,13 @@
-import { useId, useMemo, useState } from 'react';
+import { Fragment, useId, useMemo, useState } from 'react';
 import PrivacidadDatos from '../Componentes/PrivacidadDatos.jsx';
 import Campo from '../Componentes/Campo.jsx';
 import { CambiarContrasena, CambiarCorreo, DatosPersonales, FotoPerfil } from '../Componentes/EditorPerfil.jsx';
 import { MensajeError } from '../Componentes/Estados.jsx';
+import Mascota from '../Componentes/Mascota.jsx';
 import { useSesion } from '../context/SesionContext.jsx';
 import { useEnvio } from '../hooks/useEnvio.js';
 import { zonaDelNavegador } from '../services/preferencias.js';
+import { mensajeMovimiento } from '../utils/mensajesMascota.js';
 
 const ROLES = {
   platform_admin: 'Administración de plataforma',
@@ -25,6 +27,10 @@ const TAMANOS = [
   { valor: 115, texto: 'Grande' },
   { valor: 130, texto: 'Muy grande' },
   { valor: 150, texto: 'Máximo' },
+];
+const AJUSTES_MASCOTAS = [
+  { campo: 'showMascots', texto: 'Mostrar mascotas', ayuda: 'Orbi te acompaña en el mapa del curso y Pausa en los momentos tranquilos. La información importante siempre está también en texto.' },
+  { campo: 'showBigCelebrations', texto: 'Celebraciones grandes', ayuda: 'Confeti y stickers al subir de rango o terminar un módulo. Apagadas, el logro se avisa con un mensaje sencillo.' },
 ];
 const AJUSTES = [
   { campo: 'highContrast', texto: 'Alto contraste', ayuda: 'Texto secundario, bordes y foco del teclado más marcados.' },
@@ -113,7 +119,23 @@ export default function Configuracion() {
         <Segmentos leyenda="Tamaño del texto" nombre="texto" opciones={TAMANOS} valor={preferencias.textScale} alCambiar={(textScale) => cambiar({ textScale })} />
         <ul className="interruptores">
           {AJUSTES.map((ajuste) => (
-            <Interruptor key={ajuste.campo} texto={ajuste.texto} ayuda={ajuste.ayuda} activo={Boolean(preferencias[ajuste.campo])}
+            <Fragment key={ajuste.campo}>
+              <Interruptor texto={ajuste.texto} ayuda={ajuste.ayuda} activo={Boolean(preferencias[ajuste.campo])}
+                alCambiar={(valor) => cambiar({ [ajuste.campo]: valor })} />
+              {/* Pausa acompaña a «Menos movimiento» y explica qué cambia. */}
+              {ajuste.campo === 'reducedMotion' && (
+                <li className="aviso-mascota">
+                  <Mascota personaje="pausa" estado={preferencias.reducedMotion ? 'dormido' : 'leyendo'} tamano="pequeno" siOculta="mensaje"
+                    mensaje={mensajeMovimiento(Boolean(preferencias.reducedMotion))} />
+                </li>
+              )}
+            </Fragment>
+          ))}
+        </ul>
+        <h3>Mascotas y celebraciones</h3>
+        <ul className="interruptores">
+          {AJUSTES_MASCOTAS.map((ajuste) => (
+            <Interruptor key={ajuste.campo} texto={ajuste.texto} ayuda={ajuste.ayuda} activo={preferencias[ajuste.campo] !== false}
               alCambiar={(valor) => cambiar({ [ajuste.campo]: valor })} />
           ))}
         </ul>

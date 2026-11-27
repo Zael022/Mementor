@@ -53,6 +53,7 @@ const CursoQuizzes = lazy(() => import('../Pages/CursoQuizzes.jsx'));
 const CursoCalificaciones = lazy(() => import('../Pages/CursoCalificaciones.jsx'));
 const JugarQuiz = lazy(() => import('../Pages/JugarQuiz.jsx'));
 const PracticaDiaria = lazy(() => import('../Pages/PracticaDiaria.jsx'));
+const ParejasModulo = lazy(() => import('../Pages/ParejasModulo.jsx'));
 
 // Las páginas se cargan bajo demanda: el acceso queda disponible sin esperar el resto de la aplicación.
 
@@ -151,6 +152,7 @@ export default function Rutas() {
             <Route path="/estudiante/cursos/:id" element={<EstudianteCurso />} />
             <Route path="/estudiante/cursos/:id/quizzes/:quizId" element={<JugarQuiz />} />
             <Route path="/estudiante/cursos/:id/racha" element={<PracticaDiaria />} />
+            <Route path="/estudiante/cursos/:id/parejas/:moduleId" element={<ParejasModulo />} />
             <Route path="/estudiante/lecciones/:id" element={<Leccion />} />
             <Route path="/estudiante/tareas/:id" element={<EstudianteTarea />} />
             <Route path="/estudiante/evaluaciones/:id" element={<EstudianteEvaluacion />} />

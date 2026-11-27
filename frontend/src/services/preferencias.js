@@ -10,6 +10,8 @@ export const PREFERENCIAS_BASE = {
   dailyGoalMinutes: null,
   practiceSize: 5,
   emailReminders: true,
+  showMascots: true,
+  showBigCelebrations: true,
 };
 
 const CLAVE = 'mentor.preferencias';
@@ -25,6 +27,9 @@ export function aplicarPreferencias(preferencias, raiz = document.documentElemen
   poner('data-movimiento', actual.reducedMotion ? 'reducido' : null);
   poner('data-lectura', actual.readingSpacing ? 'espaciada' : null);
   poner('data-enlaces', actual.underlineLinks ? 'subrayados' : null);
+  // Mascotas ocultas y celebraciones discretas (sin confeti ni stickers grandes).
+  poner('data-mascotas', actual.showMascots === false ? 'ocultas' : null);
+  poner('data-celebraciones', actual.showBigCelebrations === false ? 'discretas' : null);
   raiz.style.setProperty('--escala-texto', String((Number(actual.textScale) || 100) / 100));
   window.dispatchEvent(new CustomEvent(EVENTO_PREFERENCIAS, { detail: actual }));
   return actual;

@@ -736,6 +736,26 @@
      "extra": "",
      "purpose": "Si la persona quiere recibir recordatorios por correo.",
      "fk": null
+    },
+    {
+     "name": "show_mascots",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Si la persona quiere ver a Orbi y Pausa.",
+     "fk": null
+    },
+    {
+     "name": "show_big_celebrations",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Si quiere celebraciones grandes (confeti y stickers) al subir de rango o terminar un módulo.",
+     "fk": null
     }
    ]
   },
@@ -4345,6 +4365,153 @@
      "default": null,
      "extra": "",
      "purpose": "Indica si la opción o respuesta es correcta.",
+     "fk": null
+    },
+    {
+     "name": "created_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de creación.",
+     "fk": null
+    },
+    {
+     "name": "updated_at",
+     "type": "datetime",
+     "null": false,
+     "key": "",
+     "default": "CURRENT_TIMESTAMP",
+     "extra": "DEFAULT_GENERATED",
+     "purpose": "Fecha y hora de la última modificación.",
+     "fk": null
+    }
+   ]
+  },
+  {
+   "module": "Quizzes, racha y aprendizaje",
+   "table": "memory_games",
+   "purpose": "Partidas de Parejas (práctica del módulo sin nota ni bono): el tablero vive solo en el servidor.",
+   "columns": [
+    {
+     "name": "id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "PRI",
+     "default": null,
+     "extra": "auto_increment",
+     "purpose": "Identificador único (llave primaria).",
+     "fk": null
+    },
+    {
+     "name": "institution_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a institutions.id (llave foránea).",
+     "fk": "institutions.id"
+    },
+    {
+     "name": "course_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a courses.id (llave foránea).",
+     "fk": "courses.id"
+    },
+    {
+     "name": "module_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a modules.id (llave foránea).",
+     "fk": "modules.id"
+    },
+    {
+     "name": "student_id",
+     "type": "bigint unsigned",
+     "null": false,
+     "key": "MUL",
+     "default": null,
+     "extra": "",
+     "purpose": "Referencia a users.id (llave foránea).",
+     "fk": "users.id"
+    },
+    {
+     "name": "status",
+     "type": "enum('in_progress','finished')",
+     "null": false,
+     "key": "",
+     "default": "in_progress",
+     "extra": "",
+     "purpose": "Estado de la partida (en curso o terminada).",
+     "fk": null
+    },
+    {
+     "name": "pair_count",
+     "type": "tinyint unsigned",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Cantidad de parejas del tablero (3 a 8).",
+     "fk": null
+    },
+    {
+     "name": "board",
+     "type": "json",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Tablero de la partida: cartas, textos y parejas (solo en el servidor).",
+     "fk": null
+    },
+    {
+     "name": "matched_pairs",
+     "type": "tinyint unsigned",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Parejas encontradas.",
+     "fk": null
+    },
+    {
+     "name": "attempts",
+     "type": "smallint unsigned",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Intentos de la partida (cada par de cartas comparadas).",
+     "fk": null
+    },
+    {
+     "name": "started_at",
+     "type": "datetime(3)",
+     "null": false,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de inicio.",
+     "fk": null
+    },
+    {
+     "name": "finished_at",
+     "type": "datetime(3)",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Fecha y hora de finalización.",
      "fk": null
     },
     {
@@ -8809,6 +8976,34 @@
    "card": "1:N"
   },
   {
+   "table": "memory_games",
+   "column": "institution_id",
+   "ref": "institutions",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "memory_games",
+   "column": "course_id",
+   "ref": "courses",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "memory_games",
+   "column": "module_id",
+   "ref": "modules",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
+   "table": "memory_games",
+   "column": "student_id",
+   "ref": "users",
+   "refcol": "id",
+   "card": "1:N"
+  },
+  {
    "table": "modules",
    "column": "course_id",
    "ref": "courses",
@@ -9160,6 +9355,7 @@
    "quiz_play_answers",
    "daily_practices",
    "daily_practice_answers",
+   "memory_games",
    "course_streaks",
    "topic_mastery",
    "learning_recommendations",
@@ -9194,6 +9390,6 @@
    "platform_crm_contacts"
   ]
  },
- "tables": 75,
- "columns": 749
+ "tables": 76,
+ "columns": 765
 }

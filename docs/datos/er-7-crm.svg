@@ -56,25 +56,8 @@
 <text text-anchor="start" x="553" y="-741.2" font-family="Figtree" font-size="11.00">updated_at</text>
 <text text-anchor="start" x="630" y="-741.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
 </g>
-<!-- institutions -->
-<g id="node13" class="node">
-<title>institutions</title>
-<path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M818,-1335C818,-1335 786,-1335 786,-1335 780,-1335 774,-1329 774,-1323 774,-1323 774,-1311 774,-1311 774,-1305 780,-1299 786,-1299 786,-1299 818,-1299 818,-1299 824,-1299 830,-1305 830,-1311 830,-1311 830,-1323 830,-1323 830,-1329 824,-1335 818,-1335"/>
-<text text-anchor="middle" x="802" y="-1314.2" font-family="Figtree" font-size="11.00" fill="#5b6280">institutions</text>
-</g>
-<!-- crm_admission_cycles&#45;&gt;institutions -->
-<g id="edge1" class="edge">
-<title>crm_admission_cycles&#45;&gt;institutions</title>
-<path fill="none" stroke="#8a91b4" d="M702.41,-992.57C704.71,-997.05 706.92,-1001.54 709,-1006 755.26,-1105.24 784.33,-1233.17 795.63,-1288.93"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="698.42,-985.18 697.62,-974.24 696.04,-980.78 693.66,-976.38 693.66,-976.38 693.66,-976.38 696.04,-980.78 689.7,-978.52 698.42,-985.18 698.42,-985.18"/>
-<ellipse fill="none" stroke="#8a91b4" cx="700.32" cy="-988.7" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="802.3,-1296.83 792.49,-1298.79 792.1,-1296.83 801.91,-1294.87 802.3,-1296.83"/>
-<polyline fill="none" stroke="#8a91b4" points="797.59,-1298.79 796.61,-1293.89 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="801.32,-1291.93 791.52,-1293.88 791.12,-1291.92 800.93,-1289.97 801.32,-1291.93"/>
-<polyline fill="none" stroke="#8a91b4" points="796.61,-1293.89 795.64,-1288.98 "/>
-</g>
 <!-- courses -->
-<g id="node14" class="node">
+<g id="node11" class="node">
 <title>courses</title>
 <path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M817,-879C817,-879 787,-879 787,-879 781,-879 775,-873 775,-867 775,-867 775,-855 775,-855 775,-849 781,-843 787,-843 787,-843 817,-843 817,-843 823,-843 829,-849 829,-855 829,-855 829,-867 829,-867 829,-873 823,-879 817,-879"/>
 <text text-anchor="middle" x="802" y="-858.2" font-family="Figtree" font-size="11.00" fill="#5b6280">courses</text>
@@ -89,6 +72,23 @@
 <polyline fill="none" stroke="#8a91b4" points="774.65,-861 769.65,-861 "/>
 <polygon fill="#8a91b4" stroke="#8a91b4" points="768.65,-856 768.65,-866 766.65,-866 766.65,-856 768.65,-856"/>
 <polyline fill="none" stroke="#8a91b4" points="769.65,-861 764.65,-861 "/>
+</g>
+<!-- institutions -->
+<g id="node14" class="node">
+<title>institutions</title>
+<path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M818,-1335C818,-1335 786,-1335 786,-1335 780,-1335 774,-1329 774,-1323 774,-1323 774,-1311 774,-1311 774,-1305 780,-1299 786,-1299 786,-1299 818,-1299 818,-1299 824,-1299 830,-1305 830,-1311 830,-1311 830,-1323 830,-1323 830,-1329 824,-1335 818,-1335"/>
+<text text-anchor="middle" x="802" y="-1314.2" font-family="Figtree" font-size="11.00" fill="#5b6280">institutions</text>
+</g>
+<!-- crm_admission_cycles&#45;&gt;institutions -->
+<g id="edge1" class="edge">
+<title>crm_admission_cycles&#45;&gt;institutions</title>
+<path fill="none" stroke="#8a91b4" d="M702.41,-992.57C704.71,-997.05 706.92,-1001.54 709,-1006 755.26,-1105.24 784.33,-1233.17 795.63,-1288.93"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="698.42,-985.18 697.62,-974.24 696.04,-980.78 693.66,-976.38 693.66,-976.38 693.66,-976.38 696.04,-980.78 689.7,-978.52 698.42,-985.18 698.42,-985.18"/>
+<ellipse fill="none" stroke="#8a91b4" cx="700.32" cy="-988.7" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="802.3,-1296.83 792.49,-1298.79 792.1,-1296.83 801.91,-1294.87 802.3,-1296.83"/>
+<polyline fill="none" stroke="#8a91b4" points="797.59,-1298.79 796.61,-1293.89 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="801.32,-1291.93 791.52,-1293.88 791.12,-1291.92 800.93,-1289.97 801.32,-1291.93"/>
+<polyline fill="none" stroke="#8a91b4" points="796.61,-1293.89 795.64,-1288.98 "/>
 </g>
 <!-- crm_prospects -->
 <g id="node2" class="node">
@@ -131,7 +131,7 @@
 <text text-anchor="start" x="631" y="-1069.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
 </g>
 <!-- users -->
-<g id="node12" class="node">
+<g id="node13" class="node">
 <title>users</title>
 <path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M817,-347C817,-347 787,-347 787,-347 781,-347 775,-341 775,-335 775,-335 775,-323 775,-323 775,-317 781,-311 787,-311 787,-311 817,-311 817,-311 823,-311 829,-317 829,-323 829,-323 829,-335 829,-335 829,-341 823,-347 817,-347"/>
 <text text-anchor="middle" x="802" y="-326.2" font-family="Figtree" font-size="11.00" fill="#5b6280">users</text>
@@ -520,7 +520,7 @@
 <polyline fill="none" stroke="#8a91b4" points="247.7,-534.24 245.65,-529.68 "/>
 </g>
 <!-- agent_runs -->
-<g id="node11" class="node">
+<g id="node12" class="node">
 <title>agent_runs</title>
 <path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M362.5,-189C362.5,-189 331.5,-189 331.5,-189 325.5,-189 319.5,-183 319.5,-177 319.5,-177 319.5,-165 319.5,-165 319.5,-159 325.5,-153 331.5,-153 331.5,-153 362.5,-153 362.5,-153 368.5,-153 374.5,-159 374.5,-165 374.5,-165 374.5,-177 374.5,-177 374.5,-183 368.5,-189 362.5,-189"/>
 <text text-anchor="middle" x="347" y="-168.2" font-family="Figtree" font-size="11.00" fill="#5b6280">agent_runs</text>

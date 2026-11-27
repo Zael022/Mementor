@@ -2,10 +2,13 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { prefiereMenosMovimiento } from '../hooks/useMovimiento.js';
 import Ilustracion from './Ilustracion.jsx';
 import Logo from './Logo.jsx';
+import { MENSAJE_PORTADA } from '../utils/mensajesMascota.js';
 
 // La cuadrícula decorativa y la rejilla animada se descargan aparte: el formulario funciona mientras llegan.
 const ShapeGrid = lazy(() => import('./ShapeGrid.jsx'));
 const RejillaRasgos = lazy(() => import('./RejillaRasgos.jsx'));
+// Pausa (con GSAP) también llega aparte, para no sumar peso a la primera pantalla.
+const Mascota = lazy(() => import('./Mascota.jsx'));
 
 // Parámetros de Shape Grid ajustados a la paleta de MENTOR (azul de estructura, cielo para el brillo de entrada).
 // Sin velocidad ni dirección: la cuadrícula aparece con una onda breve y queda quieta.
@@ -66,7 +69,14 @@ export default function Portada({ titulo, children }) {
 
   return (
     <div className="portada">
-      <header className="cabecera"><Logo como="p" /></header>
+      <header className="cabecera">
+        <Logo como="p" />
+        {/* Pausa se agarra del borde inferior de esta barra y saluda una vez; es decorativa y respeta
+            «Mostrar mascotas» y «Menos movimiento». */}
+        <Suspense fallback={null}>
+          <Mascota personaje="pausa" estado="bienvenida" rama={false} animacion={1} mensaje={MENSAJE_PORTADA} className="pausa-colgada" />
+        </Suspense>
+      </header>
 
       <section className="portada-hero">
         {/* Capa decorativa: oculta al lector de pantalla y sin eventos del puntero. */}

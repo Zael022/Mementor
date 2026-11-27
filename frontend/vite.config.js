@@ -30,6 +30,8 @@ export default defineConfig({
           if (/\/node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(id)) return 'vendor-react';
           if (/\/node_modules\/(motion|motion-dom|motion-utils|framer-motion)\//.test(id)) return 'vendor-motion';
           if (id.includes('/node_modules/@react-spring/')) return 'vendor-spring';
+          // El plugin del camino solo lo usa el mapa del curso: va en su propio bloque.
+          if (/\/node_modules\/gsap\/(MotionPathPlugin|utils\/(paths|matrix))\.js/.test(id)) return 'vendor-gsap-camino';
           if (/\/node_modules\/(gsap|@gsap)\//.test(id)) return 'vendor-gsap';
         },
       },

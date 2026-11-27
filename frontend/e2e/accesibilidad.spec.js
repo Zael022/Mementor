@@ -11,6 +11,8 @@ test.describe('Accesibilidad automática @movil', () => {
     for (const [ruta, nombre] of PANTALLAS) {
       test(`${nombre} sin infracciones WCAG 2.2 AA en ${ancho}×${alto}`, async ({ page }) => {
         await page.setViewportSize({ width: ancho, height: alto });
+        // Sin animaciones de entrada: el contraste se mide en el estado final, no a mitad de un fundido.
+        await page.emulateMedia({ reducedMotion: 'reduce' });
         await page.goto(ruta);
         await expect(page.getByRole('heading').first()).toBeVisible();
         const resultado = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
