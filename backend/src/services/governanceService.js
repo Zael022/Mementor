@@ -69,7 +69,8 @@ const LEARNING_EXPORT = {
       FROM ai_threads t JOIN ai_messages m ON m.thread_id = t.id WHERE t.user_id = :id ORDER BY m.id`,
   preferences: `SELECT theme, text_scale AS textScale, high_contrast AS highContrast, reduced_motion AS reducedMotion,
       time_zone AS timeZone, daily_goal_minutes AS dailyGoalMinutes, email_reminders AS emailReminders,
-      show_mascots AS showMascots, show_big_celebrations AS showBigCelebrations FROM user_preferences WHERE user_id = :id`,
+      show_mascots AS showMascots, show_big_celebrations AS showBigCelebrations,
+      pausa_walks AS pausaWalks, pausa_hidden_on AS pausaHiddenOn FROM user_preferences WHERE user_id = :id`,
 };
 
 // Qué queda fuera de la copia y cómo pedirlo.

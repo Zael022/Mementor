@@ -1,6 +1,6 @@
 # Diccionario de datos de MENTOR AI
 
-Generado desde las migraciones de Sequelize (76 tablas, 766 columnas, 159 llaves foráneas). Motor: MySQL 8 (utf8mb4).
+Generado desde las migraciones de Sequelize (76 tablas, 768 columnas, 159 llaves foráneas). Motor: MySQL 8 (utf8mb4).
 
 Convenciones: PK = llave primaria, FK = llave foránea, UQ = valor único. Todas las tablas tienen `created_at` y `updated_at` salvo las indicadas.
 
@@ -126,6 +126,8 @@ Preferencias de apariencia, accesibilidad y metas de cada persona.
 | `email_reminders` | `tinyint(1)` | No |  | Si la persona quiere recibir recordatorios por correo. |
 | `show_mascots` | `tinyint(1)` | No |  | Si la persona quiere ver a Orbi y Pausa. |
 | `show_big_celebrations` | `tinyint(1)` | No |  | Si quiere celebraciones grandes (confeti y stickers) al subir de rango o terminar un módulo. |
+| `pausa_walks` | `tinyint(1)` | No |  | Si Pausa puede pasear por la pantalla (apagado se queda quieto en una esquina). |
+| `pausa_hidden_on` | `date` | Sí |  | Día local en que la persona escondió a Pausa «por hoy»; deja de valer al día siguiente. |
 
 ## Gobernanza y bitácoras
 
