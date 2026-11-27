@@ -2,6 +2,18 @@
 
 **Última actualización** — 2026-11-26. Modo de prueba con cuentas por rol y acceso rápido (rama `feature/cuentas-de-prueba`); antes, 2026-11-25: Mapa del curso, rango de avance, mascotas Orbi y Pausa, sticker de papel y Parejas (rama `feature/mapa-mascota-parejas`); antes, las 8 capas de la IA (rama `feature/capas-ia`, con `main` integrado: CRM de admisiones y de plataforma); antes, CRM institucional y seguridad OWASP (PR #13); antes, correcciones de la auditoría de salida a producción (rama `fix/auditoria-produccion`); antes, correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
 
+## Sesión 2026-11-28 · Activar la IA: `npm run ia:verificar`
+Daisy pidió «habilitar todas las funciones de la IA que no funcionan». Las 9 funciones (el tutor y 8 asistentes) ya están programadas. No funcionan solo porque falta configurar la clave del proveedor: sin ella responden `AI_NOT_CONFIGURED` y nunca inventan contenido. La clave la pone Daisy en su `backend/.env`; el agente no maneja claves. Rama `feature/verificar-ia`, desde `develop`.
+- `src/services/aiDiagnostics.js` y `npm run ia:verificar`:
+  - revisa la configuración de los niveles rápido y avanzado;
+  - hace una llamada mínima real por modelo (5 tokens; una sola si los dos niveles usan el mismo modelo);
+  - explica en español el fallo: clave inválida, sin saldo, modelo inexistente, límite, saturación o sin conexión;
+  - avisa si `AI_BASE_URL` apunta a un servidor de prueba local o si la clave parece incompleta;
+  - lista las 9 funciones con su estado. Nunca imprime la clave.
+- `buildRequest` de `aiProvider.js` ahora se exporta, para que la verificación arme la solicitud igual que la app.
+- Documentación: el README (sección 2) explica cómo activarla paso a paso y `.env.example` remite al comando.
+- Pruebas: `aiDiagnostics.test.js` (6, con un proveedor simulado; nunca llama al real). Backend completo: lint y 263/263.
+
 ## Sesión 2026-11-27 · Configuración, logo «MENTOR IA», mapa con más diseño y mascotas interactivas
 Rama `feature/configuracion-mentor-ia` (desde `develop`).
 - **Cerrar sesión, Privacidad y Términos** salen de la barra superior y del menú lateral; viven en Configuración, sección «Documentos y sesión».

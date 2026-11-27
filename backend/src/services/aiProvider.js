@@ -63,8 +63,8 @@ export function toProviderMessages(provider, messages) {
 // Tokens leídos o escritos en la caché del proveedor, si los informa.
 const anthropicCacheUsage = (usage) => ({ cacheReadTokens: usage?.cache_read_input_tokens, cacheWriteTokens: usage?.cache_creation_input_tokens });
 
-// Arma la solicitud según el formato de cada proveedor.
-function buildRequest(config, { system, messages, maxTokens }) {
+// Arma la solicitud según el formato de cada proveedor (también la usa la verificación de `npm run ia:verificar`).
+export function buildRequest(config, { system, messages, maxTokens }) {
   if (config.provider === 'anthropic') {
     return {
       headers: { 'x-api-key': config.apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
