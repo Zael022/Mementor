@@ -1,6 +1,54 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-26. Modo de prueba con cuentas por rol y acceso rápido (rama `feature/cuentas-de-prueba`); antes, 2026-11-25: Mapa del curso, rango de avance, mascotas Orbi y Pausa, sticker de papel y Parejas (rama `feature/mapa-mascota-parejas`); antes, las 8 capas de la IA (rama `feature/capas-ia`, con `main` integrado: CRM de admisiones y de plataforma); antes, CRM institucional y seguridad OWASP (PR #13); antes, correcciones de la auditoría de salida a producción (rama `fix/auditoria-produccion`); antes, correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+**Última actualización** — 2026-11-27. Asistentes de IA con página propia en otra pestaña y color por asistente; antes: `npm run ia:verificar` y Parte A del paquete de comunidad (Pausa paseante); Configuración, logo «MENTOR IA», mapa con fondo nuevo y mascotas interactivas.
+
+## Sesión 2026-11-27 · Asistentes de IA: otra pestaña y más color
+Daisy pidió (video) que «Usar» abra otra pestaña en vez de mostrar el formulario abajo, y que la página tenga más color porque casi todo quedaba en dos colores. Rama `feature/asistentes-pestana-color`.
+
+- **Página propia por asistente**: nueva ruta `/asistentes/:clave` (`Pages/Asistente.jsx`, carga diferida). «Usar» es un enlace con `target="_blank"` y `rel="noopener"`, con texto para lector de pantalla «(se abre en otra pestaña)». La sesión va en cookie, así que la pestaña nueva entra sin volver a iniciar sesión. Formulario a la izquierda, resultado a la derecha (una columna en móvil), con estado vacío y los últimos 5 usos de ese asistente. Si la clave no existe o no es del rol: aviso y enlace de regreso. El tutor y el redactor de admisiones siguen abriendo su sección en la misma pestaña.
+- **Color**: cada asistente tiene acento, ícono y categoría (`utils/asistentesVisual.js`, `Componentes/IconoAsistente.jsx`; los íconos viven fuera de `Iconos.jsx` para no pesar en la carga inicial). Los tonos suaves salen de `color-mix` con `--panel`, así sirven en claro, oscuro y alto contraste. Contraste medido: blanco sobre cada acento ≥ 4,98:1; texto de acento sobre su fondo suave ≥ 6,7:1 en claro y ≥ 6,0:1 en oscuro. El color nunca va solo: siempre con nombre e ícono.
+- La lista tiene portada con degradado de colores, chips de datos, tarjetas tintadas y el historial con un chip de color por asistente; el historial se recarga al volver a la pestaña (`visibilitychange`).
+- Pruebas: `tests/Asistentes.test.jsx` (3) y e2e `gobernanza-agentes` adaptada a la pestaña nueva (8/8 en escritorio y móvil). Frontend: lint limpio, Vitest 107/107, build bien; JS inicial 97,6 KiB gzip (antes 97,5).
+- Pendiente opcional: llevar la misma paleta de acentos a otras pantallas si Daisy la aprueba.
+
+## Sesión 2026-11-28 · Activar la IA: `npm run ia:verificar`
+Daisy pidió «habilitar todas las funciones de la IA que no funcionan». Las 9 funciones (el tutor y 8 asistentes) ya están programadas. No funcionan solo porque falta configurar la clave del proveedor: sin ella responden `AI_NOT_CONFIGURED` y nunca inventan contenido. La clave la pone Daisy en su `backend/.env`; el agente no maneja claves. Rama `feature/verificar-ia`, desde `develop`.
+- `src/services/aiDiagnostics.js` y `npm run ia:verificar`:
+  - revisa la configuración de los niveles rápido y avanzado;
+  - hace una llamada mínima real por modelo (5 tokens; una sola si los dos niveles usan el mismo modelo);
+  - explica en español el fallo: clave inválida, sin saldo, modelo inexistente, límite, saturación o sin conexión;
+  - avisa si `AI_BASE_URL` apunta a un servidor de prueba local o si la clave parece incompleta;
+  - lista las 9 funciones con su estado. Nunca imprime la clave.
+- `buildRequest` de `aiProvider.js` ahora se exporta, para que la verificación arme la solicitud igual que la app.
+- Documentación: el README (sección 2) explica cómo activarla paso a paso y `.env.example` remite al comando.
+- Pruebas: `aiDiagnostics.test.js` (6, con un proveedor simulado; nunca llama al real). Backend completo: lint y 263/263.
+## Sesión 2026-11-28 · Paquete de comunidad y dedicación · Parte A: Pausa paseante
+Daisy entregó un prompt con 10 partes (A–J). Aprobó el plan con este orden: A → D → F → I → B → C → E → H → G. La Parte J va al final, con su ADR primero y dividida en J1–J5 en otras sesiones. Pidió un PR por parte y actualizar la regla de la ficha de marca que prohibía los bucles. Rama `feature/paquete-comunidad-y-dedicacion`, desde `develop`.
+
+Decisiones de Daisy para la Parte A:
+- 20 frases de curiosidad aprobadas (perezosos, Costa Rica y consejos de estudio), con la fuente de cada una.
+- Voz neutral.
+- En el nivel 3 de molestia se tapa la cara y se aleja.
+- Tres caricias seguidas lo duermen.
+
+| Pieza | Dónde | Cómo se comprobó |
+| --- | --- | --- |
+| Migración `20261128000100-pausa-paseante` (`pausa_walks`, `pausa_hidden_on`) | `backend/database/migrations/` | Subir, bajar y volver a subir en una base aislada |
+| `pausaWalks` y `pausaHiddenToday` (el servidor guarda el día local; no acepta fechas del navegador) | `preferenceService.js`, `schemas.js`, `Personalization.js`, `governanceService.js` (copia de datos) | `mapaParejas.test.js`, `personalization.test.js` |
+| 6 expresiones nuevas de Pausa (curioso, molesto, enojado, tapado, feliz, bostezo) y agarre con las dos manos | `Componentes/Pausa.jsx`, `docs/marca/mascotas/estados/pausa-paseante-*` | `PausaPaseante.test.jsx`, revisión visual |
+| Reglas puras de reacción (molestia por niveles que baja sola, caricia con espera, siesta, baraja sin repetir, destino que esquiva) | `utils/pausaPaseante.js`, `utils/frasesPausa.js`, `utils/rutasPausa.js` | `PausaPaseante.test.jsx` |
+| Pausa paseante: capa fija que no recibe clics, mano tras mano, esquiva cada 2 s, se detiene si el puntero se acerca o la pestaña se oculta, quieto con «Menos movimiento» | `Componentes/PausaPaseante.jsx`, `Layout.jsx` (con `lazy`), `Recorrido.css` | Unitarias y e2e `pausa.spec.js` (escritorio y móvil, axe sin fallos) |
+| «Pausa puede pasear por la pantalla» y «Esconder a Pausa por hoy» | `Pages/Configuracion.jsx` | Unitarias |
+| Documentación | Anexo de ADR 0010, ficha de marca (la regla de bucles cambió), `AGENTS.md` regla 14, contrato `/me/preferences`, inventario de datos, diccionario de datos y entregables regenerados | — |
+
+Ejecutado el 2026-11-28:
+- Backend: lint y 258/258.
+- Frontend: lint, 104/104 y build.
+- Playwright: 52 pasaron y 1 se omitió (la caricia con puntero no aplica en móvil).
+- Capturas y mockups regenerados.
+- JS inicial: 97,3 KiB comprimidos antes y 97,5 KiB después. Las frases y el componente se cargan aparte.
+
+Pendiente: las partes D, F, I, B, C, E, H y G. La J va en otra sesión, con su ADR primero.
 
 ## Sesión 2026-11-27 · Configuración, logo «MENTOR IA», mapa con más diseño y mascotas interactivas
 Rama `feature/configuracion-mentor-ia` (desde `develop`).

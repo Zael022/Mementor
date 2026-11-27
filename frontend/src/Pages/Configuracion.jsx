@@ -34,6 +34,10 @@ const AJUSTES_MASCOTAS = [
   { campo: 'showMascots', texto: 'Mostrar mascotas', ayuda: 'Orbi te acompaña en el mapa del curso y Pausa en los momentos tranquilos. La información importante siempre está también en texto.' },
   { campo: 'showBigCelebrations', texto: 'Celebraciones grandes', ayuda: 'Confeti y stickers al subir de rango o terminar un módulo. Apagadas, el logro se avisa con un mensaje sencillo.' },
 ];
+const AJUSTES_PAUSA = [
+  { campo: 'pausaWalks', base: true, texto: 'Pausa puede pasear por la pantalla', ayuda: 'Se cuelga de la barra de arriba y avanza muy despacio en tu inicio, tus cursos y Parejas. Apagado, se queda quieto en una esquina.' },
+  { campo: 'pausaHiddenToday', base: false, texto: 'Esconder a Pausa por hoy', ayuda: 'Vuelve solo mañana. Nunca aparece en evaluaciones ni en el tutor.' },
+];
 const AJUSTES = [
   { campo: 'highContrast', texto: 'Alto contraste', ayuda: 'Texto secundario, bordes y foco del teclado más marcados.' },
   { campo: 'reducedMotion', texto: 'Menos movimiento', ayuda: 'Quita animaciones, confeti y fondos animados aunque tu sistema no lo pida.' },
@@ -146,6 +150,11 @@ export default function Configuracion() {
         <ul className="interruptores">
           {AJUSTES_MASCOTAS.map((ajuste) => (
             <Interruptor key={ajuste.campo} texto={ajuste.texto} ayuda={ajuste.ayuda} activo={preferencias[ajuste.campo] !== false}
+              alCambiar={(valor) => cambiar({ [ajuste.campo]: valor })} />
+          ))}
+          {/* Pausa paseante: solo acompaña a estudiantes y depende de «Mostrar mascotas». */}
+          {usuario.role === 'student' && preferencias.showMascots !== false && AJUSTES_PAUSA.map((ajuste) => (
+            <Interruptor key={ajuste.campo} texto={ajuste.texto} ayuda={ajuste.ayuda} activo={Boolean(preferencias[ajuste.campo] ?? ajuste.base)}
               alCambiar={(valor) => cambiar({ [ajuste.campo]: valor })} />
           ))}
         </ul>

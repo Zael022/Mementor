@@ -39,7 +39,13 @@ test.describe('Gobernanza y asistentes de IA @movil', () => {
     await expect(page.getByRole('heading', { name: 'Generador de preguntas' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Coach de estudio' })).toHaveCount(0);
     await capturar(page, '23-asistentes-docente');
-    await page.locator('.tarjeta-agente', { hasText: 'Generador de preguntas' }).getByRole('button', { name: 'Usar' }).click();
+    // «Usar» abre la página del asistente en otra pestaña.
+    const [pestana] = await Promise.all([
+      page.context().waitForEvent('page'),
+      page.locator('.tarjeta-agente', { hasText: 'Generador de preguntas' }).getByRole('link', { name: /^Usar/ }).click(),
+    ]);
+    page = pestana;
+    await expect(page).toHaveURL(/\/asistentes\/question_generator$/);
     await page.getByLabel('Curso').selectOption(String(curso.cursoId));
     await page.getByLabel('Tema o enfoque').fill('denominador de las fracciones');
     await page.getByRole('button', { name: 'Generar' }).click();
@@ -53,7 +59,11 @@ test.describe('Gobernanza y asistentes de IA @movil', () => {
     await entrar(page, curso.estudiante);
     await page.goto('/asistentes');
     await expect(page.getByRole('heading', { name: 'Generador de preguntas' })).toHaveCount(0);
-    await page.locator('.tarjeta-agente', { hasText: 'Resumen de lección' }).getByRole('button', { name: 'Usar' }).click();
+    const [pestana] = await Promise.all([
+      page.context().waitForEvent('page'),
+      page.locator('.tarjeta-agente', { hasText: 'Resumen de lección' }).getByRole('link', { name: /^Usar/ }).click(),
+    ]);
+    page = pestana;
     await page.getByLabel('Curso').selectOption(String(curso.cursoId));
     await page.getByLabel('Lección', { exact: true }).selectOption({ label: 'Fracciones' });
     await page.getByRole('button', { name: 'Generar' }).click();

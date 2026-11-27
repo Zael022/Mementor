@@ -224,6 +224,32 @@ test('preferencias de mascotas: encendidas por defecto y se guardan', async () =
   assert.equal((await ctx.beto.patch('/me/preferences', { showMascots: 'no' })).status, 422);
 });
 
+test('Pausa paseante: pasea por defecto y «esconder por hoy» vuelve sola al día siguiente', async () => {
+  const realNow = clock.now;
+  try {
+    const inicial = (await ctx.a.student.get('/me/preferences')).body.data;
+    assert.equal(inicial.pausaWalks, true);
+    assert.equal(inicial.pausaHiddenToday, false);
+    // Hoy a las 23:00 (hora de Costa Rica) se esconde; mañana a las 08:00 vuelve.
+    clock.now = () => new Date('2026-12-01T05:00:00Z');
+    const oculta = await ctx.a.student.patch('/me/preferences', { pausaHiddenToday: true, pausaWalks: false });
+    assert.equal(oculta.status, 200, JSON.stringify(oculta.body));
+    assert.equal(oculta.body.data.pausaHiddenToday, true);
+    assert.equal(oculta.body.data.pausaWalks, false);
+    clock.now = () => new Date('2026-12-01T14:00:00Z');
+    assert.equal((await ctx.a.student.get('/me/preferences')).body.data.pausaHiddenToday, false);
+    // Volver a mostrarla el mismo día también se puede.
+    clock.now = () => new Date('2026-12-01T05:00:00Z');
+    await ctx.a.student.patch('/me/preferences', { pausaHiddenToday: true });
+    assert.equal((await ctx.a.student.patch('/me/preferences', { pausaHiddenToday: false })).body.data.pausaHiddenToday, false);
+    // No se acepta una fecha escrita por el navegador: solo sí o no.
+    assert.equal((await ctx.a.student.patch('/me/preferences', { pausaHiddenOn: '2030-01-01' })).status, 422);
+    assert.equal((await ctx.a.student.patch('/me/preferences', { pausaHiddenToday: 'hoy' })).status, 422);
+  } finally {
+    clock.now = realNow;
+  }
+});
+
 test('Parejas: sin preguntas con clave visible no hay tablero', async () => {
   const detalle = await ctx.a.student.get(`/courses/${ctx.courseId}`);
   assert.equal(detalle.body.data.modules.find((modulo) => modulo.id === ctx.module1).practicePairs, 0);

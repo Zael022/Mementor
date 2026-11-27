@@ -6,6 +6,9 @@ import { useMascotaViva } from '../hooks/useMascotaViva.js';
 // Pausa, la mascota de bienestar (docs/marca/mascotas/pausa.svg): «aprende a tu ritmo».
 // Cada estado cambia partes del mismo dibujo: brazo derecho, ojos, boca y accesorios.
 export const ESTADOS_PAUSA = ['bienvenida', 'leyendo', 'dormido'];
+// Expresiones de Pausa paseante (Parte A): curiosidad, molestia en dos grados, cara tapada, caricia y bostezo.
+export const ESTADOS_PAUSA_PASEANTE = ['curioso', 'molesto', 'enojado', 'tapado', 'feliz', 'bostezo'];
+const TODOS_LOS_ESTADOS = [...ESTADOS_PAUSA, ...ESTADOS_PAUSA_PASEANTE];
 export const VISTA_PAUSA = '362 30 276 215';
 // Sin rama: el dibujo empieza en las garras, para colgarse de un borde de la página.
 const VISTA_SIN_RAMA = '362 36 276 209';
@@ -39,6 +42,27 @@ function BrazoDerecho({ estado }) {
       </g>
     );
   }
+  // Molestia fuerte: el brazo cruzado sobre la barriga.
+  if (estado === 'enojado') {
+    return (
+      <g data-parte="brazo-libre">
+        <path d="M526 132 q4 34 -44 40" fill="none" strokeWidth="24" />
+        <path d="M526 132 q4 34 -44 40" fill="none" stroke={GRIS} strokeWidth="16" />
+        <ellipse cx="478" cy="172" rx="10" ry="8" fill={GRIS} />
+      </g>
+    );
+  }
+  // Se tapa los ojos con la mano.
+  if (estado === 'tapado') {
+    return (
+      <g data-parte="brazo-libre">
+        <path d="M526 132 q22 -10 2 -16" fill="none" strokeWidth="24" />
+        <path d="M526 132 q22 -10 2 -16" fill="none" stroke={GRIS} strokeWidth="16" />
+        <ellipse cx="492" cy="118" rx="34" ry="13" fill={GRIS} />
+        <path d="M466 112 q-2 8 4 12 M478 108 q-2 10 3 15 M492 107 q-1 10 3 15" fill="none" strokeWidth="3" />
+      </g>
+    );
+  }
   return (
     <g data-parte="brazo-libre">
       <path d="M524 128 q20 -30 14 -66" fill="none" strokeWidth="24" />
@@ -48,7 +72,16 @@ function BrazoDerecho({ estado }) {
 }
 
 function Ojos({ estado }) {
-  if (estado === 'dormido') {
+  // Feliz (caricia): ojos cerrados como arcos hacia arriba.
+  if (estado === 'feliz') {
+    return (
+      <g fill="none" stroke="#fff" strokeWidth="3">
+        <path d="M467 123 q7 -8 14 0" />
+        <path d="M499 123 q7 -8 14 0" />
+      </g>
+    );
+  }
+  if (estado === 'dormido' || estado === 'bostezo') {
     return (
       <g fill="none" stroke={CIELO} strokeWidth="2.5">
         <path d="M467 121 q6 5 12 0" />
@@ -56,23 +89,36 @@ function Ojos({ estado }) {
       </g>
     );
   }
-  // Leyendo: la mirada baja hacia el libro.
+  // Leyendo: la mirada baja hacia el libro. Curioso: ojos más abiertos.
   const dy = estado === 'leyendo' ? 1.5 : 0;
+  const blanco = estado === 'curioso' ? 5 : 4;
+  const molesto = estado === 'molesto' || estado === 'enojado';
   return (
     <g data-parte="parpados">
-      <circle cx="474" cy={119 + dy} r="4" fill="#fff" stroke="none" />
-      <circle cx="506" cy={119 + dy} r="4" fill="#fff" stroke="none" />
+      <circle cx="474" cy={119 + dy} r={blanco} fill="#fff" stroke="none" />
+      <circle cx="506" cy={119 + dy} r={blanco} fill="#fff" stroke="none" />
       <g data-parte="pupilas">
-        <circle cx="475" cy={120 + dy * 1.4} r="2" fill={TINTA} stroke="none" />
-        <circle cx="505" cy={120 + dy * 1.4} r="2" fill={TINTA} stroke="none" />
+        <circle cx="475" cy={120 + dy * 1.4} r={estado === 'curioso' ? 2.6 : 2} fill={TINTA} stroke="none" />
+        <circle cx="505" cy={120 + dy * 1.4} r={estado === 'curioso' ? 2.6 : 2} fill={TINTA} stroke="none" />
       </g>
+      {/* Molestia: párpados a media altura y cejas inclinadas hacia el centro. */}
+      {molesto && (
+        <g data-parte="cejas">
+          <path d="M468 116 h12 M500 116 h12" fill="none" stroke={TINTA} strokeWidth="3.5" />
+          <path d={estado === 'enojado' ? 'M465 104 l15 6 M515 104 l-15 6' : 'M466 107 l13 3 M514 107 l-13 3'} fill="none" stroke={TINTA} strokeWidth="3" />
+        </g>
+      )}
     </g>
   );
 }
 
 function Boca({ estado }) {
-  if (estado === 'bienvenida') return <path d="M480 139 q10 11 20 0 z" fill={TINTA} />;
+  if (estado === 'bienvenida' || estado === 'curioso') return <path d="M480 139 q10 11 20 0 z" fill={TINTA} />;
   if (estado === 'dormido') return <path d="M485 141 q5 3 10 0" fill="none" strokeWidth="3" />;
+  if (estado === 'bostezo') return <ellipse cx="490" cy="143" rx="6" ry="8" fill={TINTA} />;
+  if (estado === 'feliz') return <path d="M479 138 q11 12 22 0" fill="none" strokeWidth="3" />;
+  if (estado === 'molesto') return <path d="M482 142 h16" fill="none" strokeWidth="3" />;
+  if (estado === 'enojado') return <path d="M481 145 q9 -8 18 0" fill="none" strokeWidth="3" />;
   return <path d="M481 140 q9 8 18 0" fill="none" strokeWidth="3" />;
 }
 
@@ -117,7 +163,8 @@ export function DibujoPausa({ estado = 'leyendo', rama = true }) {
         <path d="M456 128 q-20 -30 -14 -66" fill="none" strokeWidth="24" />
         <path d="M456 128 q-20 -30 -14 -66" fill="none" stroke={GRIS} strokeWidth="16" />
       </g>
-      {estado !== 'leyendo' && <BrazoDerecho estado={estado} />}
+      {/* El brazo cruzado y la mano que tapa la cara van encima del cuerpo y de la cabeza. */}
+      {!['leyendo', 'enojado', 'tapado'].includes(estado) && <BrazoDerecho estado={estado} />}
       <ellipse cx="468" cy="226" rx="13" ry="10" fill={GRIS} />
       <ellipse cx="512" cy="226" rx="13" ry="10" fill={GRIS} />
       <ellipse cx="490" cy="176" rx="52" ry="54" fill={GRIS} />
@@ -127,6 +174,7 @@ export function DibujoPausa({ estado = 'leyendo', rama = true }) {
         <path d="M512 160 l8 30 l-14 2 z" fill={LIMA} />
       </g>
       {estado === 'leyendo' && <><Libro /><BrazoDerecho estado={estado} /></>}
+      {estado === 'enojado' && <BrazoDerecho estado={estado} />}
       <g data-parte="cabeza">
         <circle cx="490" cy="118" r="44" fill={GRIS} />
         <path d="M480 76 q4 -10 10 -2 q6 -8 10 2" fill="none" strokeWidth="3" />
@@ -136,14 +184,22 @@ export function DibujoPausa({ estado = 'leyendo', rama = true }) {
         <g data-parte="ojos"><Ojos estado={estado} /></g>
         <ellipse cx="490" cy="132" rx="6" ry="4" fill={TINTA} stroke="none" />
         <g data-parte="boca"><Boca estado={estado} /></g>
-        <ellipse cx="465" cy="138" rx="7" ry="4" fill={NARANJA} opacity="0.4" stroke="none" />
-        <ellipse cx="515" cy="138" rx="7" ry="4" fill={NARANJA} opacity="0.4" stroke="none" />
+        <ellipse cx="465" cy="138" rx="7" ry="4" fill={NARANJA} opacity={estado === 'feliz' ? 0.85 : 0.4} stroke="none" />
+        <ellipse cx="515" cy="138" rx="7" ry="4" fill={NARANJA} opacity={estado === 'feliz' ? 0.85 : 0.4} stroke="none" />
       </g>
+      {estado === 'tapado' && <BrazoDerecho estado={estado} />}
       {/* Sin rama, la mano izquierda se apoya sobre el borde (y = 58) con las garras encima. */}
       {!rama && (
         <g data-parte="agarre">
           <ellipse cx="442" cy="58" rx="15" ry="10" fill={GRIS} />
           <path d="M429 54 q0 -11 9 -10 M438 50 q0 -11 9 -10 M447 54 q0 -11 9 -10" fill="none" strokeWidth="3.6" />
+        </g>
+      )}
+      {/* Colgado con las dos manos (Pausa paseante): la derecha también se agarra del borde. */}
+      {!rama && !['bienvenida', 'leyendo', 'enojado', 'tapado'].includes(estado) && (
+        <g data-parte="agarre-derecho">
+          <ellipse cx="538" cy="58" rx="15" ry="10" fill={GRIS} />
+          <path d="M525 54 q0 -11 9 -10 M534 50 q0 -11 9 -10 M543 54 q0 -11 9 -10" fill="none" strokeWidth="3.6" />
         </g>
       )}
       {/* Garras sobre la rama: el brazo derecho solo se agarra cuando duerme. */}
@@ -179,7 +235,7 @@ export default function Pausa({
   estado = 'leyendo', animacion = 0, ancho = 120, parpadeo = true, rama = true, viva = false, toque = 0, className = '', alTerminar,
 }) {
   const raiz = useRef(null);
-  const pose = ESTADOS_PAUSA.includes(estado) ? estado : 'leyendo';
+  const pose = TODOS_LOS_ESTADOS.includes(estado) ? estado : 'leyendo';
 
   useGSAP(() => {
     if (!animacion || prefiereMenosMovimiento()) {

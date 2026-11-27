@@ -766,6 +766,26 @@
      "extra": "",
      "purpose": "Si quiere celebraciones grandes (confeti y stickers) al subir de rango o terminar un módulo.",
      "fk": null
+    },
+    {
+     "name": "pausa_walks",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "1",
+     "extra": "",
+     "purpose": "Si Pausa puede pasear por la pantalla (apagado se queda quieto en una esquina).",
+     "fk": null
+    },
+    {
+     "name": "pausa_hidden_on",
+     "type": "date",
+     "null": true,
+     "key": "",
+     "default": null,
+     "extra": "",
+     "purpose": "Día local en que la persona escondió a Pausa «por hoy»; deja de valer al día siguiente.",
+     "fk": null
     }
    ]
   },
@@ -9401,5 +9421,5 @@
   ]
  },
  "tables": 76,
- "columns": 766
+ "columns": 768
 }
