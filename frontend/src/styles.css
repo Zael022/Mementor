@@ -409,6 +409,7 @@ tbody tr:hover { background: var(--fila-hover); }
 /* La misma regla cuando se elige en Configuración, aunque el sistema no lo pida. */
 html[data-movimiento="reducido"] *, html[data-movimiento="reducido"] *::before, html[data-movimiento="reducido"] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 html[data-movimiento="reducido"] .confeti { display: none; }
+html[data-celebraciones="discretas"] .confeti { display: none; }
 
 /* Fuentes del tutor, citas y Drive */
 .lista-fuentes { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
@@ -525,6 +526,8 @@ html[data-movimiento="reducido"] .confeti { display: none; }
 
 /* Clases con su color */
 .banner-clase { background: var(--color-clase, var(--azul)); }
+/* Con cualquier color de curso el texto secundario va en blanco: el lavanda no llega a 4.5:1 en todos. */
+.banner-clase p, .banner-clase .meta, .banner-clase .volver { color: #fff; }
 .tarjeta-clase { border-top: 8px solid var(--color-clase); }
 .titulo-con-dato { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .pestanas .contador { display: inline-block; min-width: 1.6em; padding: 0 6px; margin-left: 4px; border-radius: 999px; background: var(--cielo); color: var(--azul-hondo); font-size: 0.78rem; text-align: center; }
@@ -858,3 +861,7 @@ img.con-foto { object-fit: cover; background: var(--suave-neutro); padding: 0; }
 .esqueleto.resultado .esqueleto-bloque { min-height: 90px; }
 @keyframes brillo { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 .cuenta-sube { display: inline-block; animation: estallar 0.4s var(--suave) both; }
+/* Selector pequeño dentro de una tarjeta (por ejemplo, el tema de una tarea en el mapa). */
+.campo-compacto { max-width: 340px; margin: 6px 0 0; }
+.campo-compacto label { font-size: 0.86rem; }
+.campo-compacto select { padding-block: 6px; }

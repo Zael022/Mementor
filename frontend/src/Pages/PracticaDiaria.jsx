@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import EstadoVacio from '../Componentes/EstadoVacio.jsx';
 import { anunciar } from '../Componentes/Anunciador.jsx';
 import { Cargando, MensajeError } from '../Componentes/Estados.jsx';
+import { useMascotasVisibles } from '../Componentes/Mascota.jsx';
+import OrbiSticker from '../Componentes/OrbiSticker.jsx';
 import OpcionesQuiz, { useRetroalimentacion } from '../Componentes/OpcionesQuiz.jsx';
 import { Llama } from '../Componentes/TarjetaRacha.jsx';
 import { useDatos } from '../hooks/useDatos.js';
@@ -20,6 +22,8 @@ export default function PracticaDiaria() {
   const [bono, setBono] = useState(null);
   const [actual, setActual] = useState(0);
   const { enviando, error, ejecutar } = useEnvio();
+  const mascotas = useMascotasVisibles();
+  const sticker = useRef(null);
 
   // Retoma donde se quedó: la primera pregunta sin responder.
   useEffect(() => {
@@ -67,6 +71,9 @@ export default function PracticaDiaria() {
     setRespuestas((previas) => ({ ...previas, [pregunta.id]: { optionId: opcionId, isCorrect: datos.data.isCorrect, correctOptionId: datos.data.correctOptionId } }));
     setRacha(datos.data.streak);
     if (datos.data.bonus.awarded) setBono(datos.data.bonus.amount);
+    // Solo una reacción visual: un error arruga el papel (y se alisa con una sonrisa); un acierto, un saltito.
+    if (datos.data.isCorrect) sticker.current?.saltar();
+    else sticker.current?.arrugar();
   }
 
   return (
@@ -74,6 +81,7 @@ export default function PracticaDiaria() {
       <Link to={volver} className="volver">← Volver a la clase</Link>
       <div className="practica-cabecera">
         <h1>Práctica del día</h1>
+        {mascotas && <OrbiSticker ref={sticker} ancho={84} className="practica-orbi" onTerminar={(nombre) => nombre === 'arrugar' && sticker.current?.alisar()} />}
         <div className="racha-mini" aria-label={`Racha: ${racha?.current ?? 0} días`}>
           <Llama encendida={(racha?.current ?? 0) > 0} tamano={28} /><strong key={racha?.current ?? 0} className="cuenta-sube">{racha?.current ?? 0}</strong>
         </div>

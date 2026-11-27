@@ -3,6 +3,7 @@ import { Contador, Revelar } from '../Componentes/Animaciones.jsx';
 import EncabezadoCurso from '../Componentes/EncabezadoCurso.jsx';
 import EstadoVacio from '../Componentes/EstadoVacio.jsx';
 import { Cargando, Insignia, MensajeError } from '../Componentes/Estados.jsx';
+import RangoAvance from '../Componentes/RangoAvance.jsx';
 import { useDatos } from '../hooks/useDatos.js';
 
 const porcentaje = (valor) => (valor === null ? 'n/a' : `${Math.round(valor)} %`);
@@ -79,14 +80,16 @@ export default function CursoAnalitica() {
 
       <Revelar etiqueta="section" className="tarjeta">
         <h2>Estudiantes</h2>
+        <p className="tenue">El rango mide avance (lecciones completadas y tareas entregadas), no rendimiento. La lista sigue el orden alfabético.</p>
         {datos.students.length === 0 ? <p className="tenue">No hay estudiantes matriculados.</p> : (
           <div className="tabla-contenedor">
             <table>
-              <thead><tr><th>Estudiante</th><th>Intentos enviados</th><th>Promedio</th><th>Último envío</th></tr></thead>
+              <thead><tr><th>Estudiante</th><th>Rango de avance</th><th>Intentos enviados</th><th>Promedio</th><th>Último envío</th></tr></thead>
               <tbody>
                 {datos.students.map((estudiante) => (
                   <tr key={estudiante.id}>
                     <td>{estudiante.displayName}</td>
+                    <td><RangoAvance rango={estudiante.rank} variante="tabla" /></td>
                     <td>{estudiante.submittedAttempts}</td>
                     <td>{porcentaje(estudiante.averageScorePct)}</td>
                     <td>{estudiante.lastSubmittedAt ? new Date(estudiante.lastSubmittedAt).toLocaleString() : 'Sin envíos'}</td>

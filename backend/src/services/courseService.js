@@ -7,6 +7,8 @@ import { pageMeta } from '../utils/http.js';
 import { getCourseAccess } from './accessService.js';
 import { recordAudit } from './auditService.js';
 import { applyEnrollment } from './enrollmentMutationService.js';
+import { practiceAvailability } from './memoryGameService.js';
+import { getStudentCourseRank } from './progressRankService.js';
 
 const toDto = (course) => ({
   id: course.id,
@@ -54,7 +56,8 @@ export async function getCourseDetail(user, courseId) {
   const { course, canEdit } = await getCourseAccess(user, courseId);
   const lessonWhere = canEdit ? {} : { status: 'published' };
 
-  const [modules, teachers, prerequisites, completed] = await Promise.all([
+  const isStudent = user.role === 'student';
+  const [modules, teachers, prerequisites, completed, rank, practice] = await Promise.all([
     Module.findAll({
       where: { courseId: course.id },
       include: [{
@@ -69,9 +72,12 @@ export async function getCourseDetail(user, courseId) {
       include: [{ model: Topic, as: 'topic', attributes: [], where: { courseId: course.id } }],
       attributes: ['topicId', 'prerequisiteTopicId'],
     }),
-    user.role === 'student'
+    isStudent
       ? LessonProgress.findAll({ where: { studentId: user.id }, attributes: ['lessonId'] })
       : [],
+    // Rango de avance y parejas de práctica disponibles: solo para el propio estudiante.
+    isStudent ? getStudentCourseRank(user.id, course.id) : null,
+    isStudent ? practiceAvailability(user, course.id) : null,
   ]);
 
   const completedIds = new Set(completed.map((row) => row.lessonId));
@@ -84,10 +90,12 @@ export async function getCourseDetail(user, courseId) {
     ...toDto(course),
     canEdit,
     teachers: teachers.map((teacher) => ({ id: teacher.id, displayName: teacher.displayName, ...(canEdit ? { email: teacher.email } : {}) })),
+    ...(isStudent ? { rank } : {}),
     modules: modules.map((module) => ({
       id: module.id,
       title: module.title,
       position: module.position,
+      ...(isStudent ? { practicePairs: practice.get(Number(module.id)) || 0 } : {}),
       topics: module.topics.map((topic) => ({
         id: topic.id,
         title: topic.title,
@@ -99,7 +107,7 @@ export async function getCourseDetail(user, courseId) {
           title: lesson.title,
           status: lesson.status,
           position: lesson.position,
-          ...(user.role === 'student' ? { completed: completedIds.has(lesson.id) } : {}),
+          ...(isStudent ? { completed: completedIds.has(lesson.id) } : {}),
         })),
       })),
     })),

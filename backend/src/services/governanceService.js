@@ -61,11 +61,15 @@ const LEARNING_EXPORT = {
   streaks: `SELECT c.title AS course, s.current_days AS currentDays, s.best_days AS bestDays, s.last_day AS lastDay
       FROM course_streaks s JOIN courses c ON c.id = s.course_id WHERE s.student_id = :id ORDER BY s.id`,
   bonusEvents: `SELECT kind, amount, created_at AS createdAt FROM grade_bonus_events WHERE student_id = :id ORDER BY id`,
+  memoryGames: `SELECT c.title AS course, m.title AS module, g.status, g.pair_count AS pairCount, g.matched_pairs AS matchedPairs,
+      g.attempts, g.started_at AS startedAt, g.finished_at AS finishedAt
+      FROM memory_games g JOIN courses c ON c.id = g.course_id JOIN modules m ON m.id = g.module_id WHERE g.student_id = :id ORDER BY g.id`,
   lessonComments: `SELECT body, created_at AS createdAt FROM lesson_comments WHERE author_id = :id ORDER BY id`,
   tutorConversations: `SELECT t.id AS threadId, t.title AS thread, m.role, m.content, m.created_at AS createdAt
       FROM ai_threads t JOIN ai_messages m ON m.thread_id = t.id WHERE t.user_id = :id ORDER BY m.id`,
   preferences: `SELECT theme, text_scale AS textScale, high_contrast AS highContrast, reduced_motion AS reducedMotion,
-      time_zone AS timeZone, daily_goal_minutes AS dailyGoalMinutes, email_reminders AS emailReminders FROM user_preferences WHERE user_id = :id`,
+      time_zone AS timeZone, daily_goal_minutes AS dailyGoalMinutes, email_reminders AS emailReminders,
+      show_mascots AS showMascots, show_big_celebrations AS showBigCelebrations FROM user_preferences WHERE user_id = :id`,
 };
 
 // Qué queda fuera de la copia y cómo pedirlo.
@@ -165,6 +169,8 @@ export async function processDeletion(requestId, via, { notify = true } = {}) {
     await sequelize.query('DELETE FROM ai_threads WHERE user_id = :id', { replacements: { id: user.id }, transaction });
     await sequelize.query('DELETE FROM user_preferences WHERE user_id = :id', { replacements: { id: user.id }, transaction });
     await sequelize.query('DELETE FROM reminder_deliveries WHERE user_id = :id', { replacements: { id: user.id }, transaction });
+    // Las partidas de Parejas son práctica personal: no forman parte del registro académico.
+    await sequelize.query('DELETE FROM memory_games WHERE student_id = :id', { replacements: { id: user.id }, transaction });
     await row.update({ status: 'completed', processedAt: new Date(), processedVia: via, retainedSummary: RETAINED_SUMMARY }, { transaction });
     return row;
   });

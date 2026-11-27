@@ -11,7 +11,7 @@ import { useEnvio } from '../hooks/useEnvio.js';
 import { api } from '../services/api.js';
 import { aIso, fechaHora } from '../utils/fechas.js';
 
-const VACIO = { title: '', instructions: '', dueAt: '', maxPoints: 100 };
+const VACIO = { title: '', instructions: '', dueAt: '', maxPoints: 100, topicId: '' };
 
 // Permite crear tareas, publicarlas y calificar las entregas.
 export default function CursoTareas() {
@@ -25,6 +25,9 @@ export default function CursoTareas() {
 
   if (curso.cargando && !curso.datos) return <Cargando />;
   if (curso.error) return <MensajeError error={curso.error} />;
+  // Temas del curso para ubicar la tarea en el mapa del estudiante (opcional).
+  const temas = curso.datos.modules.flatMap((modulo) => modulo.topics.map((tema) => ({ id: tema.id, texto: `${modulo.title} · ${tema.title}` })));
+  const opcionesTema = [{ valor: '', texto: 'Sin tema (va a «Tareas del curso»)' }, ...temas.map((tema) => ({ valor: tema.id, texto: tema.texto }))];
 
   async function accion(llamada) {
     const respuesta = await ejecutar(llamada);
@@ -39,6 +42,7 @@ export default function CursoTareas() {
       instructions: formulario.instructions,
       dueAt: aIso(formulario.dueAt),
       maxPoints: Number(formulario.maxPoints),
+      topicId: formulario.topicId ? Number(formulario.topicId) : null,
     }));
     if (respuesta) setFormulario(VACIO);
   }
@@ -53,6 +57,8 @@ export default function CursoTareas() {
             <Campo etiqueta="Fecha de entrega (opcional)" tipo="datetime-local" valor={formulario.dueAt} alCambiar={cambiar('dueAt')} />
             <Campo etiqueta="Puntos" tipo="number" min={1} max={1000} valor={formulario.maxPoints} alCambiar={cambiar('maxPoints')} required />
           </div>
+          <Campo etiqueta="Tema en el mapa del curso (opcional)" tipo="select" valor={formulario.topicId} alCambiar={cambiar('topicId')} opciones={opcionesTema}
+            ayuda="Con tema, la tarea aparece en el mapa justo después de las lecciones de ese tema." />
           <Campo etiqueta="Instrucciones (admite Markdown)" tipo="textarea" filas={4} valor={formulario.instructions} alCambiar={cambiar('instructions')} required />
           <button type="submit" className="boton" disabled={enviando}>Crear tarea</button>
           <p className="tenue pequeno">La tarea se crea como borrador; los estudiantes la ven cuando la publicas.</p>
@@ -73,6 +79,13 @@ export default function CursoTareas() {
                 <li>{tarea.maxPoints} puntos</li>
                 <li>{tarea.submissionCount} entrega(s), {tarea.pendingGradeCount} sin calificar</li>
               </ul>
+              <div className="campo campo-compacto">
+                <label htmlFor={`tema-tarea-${tarea.id}`}>Tema en el mapa del curso</label>
+                <select id={`tema-tarea-${tarea.id}`} value={tarea.topicId ?? ''}
+                  onChange={(evento) => accion(() => api.patch(`/assignments/${tarea.id}`, { topicId: evento.target.value ? Number(evento.target.value) : null }))}>
+                  {opcionesTema.map((opcion) => <option key={opcion.valor} value={opcion.valor}>{opcion.texto}</option>)}
+                </select>
+              </div>
             </div>
             <div className="acciones">
               {tarea.status === 'draft'

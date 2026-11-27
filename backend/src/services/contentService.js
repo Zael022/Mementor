@@ -6,6 +6,7 @@ import { recordAudit } from './auditService.js';
 import { removeStoredFiles } from './fileCleanup.js';
 import { retireLessonSources, syncLessonSource } from './knowledgeService.js';
 import { invalidateSource } from './agents/responseCache.js';
+import { getModuleProgress, getStudentCourseRank, rankWentUp } from './progressRankService.js';
 
 // Calcula la siguiente posición dentro de un grupo.
 async function nextPosition(model, where) {
@@ -182,9 +183,19 @@ export async function completeLesson(user, lessonId) {
   if (user.role !== 'student') throw forbidden('Solo los estudiantes registran avance.');
   const { record: lesson } = await loadWithAccess(Lesson, lessonId, user, { label: 'Lección' });
   if (lesson.status !== 'published') throw notFound('Lección no encontrada.');
-  await LessonProgress.findOrCreate({
+  // El rango de antes y el de después permiten celebrar una subida sin guardar el último rango visto.
+  const before = await getStudentCourseRank(user.id, lesson.courseId);
+  const [, created] = await LessonProgress.findOrCreate({
     where: { studentId: user.id, lessonId: lesson.id },
     defaults: { status: 'completed', completedAt: new Date() },
   });
-  return { lessonId: lesson.id, completed: true };
+  const after = await getStudentCourseRank(user.id, lesson.courseId);
+  const topic = await Topic.findByPk(lesson.topicId, { attributes: ['moduleId'] });
+  const module = await getModuleProgress(user.id, topic.moduleId);
+  return {
+    lessonId: lesson.id,
+    completed: true,
+    rank: { before, after, rankedUp: rankWentUp(before, after) },
+    module: { ...module, justCompleted: created && module.completed },
+  };
 }

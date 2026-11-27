@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { anunciar } from '../Componentes/Anunciador.jsx';
+import Celebracion from '../Componentes/Celebracion.jsx';
 import Comentarios from '../Componentes/Comentarios.jsx';
 import { useBaseGestion } from '../Componentes/EncabezadoCurso.jsx';
 import { Aviso, Cargando, Insignia, MensajeError } from '../Componentes/Estados.jsx';
@@ -8,6 +11,8 @@ import { useSesion } from '../context/SesionContext.jsx';
 import { useDatos } from '../hooks/useDatos.js';
 import { useEnvio } from '../hooks/useEnvio.js';
 import { api } from '../services/api.js';
+import { recordarAvance } from '../utils/avanceMapa.js';
+import { MENSAJE_LECCION_COMPLETADA } from '../utils/mensajesMascota.js';
 
 // Página de una lección: video, lectura, materiales, avance y preguntas.
 export default function Leccion() {
@@ -17,15 +22,27 @@ export default function Leccion() {
   const baseGestion = useBaseGestion();
   const leccion = useDatos(`/lessons/${id}`);
   const { enviando, error, ejecutar } = useEnvio();
+  const [logro, setLogro] = useState(null);
 
   if (leccion.cargando && !leccion.datos) return <Cargando />;
   if (leccion.error) return <MensajeError error={leccion.error} />;
   const datos = leccion.datos;
   const rutaLeccion = (otra) => (esEstudiante ? `/estudiante/lecciones/${otra.id}` : `${baseGestion}/lecciones/${otra.id}`);
-  const rutaCurso = esEstudiante ? `/estudiante/cursos/${datos.course.id}` : `${baseGestion}/cursos/${datos.course.id}/contenidos`;
+  // El estudiante vuelve al mapa del curso; quien gestiona, a sus contenidos.
+  const rutaCurso = esEstudiante ? `/estudiante/cursos/${datos.course.id}?seccion=trabajo&ver=lecciones` : `${baseGestion}/cursos/${datos.course.id}/contenidos`;
 
   async function completar() {
-    if (await ejecutar(() => api.post(`/lessons/${id}/complete`))) leccion.recargar();
+    const respuesta = await ejecutar(() => api.post(`/lessons/${id}/complete`));
+    if (!respuesta) return;
+    const { rank, module } = respuesta.data;
+    // Al volver al mapa, Orbi recorre el tramo desde esta lección hasta la siguiente parada.
+    recordarAvance(datos.course.id, `leccion-${datos.id}`);
+    if (rank?.rankedUp || module?.justCompleted) {
+      setLogro({ leccion: id, rango: rank.after, subida: rank.rankedUp, modulo: module?.justCompleted ? module.title : null });
+    } else {
+      anunciar(MENSAJE_LECCION_COMPLETADA);
+    }
+    leccion.recargar();
   }
 
   return (
@@ -56,9 +73,11 @@ export default function Leccion() {
           {datos.completed
             ? <Aviso tipo="exito">Lección completada.</Aviso>
             : <button type="button" className="boton" disabled={enviando} onClick={completar}>Marcar como completada</button>}
+          {datos.completed && <Link className="boton" to={rutaCurso}>Ver mi avance en el mapa</Link>}
           <Link className="boton secundario" to={`/estudiante/tutor/${datos.course.id}`}>Preguntar al tutor IA</Link>
         </div>
       )}
+      {logro?.leccion === id && <Celebracion rango={logro.rango} subida={logro.subida} modulo={logro.modulo} alCerrar={() => setLogro(null)} />}
 
       <nav className="navegacion-leccion" aria-label="Lecciones del curso">
         {datos.previous ? <Link to={rutaLeccion(datos.previous)}><small>Lección anterior</small>{datos.previous.title}</Link> : <span />}

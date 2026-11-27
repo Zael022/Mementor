@@ -18,6 +18,8 @@ export const UserPreference = sequelize.define('UserPreference', {
   dailyGoalMinutes: { type: DataTypes.SMALLINT, allowNull: true },
   practiceSize: { type: DataTypes.TINYINT, allowNull: false, defaultValue: 5 },
   emailReminders: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+  showMascots: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+  showBigCelebrations: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
 }, { tableName: 'user_preferences', underscored: true });
 
 // Estado de memoria de un tema para un estudiante (repaso espaciado).

@@ -73,6 +73,23 @@ describe('Configuración', () => {
     expect(sesion.guardarPreferencias).toHaveBeenLastCalledWith({ practiceSize: 10 });
   });
 
+  it('«Mostrar mascotas» y «Celebraciones grandes» se guardan en la cuenta y se reflejan en <html>', async () => {
+    render(<MemoryRouter><Configuracion /></MemoryRouter>);
+    const mostrar = screen.getByLabelText('Mostrar mascotas');
+    expect(mostrar.checked).toBe(true);
+    // Junto a «Menos movimiento», Pausa explica qué cambia.
+    expect(screen.getByText(/activa «Menos movimiento»/)).toBeTruthy();
+    fireEvent.click(mostrar);
+    await waitFor(() => expect(sesion.guardarPreferencias).toHaveBeenCalledWith({ showMascots: false }));
+    fireEvent.click(screen.getByLabelText('Celebraciones grandes'));
+    await waitFor(() => expect(sesion.guardarPreferencias).toHaveBeenCalledWith({ showBigCelebrations: false }));
+    aplicarPreferencias({ showMascots: false, showBigCelebrations: false });
+    expect(raiz.getAttribute('data-mascotas')).toBe('ocultas');
+    expect(raiz.getAttribute('data-celebraciones')).toBe('discretas');
+    aplicarPreferencias(PREFERENCIAS_BASE);
+    expect(raiz.hasAttribute('data-mascotas')).toBe(false);
+  });
+
   it('las metas de estudio solo aparecen para estudiantes', () => {
     sesion.usuario = { ...sesion.usuario, role: 'teacher' };
     render(<MemoryRouter><Configuracion /></MemoryRouter>);

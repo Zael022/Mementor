@@ -138,6 +138,12 @@ export const quickQuestionSchema = z.object({
 });
 export const quickAnswerSchema = z.object({ questionId: id, optionId: id.nullable() });
 export const dailyAnswerSchema = z.object({ questionId: id, optionId: id });
+// Parejas: tamaño del tablero y cartas con identificador opaco.
+const memoryCardId = z.string().regex(/^[A-Za-z0-9_-]{8,24}$/, 'Carta no válida.');
+export const memoryGameSchema = z.object({ pairs: z.union([z.literal(6), z.literal(8)]).optional() }).strict();
+export const memoryRevealSchema = z.object({ cardId: memoryCardId }).strict();
+export const memoryMatchSchema = z.object({ cardIds: z.array(memoryCardId).length(2) }).strict()
+  .refine((data) => data.cardIds[0] !== data.cardIds[1], 'Elige dos cartas distintas.');
 const bonusValue = z.number().min(0).max(10).multipleOf(0.01, 'Usa como máximo dos decimales.');
 export const gradePolicySchema = z.object({
   assessmentsWeight: z.number().int().min(0).max(100),
@@ -187,6 +193,8 @@ export const preferencesSchema = z.object({
   dailyGoalMinutes: z.number().int().min(10).max(240).nullable().optional(),
   practiceSize: z.union([z.literal(5), z.literal(10), z.literal(15)]).optional(),
   emailReminders: z.boolean().optional(),
+  showMascots: z.boolean().optional(),
+  showBigCelebrations: z.boolean().optional(),
 }).strict().refine((data) => Object.keys(data).length > 0, 'No hay cambios.');
 
 export const selfReviewSchema = z.object({ grade: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]) });

@@ -7,6 +7,7 @@ import { Cargando, MensajeError } from '../Componentes/Estados.jsx';
 import ListaPersonas from '../Componentes/ListaPersonas.jsx';
 import { ListaMateriales } from '../Componentes/Materiales.jsx';
 import NotaCurso from '../Componentes/NotaCurso.jsx';
+import { RangoConSticker } from '../Componentes/RangoAvance.jsx';
 import Recomendaciones from '../Componentes/Recomendaciones.jsx';
 import RutaLecciones from '../Componentes/RutaLecciones.jsx';
 import TarjetaRacha from '../Componentes/TarjetaRacha.jsx';
@@ -32,6 +33,8 @@ const FILTROS = [
   { id: 'materiales', texto: 'Materiales' },
   { id: 'clases', texto: 'Clases en vivo' },
 ];
+
+const SIN_TAREAS = [];
 
 // Enlaces antiguos (?seccion=tareas) siguen funcionando dentro de «Trabajo en clase».
 const ANTIGUAS = { contenido: 'lecciones', tareas: 'tareas', evaluaciones: 'evaluaciones', materiales: 'materiales', clases: 'clases' };
@@ -106,13 +109,10 @@ export default function EstudianteCurso() {
           <span className="pildora clara">{datos.code}</span>
           <h1>{datos.title}</h1>
           {datos.description && <p>{datos.description}</p>}
-          <div className="barra-avance" role="img" aria-label={`Avance: ${completadas} de ${lecciones.length} lecciones`}>
-            <div style={{ width: `${lecciones.length ? (completadas / lecciones.length) * 100 : 0}%` }} />
-          </div>
           <ul className="meta">
-            <li>{completadas} de {lecciones.length} lecciones completadas</li>
             <li>Docente: {datos.teachers.map((docente) => docente.displayName).join(', ') || 'sin asignar'}</li>
           </ul>
+          <RangoConSticker rango={datos.rank} alVerMapa={() => irA('trabajo', { ver: 'lecciones' })} />
         </div>
         <div className="acciones">
           {pendiente && <Link className="boton" to={`/estudiante/lecciones/${pendiente.id}`}>{completadas > 0 ? 'Continuar' : 'Empezar'}</Link>}
@@ -137,7 +137,7 @@ export default function EstudianteCurso() {
           <div className="flujo">
             {vigentes[0] && <TarjetaSesion sesion={vigentes[0]} destacada alEntrar={sesiones.recargar} />}
             <MensajeError error={anuncios.error} />
-            {anuncios.datos?.length === 0 && <EstadoVacio ilustracion="chat" titulo="Aún no hay novedades" detalle="Los anuncios de tu docente aparecerán aquí." />}
+            {anuncios.datos?.length === 0 && <EstadoVacio mascota="dormido" titulo="Aún no hay novedades" detalle="Los anuncios de tu docente aparecerán aquí." />}
             {anuncios.datos?.length > 0 && <section className="tarjeta"><Anuncios lista={anuncios.datos} /></section>}
           </div>
         </div>
@@ -154,10 +154,9 @@ export default function EstudianteCurso() {
 
           {ver('lecciones') && (
             <section className="bloque-trabajo">
-              <h2>Lecciones</h2>
+              <h2>Mapa del curso</h2>
               <Recomendaciones lista={recomendaciones.datos} />
-              {datos.modules.length === 0 && <EstadoVacio ilustracion="libro" titulo="Este curso aún no tiene contenido" detalle="Tu docente todavía no ha agregado módulos." />}
-              <RutaLecciones modulos={datos.modules} />
+              <RutaLecciones modulos={datos.modules} tareas={tareas.datos || SIN_TAREAS} cursoId={datos.id} />
             </section>
           )}
 
