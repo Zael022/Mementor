@@ -11,10 +11,10 @@
 |---|---|
 | `orbi.svg`, `pausa.svg` | Dibujos de referencia oficiales |
 | `orbi-sticker.svg` | Orbi como calcomanía (sombra, papel troquelado y dibujo) |
-| `estados/*.png`, `estados/*.svg` | Un archivo por estado, exportado desde los mismos componentes de la app (`node frontend/scripts/exportar-mascotas.mjs`) |
+| `estados/*.png`, `estados/*.svg` | Un archivo por estado, exportado desde los mismos componentes de la app (`node frontend/scripts/exportar-mascotas.mjs`); los de Pausa paseante se llaman `pausa-paseante-*` |
 | `ficha-mascotas.png` | Esta lámina (`node frontend/scripts/ficha-mascotas.mjs`) |
 
-En la app se dibujan con `Componentes/Orbi.jsx`, `Pausa.jsx`, `OrbiSticker.jsx` y el envoltorio `Mascota.jsx`. Los textos están todos en `utils/mensajesMascota.js`.
+En la app se dibujan con `Componentes/Orbi.jsx`, `Pausa.jsx`, `OrbiSticker.jsx` y el envoltorio `Mascota.jsx`. Los textos están en `utils/mensajesMascota.js`; las frases de Pausa paseante, en `utils/frasesPausa.js`.
 
 ## Estados
 | Personaje | Estado | Dónde |
@@ -26,9 +26,17 @@ En la app se dibujan con `Componentes/Orbi.jsx`, `Pausa.jsx`, `OrbiSticker.jsx` 
 | Orbi | Descanso | Reservado, aún sin uso en pantalla |
 | Pausa | Bienvenida | Portada pública (iniciar sesión, recuperar y activar), agarrada con una mano del borde inferior de la barra del logo y sin su rama (`rama={false}`); inicio del estudiante tras 7 días o más sin actividad de aprendizaje |
 | Pausa | Leyendo | Estados vacíos (sin cursos, curso sin lecciones) y Configuración |
-| Pausa | Dormido | Sin novedades, módulo sin lecciones o sin preguntas de práctica; Configuración con «Menos movimiento» |
+| Pausa | Dormido | Sin novedades, módulo sin lecciones o sin preguntas de práctica; Configuración con «Menos movimiento»; Pausa paseante cuando descansa o tras tres caricias |
+| Pausa | Curioso | Pausa paseante: al tocarlo, con un dato curioso |
+| Pausa | Molesto / Enojado | Pausa paseante: muchos clics seguidos (niveles 1 y 2) |
+| Pausa | Tapado | Pausa paseante: nivel 3 de molestia; se tapa la cara y se aleja |
+| Pausa | Feliz | Pausa paseante: caricia (ojos cerrados, rubor y corazones lima) |
+| Pausa | Bostezo | Pausa paseante: mientras descansa y al despertar |
 
 Los estados cambian partes del mismo dibujo (ojos, boca, brazo, birrete, mapa). No hay una imagen distinta por estado.
+
+## Pausa paseante
+Para estudiantes, en su inicio, sus cursos, el mapa y Parejas: cuelga con las dos manos del borde inferior de la barra superior y avanza mano tras mano, muy despacio. No se detiene encima del foco, de los campos ni del botón principal, y se queda quieto si el puntero se acerca. Al tocarlo cuenta un dato curioso real; con muchos clics seguidos se molesta (con humor amable) y una caricia en la cabeza lo pone feliz. Se apaga o se esconde por hoy desde Configuración. Detalle en el anexo de `docs/adr/0010-mapa-rango-mascotas-parejas.md`.
 
 ## Tamaños
 - Pequeño (48 px): avisos y el tutor.
@@ -59,5 +67,6 @@ Cada animación dura menos de 1 segundo y no bloquea la página. Con «Menos mov
 - En evaluaciones o en el quiz con bono: ahí distraen y pueden sentirse como presión.
 - Para regañar, amenazar con perder la racha o crear urgencias falsas.
 - Como única forma de dar una información (sin texto al lado).
-- Deformadas, con otros colores, recortadas sin su contorno o con animaciones en bucle infinito.
+- Deformadas, con otros colores o recortadas sin su contorno.
+- Con movimiento continuo que no se detenga con «Menos movimiento», con la pestaña oculta o desde su interruptor. El movimiento de reposo y el paseo de Pausa están permitidos solo así (decisión del 2026-11-27).
 - Con datos inventados o de demostración.

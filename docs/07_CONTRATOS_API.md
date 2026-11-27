@@ -147,7 +147,7 @@ Detalle de las decisiones en [ADR 0010](adr/0010-mapa-rango-mascotas-parejas.md)
 | POST | `/lessons/:lessonId/complete` | Estudiante matriculado | Además: `rank: { before, after, rankedUp }` y `module: { id, title, done, total, completed, justCompleted }` |
 | POST | `/assignments/:assignmentId/submission` | Estudiante matriculado | Igual que arriba; corregir una entrega no suma avance ni repite `justCompleted` |
 | POST/PATCH | `/courses/:courseId/assignments`, `/assignments/:id` | Docente asignado | `topicId` opcional ubica la tarea en el mapa (tema del mismo curso) |
-| GET/PATCH | `/me/preferences` | Propias | `showMascots` y `showBigCelebrations` (booleanos, por defecto `true`) |
+| GET/PATCH | `/me/preferences` | Propias | `showMascots` y `showBigCelebrations` (booleanos, por defecto `true`). Pausa paseante: `pausaWalks` (booleano, por defecto `true`) y `pausaHiddenToday` (booleano; al enviarlo en `true` el servidor guarda el día local de la persona y deja de valer al día siguiente; el navegador nunca envía una fecha) |
 
 **Parejas** (práctica del módulo; sin nota, sin bono y sin racha). Solo estudiantes, sobre módulos de cursos donde están matriculados y de su institución. Fuente: preguntas de evaluaciones del módulo cuya clave ya es visible para ese estudiante (evaluación cerrada o intentos agotados), con respuestas distintas entre sí. El tablero vive en el servidor; el cliente nunca recibe qué cartas forman pareja. Límite: 120 solicitudes por minuto.
 
