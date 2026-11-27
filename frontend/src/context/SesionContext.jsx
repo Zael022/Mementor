@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { api, setCsrfToken } from '../services/api.js';
+import { reiniciarRecorridos } from '../hooks/useRecorrido.js';
 import {
   PREFERENCIAS_BASE, aplicarPreferencias, borrarPreferenciasLocales, guardarPreferenciasLocales, leerPreferenciasLocales,
 } from '../services/preferencias.js';
@@ -70,6 +71,8 @@ export function SesionProvider({ children }) {
 
   // Deja lista la sesión que entregó el backend (inicio normal o acceso rápido de prueba).
   const abrirSesion = useCallback(async (data) => {
+    // Cada entrada con una cuenta de prueba vuelve a mostrar el recorrido guiado.
+    if (data.user?.isDemo) reiniciarRecorridos();
     setCsrfToken(data.csrfToken);
     setUsuario(data.user);
     setPendientes(data.pendingConsents || []);

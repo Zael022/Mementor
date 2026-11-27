@@ -35,7 +35,7 @@ Para mostrar y probar la plataforma (por ejemplo, ante el profesor) hacía falta
    - Fuera del modo de prueba no se precargan cursos ni contenido académico.
 6. **Recorrido guiado** (`RecorridoGuiado.jsx`, pasos en `utils/pasosRecorrido.js`):
    - Resalta cada función y explica cómo ayuda a estudiar. Hay 3 pasos en el inicio del estudiante y 10 en la página del curso, y el recorrido cambia de pestaña solo.
-   - Se abre automáticamente la primera vez con una cuenta de prueba (se recuerda en el navegador). Cualquiera puede verlo con «¿Cómo me ayuda esta página?».
+   - Se abre automáticamente en cada inicio de sesión con una cuenta de prueba (al cerrarlo se recuerda hasta la siguiente entrada; cambio del 2026-11-27). Cualquiera puede verlo con «¿Cómo me ayuda esta página?».
    - Va en un portal sobre `<body>`, no bloquea la página y Escape lo cierra; las flechas avanzan o retroceden y al cerrar el foco vuelve al botón.
    - Respeta «Menos movimiento» y «Mostrar mascotas» (Orbi narra). Si un paso no tiene qué mostrar, se salta.
 
