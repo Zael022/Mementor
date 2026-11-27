@@ -1,5 +1,7 @@
+import { useCallback, useRef } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import Anuncios from '../Componentes/Anuncios.jsx';
+import BotonRecorrido from '../Componentes/BotonRecorrido.jsx';
 import { TarjetaSesion } from '../Componentes/ClasesEnVivo.jsx';
 import EstadoVacio from '../Componentes/EstadoVacio.jsx';
 import { anunciar } from '../Componentes/Anunciador.jsx';
@@ -9,11 +11,14 @@ import { ListaMateriales } from '../Componentes/Materiales.jsx';
 import NotaCurso from '../Componentes/NotaCurso.jsx';
 import { RangoConSticker } from '../Componentes/RangoAvance.jsx';
 import Recomendaciones from '../Componentes/Recomendaciones.jsx';
+import RecorridoGuiado from '../Componentes/RecorridoGuiado.jsx';
 import RutaLecciones from '../Componentes/RutaLecciones.jsx';
 import TarjetaRacha from '../Componentes/TarjetaRacha.jsx';
 import { useDatos } from '../hooks/useDatos.js';
+import { useRecorrido } from '../hooks/useRecorrido.js';
 import { colorDeCurso } from '../utils/cursos.js';
 import { fechaHora } from '../utils/fechas.js';
+import { RECORRIDO_CURSO } from '../utils/pasosRecorrido.js';
 
 // Pestañas de la clase, como en un aula virtual.
 const PESTANAS = [
@@ -53,7 +58,7 @@ function Proximas({ tareas, cursoId }) {
     .sort((a, b) => new Date(a.dueAt) - new Date(b.dueAt))
     .slice(0, 3);
   return (
-    <aside className="tarjeta proximas" aria-label="Próximas entregas">
+    <aside className="tarjeta proximas" aria-label="Próximas entregas" data-recorrido="proximas">
       <h3>Próximas</h3>
       {proximas.length === 0 && <p className="tenue pequeno">¡Excelente! No tienes ninguna tarea por entregar pronto.</p>}
       <ul className="lista-simple">
@@ -85,6 +90,10 @@ export default function EstudianteCurso() {
   const practica = useDatos(seccion === 'quizzes' ? `/courses/${id}/daily-practice` : null);
   const nota = useDatos(seccion === 'calificaciones' || seccion === 'quizzes' ? `/courses/${id}/my-grade` : null);
   const trabajoClase = useDatos(seccion === 'calificaciones' ? `/courses/${id}/class-work` : null);
+  const recorrido = useRecorrido('curso', Boolean(curso.datos));
+  // El recorrido cambia de pestaña con la versión más reciente de irA (sin reiniciar el paso en cada render).
+  const irARef = useRef(null);
+  const prepararPaso = useCallback((paso) => { if (paso.seccion) irARef.current?.(paso.seccion); }, []);
 
   if (curso.cargando && !curso.datos) return <Cargando texto="Cargando la clase…" />;
   if (curso.error) return <MensajeError error={curso.error} />;
@@ -101,6 +110,7 @@ export default function EstudianteCurso() {
     const nombre = PESTANAS.find((opcion) => opcion.id === nueva)?.texto;
     if (nombre && nueva !== seccion) anunciar(`Sección ${nombre}`);
   }
+  irARef.current = irA;
 
   return (
     <>
@@ -116,11 +126,12 @@ export default function EstudianteCurso() {
         </div>
         <div className="acciones">
           {pendiente && <Link className="boton" to={`/estudiante/lecciones/${pendiente.id}`}>{completadas > 0 ? 'Continuar' : 'Empezar'}</Link>}
-          <Link className="boton secundario" to={`/estudiante/tutor/${id}`}>Preguntar al tutor IA</Link>
+          <Link className="boton secundario" to={`/estudiante/tutor/${id}`} data-recorrido="tutor">Preguntar al tutor IA</Link>
+          <BotonRecorrido ref={recorrido.boton} alAbrir={recorrido.abrir} claro />
         </div>
       </section>
 
-      <nav className="pestanas" aria-label="Secciones de la clase">
+      <nav className="pestanas" aria-label="Secciones de la clase" data-recorrido="pestanas">
         {PESTANAS.map((opcion) => (
           <a key={opcion.id} href={`?seccion=${opcion.id}`} className={seccion === opcion.id ? 'active' : ''} aria-current={seccion === opcion.id ? 'page' : undefined}
             onClick={(evento) => { evento.preventDefault(); irA(opcion.id); }}>
@@ -283,6 +294,7 @@ export default function EstudianteCurso() {
 
       {seccion === 'personas' && <ListaPersonas cursoId={id} />}
       </div>
+      <RecorridoGuiado pasos={RECORRIDO_CURSO} abierto={recorrido.abierto} alCerrar={recorrido.cerrar} alPrepararPaso={prepararPaso} />
     </>
   );
 }

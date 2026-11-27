@@ -35,69 +35,72 @@
 <!-- users -->
 <g id="node2" class="node">
 <title>users</title>
-<path fill="none" stroke="#d7dcf2" d="M455,-672C455,-672 276,-672 276,-672 270,-672 264,-666 264,-660 264,-660 264,-306 264,-306 264,-300 270,-294 276,-294 276,-294 455,-294 455,-294 461,-294 467,-300 467,-306 467,-306 467,-660 467,-660 467,-666 461,-672 455,-672"/>
-<polygon fill="#3451e1" stroke="transparent" points="264.5,-654 264.5,-672 467.5,-672 467.5,-654 264.5,-654"/>
-<text text-anchor="start" x="352" y="-661.2" font-family="Figtree" font-weight="bold" font-size="11.00" fill="white">users</text>
-<text text-anchor="start" x="267.5" y="-642.2" font-family="Figtree" font-size="11.00" fill="#5b6280">PK</text>
-<text text-anchor="start" x="289.5" y="-643.2" font-family="Figtree" font-weight="bold" font-size="11.00">id</text>
-<text text-anchor="start" x="401.5" y="-642.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
-<text text-anchor="start" x="267.5" y="-624.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
-<text text-anchor="start" x="289.5" y="-624.2" font-family="Figtree" font-size="11.00">institution_id</text>
-<text text-anchor="start" x="401.5" y="-624.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
-<text text-anchor="start" x="267.5" y="-606.2" font-family="Figtree" font-size="11.00" fill="#5b6280">UQ</text>
-<text text-anchor="start" x="289.5" y="-606.2" font-family="Figtree" font-size="11.00">email</text>
-<text text-anchor="start" x="401.5" y="-606.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(190)</text>
-<text text-anchor="start" x="267.5" y="-588.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-588.2" font-family="Figtree" font-size="11.00">password_hash</text>
-<text text-anchor="start" x="401.5" y="-588.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(255)</text>
-<text text-anchor="start" x="267.5" y="-570.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-570.2" font-family="Figtree" font-size="11.00">display_name</text>
-<text text-anchor="start" x="401.5" y="-570.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(120)</text>
-<text text-anchor="start" x="267.5" y="-552.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
-<text text-anchor="start" x="289.5" y="-552.2" font-family="Figtree" font-size="11.00">role</text>
-<text text-anchor="start" x="401.5" y="-552.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(30)</text>
-<text text-anchor="start" x="267.5" y="-534.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-534.2" font-family="Figtree" font-size="11.00">status</text>
-<text text-anchor="start" x="401.5" y="-534.2" font-family="Figtree" font-size="11.00" fill="#5b6280">enum</text>
-<text text-anchor="start" x="267.5" y="-516.2" font-family="Figtree" font-size="11.00" fill="#5b6280">UQ</text>
-<text text-anchor="start" x="289.5" y="-516.2" font-family="Figtree" font-size="11.00">invitation_token_hash</text>
-<text text-anchor="start" x="401.5" y="-516.2" font-family="Figtree" font-size="11.00" fill="#5b6280">char(64)</text>
-<text text-anchor="start" x="267.5" y="-498.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-498.2" font-family="Figtree" font-size="11.00">invitation_expires_at</text>
-<text text-anchor="start" x="401.5" y="-498.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
-<text text-anchor="start" x="267.5" y="-480.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-480.2" font-family="Figtree" font-size="11.00">failed_login_count</text>
-<text text-anchor="start" x="401.5" y="-480.2" font-family="Figtree" font-size="11.00" fill="#5b6280">int</text>
-<text text-anchor="start" x="267.5" y="-462.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-462.2" font-family="Figtree" font-size="11.00">locked_until</text>
-<text text-anchor="start" x="401.5" y="-462.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
-<text text-anchor="start" x="267.5" y="-444.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-444.2" font-family="Figtree" font-size="11.00">created_at</text>
-<text text-anchor="start" x="401.5" y="-444.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
-<text text-anchor="start" x="267.5" y="-426.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-426.2" font-family="Figtree" font-size="11.00">updated_at</text>
-<text text-anchor="start" x="401.5" y="-426.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
-<text text-anchor="start" x="267.5" y="-408.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-408.2" font-family="Figtree" font-size="11.00">first_name</text>
-<text text-anchor="start" x="401.5" y="-408.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(80)</text>
-<text text-anchor="start" x="267.5" y="-390.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-390.2" font-family="Figtree" font-size="11.00">last_name</text>
-<text text-anchor="start" x="401.5" y="-390.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(80)</text>
-<text text-anchor="start" x="267.5" y="-372.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-372.2" font-family="Figtree" font-size="11.00">phone</text>
-<text text-anchor="start" x="401.5" y="-372.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(30)</text>
-<text text-anchor="start" x="267.5" y="-354.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-354.2" font-family="Figtree" font-size="11.00">bio</text>
-<text text-anchor="start" x="401.5" y="-354.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(500)</text>
-<text text-anchor="start" x="267.5" y="-336.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-336.2" font-family="Figtree" font-size="11.00">avatar_file</text>
-<text text-anchor="start" x="401.5" y="-336.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(64)</text>
-<text text-anchor="start" x="267.5" y="-318.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-318.2" font-family="Figtree" font-size="11.00">avatar_updated_at</text>
-<text text-anchor="start" x="401.5" y="-318.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
-<text text-anchor="start" x="267.5" y="-300.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="289.5" y="-300.2" font-family="Figtree" font-size="11.00">anonymized_at</text>
-<text text-anchor="start" x="401.5" y="-300.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+<path fill="none" stroke="#d7dcf2" d="M455,-681C455,-681 276,-681 276,-681 270,-681 264,-675 264,-669 264,-669 264,-297 264,-297 264,-291 270,-285 276,-285 276,-285 455,-285 455,-285 461,-285 467,-291 467,-297 467,-297 467,-669 467,-669 467,-675 461,-681 455,-681"/>
+<polygon fill="#3451e1" stroke="transparent" points="264.5,-663 264.5,-681 467.5,-681 467.5,-663 264.5,-663"/>
+<text text-anchor="start" x="352" y="-670.2" font-family="Figtree" font-weight="bold" font-size="11.00" fill="white">users</text>
+<text text-anchor="start" x="267.5" y="-651.2" font-family="Figtree" font-size="11.00" fill="#5b6280">PK</text>
+<text text-anchor="start" x="289.5" y="-652.2" font-family="Figtree" font-weight="bold" font-size="11.00">id</text>
+<text text-anchor="start" x="401.5" y="-651.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
+<text text-anchor="start" x="267.5" y="-633.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
+<text text-anchor="start" x="289.5" y="-633.2" font-family="Figtree" font-size="11.00">institution_id</text>
+<text text-anchor="start" x="401.5" y="-633.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
+<text text-anchor="start" x="267.5" y="-615.2" font-family="Figtree" font-size="11.00" fill="#5b6280">UQ</text>
+<text text-anchor="start" x="289.5" y="-615.2" font-family="Figtree" font-size="11.00">email</text>
+<text text-anchor="start" x="401.5" y="-615.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(190)</text>
+<text text-anchor="start" x="267.5" y="-597.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-597.2" font-family="Figtree" font-size="11.00">password_hash</text>
+<text text-anchor="start" x="401.5" y="-597.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(255)</text>
+<text text-anchor="start" x="267.5" y="-579.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-579.2" font-family="Figtree" font-size="11.00">display_name</text>
+<text text-anchor="start" x="401.5" y="-579.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(120)</text>
+<text text-anchor="start" x="267.5" y="-561.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
+<text text-anchor="start" x="289.5" y="-561.2" font-family="Figtree" font-size="11.00">role</text>
+<text text-anchor="start" x="401.5" y="-561.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(30)</text>
+<text text-anchor="start" x="267.5" y="-543.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-543.2" font-family="Figtree" font-size="11.00">status</text>
+<text text-anchor="start" x="401.5" y="-543.2" font-family="Figtree" font-size="11.00" fill="#5b6280">enum</text>
+<text text-anchor="start" x="267.5" y="-525.2" font-family="Figtree" font-size="11.00" fill="#5b6280">UQ</text>
+<text text-anchor="start" x="289.5" y="-525.2" font-family="Figtree" font-size="11.00">invitation_token_hash</text>
+<text text-anchor="start" x="401.5" y="-525.2" font-family="Figtree" font-size="11.00" fill="#5b6280">char(64)</text>
+<text text-anchor="start" x="267.5" y="-507.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-507.2" font-family="Figtree" font-size="11.00">invitation_expires_at</text>
+<text text-anchor="start" x="401.5" y="-507.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+<text text-anchor="start" x="267.5" y="-489.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-489.2" font-family="Figtree" font-size="11.00">failed_login_count</text>
+<text text-anchor="start" x="401.5" y="-489.2" font-family="Figtree" font-size="11.00" fill="#5b6280">int</text>
+<text text-anchor="start" x="267.5" y="-471.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-471.2" font-family="Figtree" font-size="11.00">locked_until</text>
+<text text-anchor="start" x="401.5" y="-471.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+<text text-anchor="start" x="267.5" y="-453.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-453.2" font-family="Figtree" font-size="11.00">created_at</text>
+<text text-anchor="start" x="401.5" y="-453.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+<text text-anchor="start" x="267.5" y="-435.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-435.2" font-family="Figtree" font-size="11.00">updated_at</text>
+<text text-anchor="start" x="401.5" y="-435.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+<text text-anchor="start" x="267.5" y="-417.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-417.2" font-family="Figtree" font-size="11.00">first_name</text>
+<text text-anchor="start" x="401.5" y="-417.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(80)</text>
+<text text-anchor="start" x="267.5" y="-399.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-399.2" font-family="Figtree" font-size="11.00">last_name</text>
+<text text-anchor="start" x="401.5" y="-399.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(80)</text>
+<text text-anchor="start" x="267.5" y="-381.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-381.2" font-family="Figtree" font-size="11.00">phone</text>
+<text text-anchor="start" x="401.5" y="-381.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(30)</text>
+<text text-anchor="start" x="267.5" y="-363.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-363.2" font-family="Figtree" font-size="11.00">bio</text>
+<text text-anchor="start" x="401.5" y="-363.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(500)</text>
+<text text-anchor="start" x="267.5" y="-345.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-345.2" font-family="Figtree" font-size="11.00">avatar_file</text>
+<text text-anchor="start" x="401.5" y="-345.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(64)</text>
+<text text-anchor="start" x="267.5" y="-327.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-327.2" font-family="Figtree" font-size="11.00">avatar_updated_at</text>
+<text text-anchor="start" x="401.5" y="-327.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+<text text-anchor="start" x="267.5" y="-309.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-309.2" font-family="Figtree" font-size="11.00">anonymized_at</text>
+<text text-anchor="start" x="401.5" y="-309.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+<text text-anchor="start" x="267.5" y="-291.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="289.5" y="-291.2" font-family="Figtree" font-size="11.00">is_demo</text>
+<text text-anchor="start" x="401.5" y="-291.2" font-family="Figtree" font-size="11.00" fill="#5b6280">tinyint(1)</text>
 </g>
 <!-- users&#45;&gt;roles -->
 <g id="edge5" class="edge">

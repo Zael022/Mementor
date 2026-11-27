@@ -5,6 +5,7 @@ import { jwtHours, signSessionToken, verifySessionToken } from '../utils/jwt.js'
 import { createToken, hashPassword, hashToken, needsRehash, verifyDummyPassword, verifyPassword } from '../utils/security.js';
 import { recordAudit } from './auditService.js';
 import { acceptPolicies } from './consentService.js';
+import { demoEnabled } from '../utils/demo.js';
 
 const MAX_FAILED = 5;
 const LOCK_MINUTES = 15;
@@ -19,6 +20,8 @@ export function publicUser(user) {
     institutionId: user.institutionId,
     institutionName: user.institution?.name ?? null,
     avatarUrl: avatarUrl(user),
+    // Cuenta de prueba: el frontend abre solo el recorrido guiado la primera vez.
+    isDemo: Boolean(user.isDemo),
   };
 }
 
@@ -37,6 +40,8 @@ export async function findSession(token) {
     include: [{ model: User, as: 'user', include: [{ model: Institution, as: 'institution' }] }],
   });
   if (!session || String(session.userId) !== payload.sub || session.user.status !== 'active') return null;
+  // Con el modo de prueba apagado, las sesiones de cuentas de prueba dejan de valer.
+  if (session.user.isDemo && !demoEnabled()) return null;
   if (session.user.institution && session.user.institution.status !== 'active') return null;
   return { session, user: session.user };
 }
@@ -46,7 +51,8 @@ export async function login({ email, password }) {
   const user = await User.findOne({ where: { email }, include: [{ model: Institution, as: 'institution' }] });
   const genericError = unauthenticated('Correo o contraseña incorrectos.');
 
-  if (!user || user.status !== 'active' || !user.passwordHash) {
+  // Las cuentas de prueba solo entran con DEMO_MODE encendido; si no, se tratan como inexistentes.
+  if (!user || user.status !== 'active' || !user.passwordHash || (user.isDemo && !demoEnabled())) {
     await verifyDummyPassword(password);
     throw genericError;
   }
@@ -63,16 +69,21 @@ export async function login({ email, password }) {
     throw genericError;
   }
 
+  // Contraseñas de cuentas anteriores (scrypt) pasan a bcrypt sin que la persona note nada.
+  const upgradedHash = needsRehash(user.passwordHash) && Buffer.byteLength(password, 'utf8') <= 72 ? await hashPassword(password) : null;
+  return startSession(user, { changes: upgradedHash ? { passwordHash: upgradedHash } : {} });
+}
+
+// Crea la sesión (cookie JWT + token CSRF) de una persona ya verificada.
+export async function startSession(user, { changes = {}, action = 'auth.login' } = {}) {
   // La sesión guarda solo el hash de su identificador; el JWT lo lleva firmado.
   const { token: sessionId, tokenHash } = createToken();
   const csrf = createToken().token;
   const expiresAt = new Date(Date.now() + jwtHours() * 3600000);
-  // Contraseñas de cuentas anteriores (scrypt) pasan a bcrypt sin que la persona note nada.
-  const upgradedHash = needsRehash(user.passwordHash) && Buffer.byteLength(password, 'utf8') <= 72 ? await hashPassword(password) : null;
   await sequelize.transaction(async (transaction) => {
-    await user.update({ failedLoginCount: 0, lockedUntil: null, ...(upgradedHash ? { passwordHash: upgradedHash } : {}) }, { transaction });
+    await user.update({ failedLoginCount: 0, lockedUntil: null, ...changes }, { transaction });
     await UserSession.create({ userId: user.id, tokenHash, csrfToken: csrf, expiresAt }, { transaction });
-    await recordAudit({ actor: user, action: 'auth.login', resourceType: 'user', resourceId: user.id, transaction });
+    await recordAudit({ actor: user, action, resourceType: 'user', resourceId: user.id, transaction });
   });
   const token = signSessionToken({ userId: user.id, role: user.role, sessionId });
   return { token, csrfToken: csrf, expiresAt, user: publicUser(user) };

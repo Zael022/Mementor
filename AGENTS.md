@@ -8,7 +8,7 @@ Este archivo es coherente con `CLAUDE.md`; si hay contradicción, mandan `CLAUDE
 - Interfaz y comentarios en español, breves y generales.
 
 ## Reglas que no se negocian
-1. Sin seeds, datos demo ni cuentas ficticias. Las pruebas crean y borran sus datos en `TEST_DB_NAME`.
+1. Cuentas de prueba solo con `DEMO_MODE=on` (ADR 0011: una por rol, `users.is_demo`, `npm run demo:cuentas` y acceso rápido); sin seeds de cursos ni contenido académico. Las pruebas crean y borran sus datos en `TEST_DB_NAME`.
 2. Autorización en el backend: rol, institución y relación con el curso (`getCourseAccess`). El curso y el corpus salen de la sesión, nunca del cuerpo de la petición.
 3. Corrección de evaluaciones determinista y transaccional. La IA no califica ni publica preguntas.
 4. El tutor solo usa fuentes activas del curso y valida respuesta y citas en el servidor. Sin evidencia no se llama al modelo. Sin credenciales: `AI_NOT_CONFIGURED`.

@@ -44,6 +44,7 @@ backend/
 Persistencia real **MySQL + Sequelize**. `db.json` NO guarda cursos, contraseñas, estudiantes ni registros: solo metadatos de conexión como nombres de variables `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`. El adaptador Sequelize lee valores reales de `.env` de forma segura. No publicar credenciales.
 
 ## Sin datos de prueba precargados
+- Excepción: cuentas de prueba por rol con el modo de prueba (`DEMO_MODE=on`, ADR 0011). Se marcan con `users.is_demo`, se crean al arrancar o con `npm run demo:cuentas` y solo entran con el modo encendido.
 - No crear `seed.js`, `seeders/`, `curriculo_demo.json`, `db.json` con datos académicos, JSON Server, Faker, ejemplos de alumnos o perfiles precargados.
 - No inventar estadística de cursos, notas, usuarios, tendencias ni recomendaciones en el frontend: si MySQL devuelve cero filas, mostrar un estado vacío bien diseñado.
 - Al ejecutar migraciones se crean tablas, FKs e índices; la BD permanece sin filas de contenido hasta que personas autorizadas creen registros mediante la app.

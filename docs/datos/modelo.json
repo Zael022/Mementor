@@ -261,6 +261,16 @@
      "extra": "",
      "purpose": "Fecha en que se anonimizó la cuenta tras la baja.",
      "fk": null
+    },
+    {
+     "name": "is_demo",
+     "type": "tinyint(1)",
+     "null": false,
+     "key": "",
+     "default": "0",
+     "extra": "",
+     "purpose": "Si es una cuenta de prueba (solo entra con DEMO_MODE encendido).",
+     "fk": null
     }
    ]
   },
@@ -9391,5 +9401,5 @@
   ]
  },
  "tables": 76,
- "columns": 765
+ "columns": 766
 }

@@ -1,16 +1,20 @@
 import { Link } from 'react-router-dom';
 import { TarjetaInteractiva } from '../Componentes/Animaciones.jsx';
 import Anuncios from '../Componentes/Anuncios.jsx';
+import BotonRecorrido from '../Componentes/BotonRecorrido.jsx';
 import BienvenidaRegreso from '../Componentes/BienvenidaRegreso.jsx';
 import { CuentaRegresiva, TarjetaSesion, useEntrarClase } from '../Componentes/ClasesEnVivo.jsx';
 import EstadoVacio from '../Componentes/EstadoVacio.jsx';
 import { Cargando, Insignia, MensajeError } from '../Componentes/Estados.jsx';
 import RangoAvance from '../Componentes/RangoAvance.jsx';
+import RecorridoGuiado from '../Componentes/RecorridoGuiado.jsx';
 import { useSesion } from '../context/SesionContext.jsx';
 import { useEstadoClase } from '../hooks/useEstadoClase.js';
 import { useDatos } from '../hooks/useDatos.js';
+import { useRecorrido } from '../hooks/useRecorrido.js';
 import { colorDeCurso } from '../utils/cursos.js';
 import { fechaHora } from '../utils/fechas.js';
+import { RECORRIDO_INICIO } from '../utils/pasosRecorrido.js';
 
 // La próxima clase ocupa el lugar principal de la página.
 function ClasePrincipal({ sesion, nombre, alEntrar }) {
@@ -44,6 +48,8 @@ function ClasePrincipal({ sesion, nombre, alEntrar }) {
 export default function EstudianteInicio() {
   const { usuario } = useSesion();
   const inicio = useDatos('/me/home');
+  // El recorrido solo tiene sentido con clases que mostrar.
+  const recorrido = useRecorrido('inicio', Boolean(inicio.datos?.courses?.length));
 
   if (inicio.cargando && !inicio.datos) return <Cargando texto="Cargando tu página principal…" forma="tarjetas" />;
   if (inicio.error) return <MensajeError error={inicio.error} />;
@@ -80,7 +86,7 @@ export default function EstudianteInicio() {
           {otras.map((sesion) => <TarjetaSesion key={sesion.id} sesion={sesion} alEntrar={inicio.recargar} />)}
 
           <div className="dos-columnas inicio-columnas">
-            <section className="tarjeta">
+            <section className="tarjeta" data-recorrido="vence-pronto">
               <div className="titulo-con-dato"><h2>Vence pronto</h2><Link className="pequeno" to="/pendientes">Ver pendientes</Link></div>
               {tareas.length === 0 && <p className="tenue">No tienes tareas pendientes.</p>}
               <ul className="lista-simple">
@@ -98,8 +104,11 @@ export default function EstudianteInicio() {
             </section>
           </div>
 
-          <h2>Clases</h2>
-          <div className="rejilla">
+          <div className="titulo-con-dato">
+            <h2>Clases</h2>
+            <BotonRecorrido ref={recorrido.boton} alAbrir={recorrido.abrir} />
+          </div>
+          <div className="rejilla" data-recorrido="clases">
             {cursos.map((curso) => (
               <TarjetaInteractiva key={curso.id} to={`/estudiante/cursos/${curso.id}`} color={colorDeCurso(curso.id)}>
                 <span className="codigo">{curso.code}</span>
@@ -113,6 +122,7 @@ export default function EstudianteInicio() {
           </div>
         </>
       )}
+      <RecorridoGuiado pasos={RECORRIDO_INICIO} abierto={recorrido.abierto} alCerrar={recorrido.cerrar} />
     </>
   );
 }
