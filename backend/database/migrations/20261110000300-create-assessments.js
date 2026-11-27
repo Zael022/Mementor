@@ -76,7 +76,7 @@ module.exports = {
 
   async down(queryInterface) {
     for (const tabla of ['attempt_answers', 'assessment_attempts', 'question_options', 'questions', 'assessments']) {
-      await queryInterface.dropTable(tabla);
+      await queryInterface.dropTable(tabla, {});
     }
   },
 };

@@ -21,6 +21,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('email_changes');
+    await queryInterface.dropTable('email_changes', {});
   },
 };

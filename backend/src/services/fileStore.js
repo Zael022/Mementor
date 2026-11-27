@@ -4,11 +4,15 @@ import path from 'node:path';
 import { avatarDir, uploadDir } from '../middlewares/upload.js';
 import { GoogleCallError, googleRequest } from './googleCloud.js';
 import { notFound } from '../utils/AppError.js';
+import {
+  SupabaseCallError, deleteObject, downloadObject, listFolder, readSupabaseConfig, uploadObject,
+} from './supabaseStorage.js';
 
 // Almacén de originales (materiales y fotos de perfil).
 // local: los archivos quedan en el disco del servidor (desarrollo o servidor con volumen persistente).
 // gcs: el archivo recibido se copia a un bucket privado de Cloud Storage con ADC y se borra del disco temporal,
 // así un reinicio o redespliegue no pierde los originales.
+// supabase: lo mismo, pero en un bucket privado de Supabase Storage (despliegue Vercel + Render + Supabase).
 
 const AREAS = { materials: () => uploadDir(), avatars: () => avatarDir() };
 // Solo se manejan nombres generados por MENTOR al recibir la carga.
@@ -16,9 +20,16 @@ const MANAGED_NAME = /^[0-9a-f]{32}\.[a-z0-9]{2,5}$/;
 
 export function readStorageConfig() {
   const driver = (process.env.STORAGE_DRIVER || 'local').trim().toLowerCase();
+  if (driver === 'supabase') {
+    const prefix = (process.env.SUPABASE_STORAGE_PREFIX || 'originales').trim().replace(/^\/+|\/+$/g, '');
+    const supabase = readSupabaseConfig();
+    return supabase.configured
+      ? { driver, bucket: supabase.bucket, prefix, configured: true, supabase }
+      : { driver, bucket: '', prefix, configured: false, reason: supabase.reason };
+  }
   const bucket = (process.env.STORAGE_GCS_BUCKET || '').trim();
   const prefix = (process.env.STORAGE_GCS_PREFIX || 'mentor-ai/originales').trim().replace(/^\/+|\/+$/g, '');
-  if (!['local', 'gcs'].includes(driver)) return { driver, bucket, prefix, configured: false, reason: `STORAGE_DRIVER "${driver}" no es válido (usa local o gcs).` };
+  if (!['local', 'gcs'].includes(driver)) return { driver, bucket, prefix, configured: false, reason: `STORAGE_DRIVER "${driver}" no es válido (usa local, gcs o supabase).` };
   if (driver === 'gcs' && !bucket) return { driver, bucket, prefix, configured: false, reason: 'Falta STORAGE_GCS_BUCKET para STORAGE_DRIVER=gcs.' };
   return { driver, bucket, prefix, configured: true };
 }
@@ -59,6 +70,10 @@ export async function persistUpload(area, name) {
     });
     await unlink(source).catch(() => {});
   }
+  if (config.driver === 'supabase') {
+    await uploadObject(config.supabase, objectName(config, area, name), buffer);
+    await unlink(source).catch(() => {});
+  }
   return sha256(buffer);
 }
 
@@ -66,6 +81,14 @@ export async function persistUpload(area, name) {
 export async function readStored(area, name) {
   checkArea(area);
   const config = requireConfig();
+  if (config.driver === 'supabase') {
+    try {
+      return await downloadObject(config.supabase, objectName(config, area, name));
+    } catch (error) {
+      if (error instanceof SupabaseCallError && error.status === 404) throw notFound('El archivo ya no está disponible.');
+      throw error;
+    }
+  }
   if (config.driver === 'gcs') {
     try {
       return await googleRequest({ url: `${objectUrl(config, area, name)}?alt=media`, responseType: 'buffer' });
@@ -87,6 +110,7 @@ export async function removeStored(area, name) {
   checkArea(area);
   if (!isManagedName(name)) return;
   const config = readStorageConfig();
+  if (config.driver === 'supabase' && config.configured) await deleteObject(config.supabase, objectName(config, area, name));
   if (config.driver === 'gcs' && config.configured) {
     try {
       await googleRequest({ method: 'DELETE', url: objectUrl(config, area, name) });
@@ -94,7 +118,7 @@ export async function removeStored(area, name) {
       if (!(error instanceof GoogleCallError && error.status === 404)) throw error;
     }
   }
-  // También el disco local: en gcs puede quedar una copia temporal si la subida falló.
+  // También el disco local: en la nube puede quedar una copia temporal si la subida falló.
   await unlink(localPath(area, name)).catch(() => {});
 }
 
@@ -108,6 +132,10 @@ export async function listStored(area) {
   checkArea(area);
   const config = requireConfig();
   const items = [];
+  if (config.driver === 'supabase') {
+    const found = await listFolder(config.supabase, `${config.prefix}/${area}`);
+    return found.filter((item) => MANAGED_NAME.test(item.name));
+  }
   if (config.driver === 'gcs') {
     let pageToken = '';
     do {

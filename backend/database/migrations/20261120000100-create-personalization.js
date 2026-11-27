@@ -5,6 +5,8 @@ const fechas = (Sequelize) => ({
   created_at: { type: Sequelize.DATE, allowNull: false, defaultValue: Sequelize.literal('CURRENT_TIMESTAMP') },
   updated_at: { type: Sequelize.DATE, allowNull: false, defaultValue: Sequelize.literal('CURRENT_TIMESTAMP') },
 });
+// PostgreSQL no tiene TINYINT: allí se usa SMALLINT (MySQL queda igual).
+const pequeno = (queryInterface, Sequelize) => (queryInterface.sequelize.getDialect() === 'postgres' ? Sequelize.SMALLINT : Sequelize.TINYINT);
 const id = (Sequelize) => ({ type: Sequelize.BIGINT.UNSIGNED, allowNull: false, primaryKey: true, autoIncrement: true });
 const fk = (Sequelize, tabla, onDelete = 'CASCADE') => ({
   type: Sequelize.BIGINT.UNSIGNED,
@@ -27,7 +29,7 @@ module.exports = {
       underline_links: { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
       time_zone: { type: Sequelize.STRING(64), allowNull: true },
       daily_goal_minutes: { type: Sequelize.SMALLINT, allowNull: true },
-      practice_size: { type: Sequelize.TINYINT, allowNull: false, defaultValue: 5 },
+      practice_size: { type: pequeno(queryInterface, Sequelize), allowNull: false, defaultValue: 5 },
       ...fechas(Sequelize),
     });
 
@@ -43,7 +45,7 @@ module.exports = {
       last_reviewed_at: { type: Sequelize.DATE, allowNull: false },
       reps: { type: Sequelize.INTEGER, allowNull: false, defaultValue: 0 },
       lapses: { type: Sequelize.INTEGER, allowNull: false, defaultValue: 0 },
-      last_grade: { type: Sequelize.TINYINT, allowNull: false },
+      last_grade: { type: pequeno(queryInterface, Sequelize), allowNull: false },
       algorithm_version: { type: Sequelize.STRING(40), allowNull: false },
       ...fechas(Sequelize),
     });
@@ -54,7 +56,7 @@ module.exports = {
     await queryInterface.createTable('topic_review_logs', {
       id: id(Sequelize),
       review_id: fk(Sequelize, 'topic_reviews'),
-      grade: { type: Sequelize.TINYINT, allowNull: false },
+      grade: { type: pequeno(queryInterface, Sequelize), allowNull: false },
       source: { type: Sequelize.ENUM('assessment', 'self'), allowNull: false },
       elapsed_days: { type: Sequelize.DECIMAL(9, 3), allowNull: false },
       scheduled_days: { type: Sequelize.INTEGER, allowNull: false },
@@ -97,10 +99,10 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('study_plan_items');
-    await queryInterface.dropTable('study_plans');
-    await queryInterface.dropTable('topic_review_logs');
-    await queryInterface.dropTable('topic_reviews');
-    await queryInterface.dropTable('user_preferences');
+    await queryInterface.dropTable('study_plan_items', {});
+    await queryInterface.dropTable('study_plans', {});
+    await queryInterface.dropTable('topic_review_logs', {});
+    await queryInterface.dropTable('topic_reviews', {});
+    await queryInterface.dropTable('user_preferences', {});
   },
 };

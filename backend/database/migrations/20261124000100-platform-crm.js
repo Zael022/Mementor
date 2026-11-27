@@ -21,7 +21,7 @@ module.exports = {
     await q.addIndex('platform_crm_contacts', ['account_id', 'request_key'], { unique: true, name: 'ux_platform_crm_contact_request' });
   },
   async down(q) {
-    await q.dropTable('platform_crm_contacts');
-    await q.dropTable('platform_crm_accounts');
+    await q.dropTable('platform_crm_contacts', {});
+    await q.dropTable('platform_crm_accounts', {});
   },
 };

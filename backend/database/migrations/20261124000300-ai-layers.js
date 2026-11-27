@@ -1,5 +1,7 @@
 'use strict';
 
+const { cambiarEnum } = require('../compat.cjs');
+
 // Capas de IA: versión del prompt, modelo elegido por el router, caché y resultado de los guardrails
 // en la bitácora (sin contenido), y la caché de respuestas reutilizables.
 const OUTCOMES = ['reserved', 'completed', 'no_evidence', 'no_citations', 'invalid_format', 'provider_error', 'retrieval_error', 'cancelled'];
@@ -21,9 +23,7 @@ module.exports = {
       }
     }
     // Respuesta descartada por los guardrails de salida (el modelo sí se llamó, por eso cuenta en la cuota).
-    await queryInterface.changeColumn('ai_usage_events', 'outcome', {
-      type: Sequelize.ENUM(...OUTCOMES, 'guard_blocked'), allowNull: false, defaultValue: 'reserved',
-    });
+    await cambiarEnum(queryInterface, Sequelize, 'ai_usage_events', 'outcome', [...OUTCOMES, 'guard_blocked'], { allowNull: false, defaultValue: 'reserved' });
 
     await queryInterface.createTable('ai_response_cache', {
       id: { type: Sequelize.BIGINT.UNSIGNED, allowNull: false, primaryKey: true, autoIncrement: true },
@@ -49,10 +49,10 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('ai_response_cache');
+    await queryInterface.dropTable('ai_response_cache', {});
     // Las filas bloqueadas pasan a «invalid_format» para poder volver al ENUM anterior.
     await queryInterface.sequelize.query("UPDATE ai_usage_events SET outcome = 'invalid_format' WHERE outcome = 'guard_blocked'");
-    await queryInterface.changeColumn('ai_usage_events', 'outcome', { type: Sequelize.ENUM(...OUTCOMES), allowNull: false, defaultValue: 'reserved' });
+    await cambiarEnum(queryInterface, Sequelize, 'ai_usage_events', 'outcome', OUTCOMES, { allowNull: false, defaultValue: 'reserved' });
     for (const table of ['agent_runs', 'ai_usage_events']) {
       for (const name of Object.keys(traceColumns(Sequelize))) await queryInterface.removeColumn(table, name);
     }

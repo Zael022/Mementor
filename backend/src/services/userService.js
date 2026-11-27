@@ -4,6 +4,7 @@ import { conflict, forbidden, invalid, notFound } from '../utils/AppError.js';
 import { createToken } from '../utils/security.js';
 import { pageMeta } from '../utils/http.js';
 import { recordAudit } from './auditService.js';
+import { likeOp } from '../utils/sql.js';
 
 const INVITATION_HOURS = 72;
 const INSTITUTION_ROLES = ['institution_admin', 'teacher', 'student', 'auditor'];
@@ -46,7 +47,7 @@ export async function listUsers(actor, { role, q, pagination }) {
   const search = typeof q === 'string' ? q.trim().slice(0, 100) : '';
   if (search) {
     const pattern = `%${escapeLike(search)}%`;
-    where[Op.or] = [{ displayName: { [Op.like]: pattern } }, { email: { [Op.like]: pattern } }];
+    where[Op.or] = [{ displayName: { [likeOp]: pattern } }, { email: { [likeOp]: pattern } }];
   }
   const { rows, count } = await User.findAndCountAll({
     where,

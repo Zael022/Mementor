@@ -36,12 +36,17 @@ export async function prepareDatabase() {
 export async function cleanDatabase() {
   if (process.env.NODE_ENV !== 'test' || !/_(test|e2e)$/.test(process.env.TEST_DB_NAME || '') || process.env.TEST_DB_NAME === process.env.DB_NAME) throw new Error('La limpieza requiere una base aislada terminada en _test o _e2e.');
   const tables = await sequelize.getQueryInterface().showAllTables();
-  await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
-  for (const table of tables) {
-    // En Windows MySQL guarda los nombres en minúsculas: se compara sin distinguir mayúsculas.
-    // El catálogo de roles es dato de referencia creado por la migración: no se borra.
-    if (!['sequelizemeta', 'roles'].includes(table.toLowerCase())) await sequelize.query(`TRUNCATE TABLE \`${table}\``);
+  // En Windows MySQL guarda los nombres en minúsculas: se compara sin distinguir mayúsculas.
+  // El catálogo de roles es dato de referencia creado por la migración: no se borra.
+  const borrables = tables.map((table) => (typeof table === 'string' ? table : table.tableName))
+    .filter((table) => !['sequelizemeta', 'roles'].includes(table.toLowerCase()));
+  if (sequelize.getDialect() === 'postgres') {
+    // PostgreSQL vacía todo de una vez y reinicia los contadores de id.
+    if (borrables.length) await sequelize.query(`TRUNCATE TABLE ${borrables.map((table) => `"${table}"`).join(', ')} RESTART IDENTITY CASCADE`);
+    return;
   }
+  await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+  for (const table of borrables) await sequelize.query(`TRUNCATE TABLE \`${table}\``);
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
 }
 

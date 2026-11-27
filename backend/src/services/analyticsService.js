@@ -1,7 +1,7 @@
 import { QueryTypes } from 'sequelize';
-import { sequelize } from '../models/index.js';
 import { getCourseAccess } from './accessService.js';
 import { getCourseRanks } from './progressRankService.js';
+import { runSql } from '../utils/sql.js';
 
 const num = (value) => (value === null || value === undefined ? null : Number(value));
 
@@ -11,12 +11,12 @@ export async function getCourseAnalytics(user, courseId) {
   const options = { replacements: { courseId: course.id }, type: QueryTypes.SELECT };
 
   const [assessments, topics, students] = await Promise.all([
-    sequelize.query(
+    runSql(
       `SELECT a.id, a.title, a.status, a.passing_score AS passingScore,
               COUNT(att.id) AS submittedAttempts,
               COUNT(DISTINCT att.student_id) AS studentsWithAttempts,
               AVG(att.score_pct) AS averageScorePct,
-              SUM(att.score_pct >= a.passing_score) AS passedAttempts
+              SUM(CASE WHEN att.score_pct >= a.passing_score THEN 1 ELSE 0 END) AS passedAttempts
          FROM assessments a
          LEFT JOIN assessment_attempts att ON att.assessment_id = a.id AND att.status = 'submitted'
         WHERE a.course_id = :courseId
@@ -24,7 +24,7 @@ export async function getCourseAnalytics(user, courseId) {
         ORDER BY a.id`,
       options,
     ),
-    sequelize.query(
+    runSql(
       `SELECT t.id, t.title,
               COALESCE(responses.answers, 0) AS answers,
               responses.correctAnswers,
@@ -33,7 +33,7 @@ export async function getCourseAnalytics(user, courseId) {
          FROM topics t
          JOIN modules m ON m.id = t.module_id
          LEFT JOIN (
-           SELECT q.topic_id, COUNT(*) AS answers, SUM(aa.is_correct) AS correctAnswers
+           SELECT q.topic_id, COUNT(*) AS answers, SUM(CASE WHEN aa.is_correct THEN 1 ELSE 0 END) AS correctAnswers
              FROM questions q
              JOIN topics scope ON scope.id = q.topic_id AND scope.course_id = :courseId
              JOIN attempt_answers aa ON aa.question_id = q.id
@@ -49,7 +49,7 @@ export async function getCourseAnalytics(user, courseId) {
         ORDER BY m.position, t.position, t.id`,
       options,
     ),
-    sequelize.query(
+    runSql(
       `SELECT u.id, u.display_name AS displayName,
               COUNT(att.id) AS submittedAttempts,
               AVG(att.score_pct) AS averageScorePct,

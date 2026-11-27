@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { QueryTypes } from 'sequelize';
-import { sequelize } from '../config/database.js';
+import { sequelize, isPostgres } from '../config/database.js';
+import { nowPlus } from '../utils/sql.js';
 
 // Identifica a esta instancia del backend mientras está encendida.
 export const INSTANCE_ID = randomUUID();
@@ -8,10 +9,14 @@ export const INSTANCE_ID = randomUUID();
 // Toma o renueva un turno con vencimiento. Devuelve true si esta instancia lo tiene.
 // Si la instancia que lo tenía se apaga, otra lo toma cuando vence.
 export async function holdLease(name, ttlMs, owner = INSTANCE_ID) {
-  await sequelize.query('INSERT IGNORE INTO job_leases (name, owner, expires_at) VALUES (:name, NULL, NULL)', { replacements: { name } });
+  // Crea la fila del turno si no existe (sin error si ya está).
+  const crear = isPostgres
+    ? 'INSERT INTO job_leases (name, owner, expires_at) VALUES (:name, NULL, NULL) ON CONFLICT (name) DO NOTHING'
+    : 'INSERT IGNORE INTO job_leases (name, owner, expires_at) VALUES (:name, NULL, NULL)';
+  await sequelize.query(crear, { replacements: { name } });
   await sequelize.query(
-    `UPDATE job_leases SET owner = :owner, expires_at = DATE_ADD(NOW(3), INTERVAL :micro MICROSECOND)
-      WHERE name = :name AND (owner = :owner OR owner IS NULL OR expires_at IS NULL OR expires_at < NOW(3))`,
+    `UPDATE job_leases SET owner = :owner, expires_at = ${nowPlus(':micro', 'MICROSECOND')}
+      WHERE name = :name AND (owner = :owner OR owner IS NULL OR expires_at IS NULL OR expires_at < CURRENT_TIMESTAMP(3))`,
     { replacements: { name, owner, micro: Math.round(ttlMs * 1000) } },
   );
   const [row] = await sequelize.query('SELECT owner FROM job_leases WHERE name = :name', { replacements: { name }, type: QueryTypes.SELECT });

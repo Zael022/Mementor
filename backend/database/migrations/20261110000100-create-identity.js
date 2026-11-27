@@ -50,8 +50,8 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('user_sessions');
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable('user_sessions', {});
+    await queryInterface.dropTable('users', {});
     await queryInterface.removeColumn('institutions', 'status');
   },
 };

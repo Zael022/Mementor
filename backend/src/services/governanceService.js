@@ -10,6 +10,7 @@ import { conflict, forbidden, notFound } from '../utils/AppError.js';
 import { recordAudit } from './auditService.js';
 import { confirmPassword } from './authService.js';
 import { isMailConfigured, sendMail } from './mailService.js';
+import { runSql } from '../utils/sql.js';
 
 // Lo que se conserva tras una baja y su motivo (se muestra a la persona y queda en la solicitud).
 export const RETAINED_SUMMARY = [
@@ -81,7 +82,7 @@ export async function exportMyData(user) {
   const row = await User.findByPk(user.id);
   const learning = {};
   for (const [section, sql] of Object.entries(LEARNING_EXPORT)) {
-    learning[section] = await sequelize.query(sql, { replacements: { id: user.id }, type: QueryTypes.SELECT });
+    learning[section] = await runSql(sql, { replacements: { id: user.id }, type: QueryTypes.SELECT });
   }
   return {
     generatedAt: new Date().toISOString(),
@@ -166,11 +167,11 @@ export async function processDeletion(requestId, via, { notify = true } = {}) {
     await PasswordReset.destroy({ where: { userId: user.id }, transaction });
     await EmailChange.destroy({ where: { userId: user.id }, transaction });
     // Conversaciones con el tutor (sus mensajes y citas se borran en cascada) y preferencias personales.
-    await sequelize.query('DELETE FROM ai_threads WHERE user_id = :id', { replacements: { id: user.id }, transaction });
-    await sequelize.query('DELETE FROM user_preferences WHERE user_id = :id', { replacements: { id: user.id }, transaction });
-    await sequelize.query('DELETE FROM reminder_deliveries WHERE user_id = :id', { replacements: { id: user.id }, transaction });
+    await runSql('DELETE FROM ai_threads WHERE user_id = :id', { replacements: { id: user.id }, transaction });
+    await runSql('DELETE FROM user_preferences WHERE user_id = :id', { replacements: { id: user.id }, transaction });
+    await runSql('DELETE FROM reminder_deliveries WHERE user_id = :id', { replacements: { id: user.id }, transaction });
     // Las partidas de Parejas son práctica personal: no forman parte del registro académico.
-    await sequelize.query('DELETE FROM memory_games WHERE student_id = :id', { replacements: { id: user.id }, transaction });
+    await runSql('DELETE FROM memory_games WHERE student_id = :id', { replacements: { id: user.id }, transaction });
     await row.update({ status: 'completed', processedAt: new Date(), processedVia: via, retainedSummary: RETAINED_SUMMARY }, { transaction });
     return row;
   });
@@ -221,7 +222,7 @@ export async function listDeletionRequests(user) {
 // Resumen de aceptación por documento y versión, sin datos de cada persona.
 export async function consentSummary(user) {
   // Consulta fija con parámetros: ningún fragmento de SQL se arma con texto.
-  const [rows] = await sequelize.query(
+  const [rows] = await runSql(
     `SELECT c.document, c.version, COUNT(*) AS total FROM consent_records c JOIN users u ON u.id = c.user_id
       WHERE (:all = 1 OR u.institution_id = :institutionId)
       GROUP BY c.document, c.version ORDER BY c.document, c.version DESC`,

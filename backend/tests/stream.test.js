@@ -176,8 +176,7 @@ test('el tope diario de la institución responde 429', async () => {
 });
 
 test('el registro técnico no guarda contenido y solo la administración lo consulta', async () => {
-  const [columns] = await sequelize.query('SHOW COLUMNS FROM ai_usage_events');
-  const names = columns.map((column) => column.Field);
+  const names = Object.keys(await sequelize.getQueryInterface().describeTable('ai_usage_events'));
   for (const forbidden of ['question', 'answer', 'content', 'prompt', 'text']) assert.equal(names.includes(forbidden), false);
   const summary = await ctx.org.admin.get('/institution/ai-usage');
   assert.equal(summary.status, 200);

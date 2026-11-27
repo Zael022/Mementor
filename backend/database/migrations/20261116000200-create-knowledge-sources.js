@@ -103,7 +103,7 @@ module.exports = {
     await queryInterface.removeColumn('institutions', 'ai_daily_question_limit');
     await queryInterface.removeColumn('institutions', 'max_documents');
     for (const tabla of ['ai_message_sources', 'source_versions', 'knowledge_sources', 'course_rag_corpora']) {
-      await queryInterface.dropTable(tabla);
+      await queryInterface.dropTable(tabla, {});
     }
   },
 };

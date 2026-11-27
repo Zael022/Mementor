@@ -32,6 +32,6 @@ module.exports = {
     await queryInterface.removeConstraint('users', 'fk_users_role');
     await queryInterface.removeIndex('users', 'fk_users_role').catch(() => {});
     await queryInterface.changeColumn('users', 'role', { type: Sequelize.ENUM(...ENUM_ROLES), allowNull: false });
-    await queryInterface.dropTable('roles');
+    await queryInterface.dropTable('roles', {});
   },
 };

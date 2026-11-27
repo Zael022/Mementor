@@ -1,18 +1,26 @@
 {
   "development": {
-    "dialect": "mysql",
+    "dialectEnv": "DB_DIALECT",
+    "urlEnv": "DATABASE_URL",
     "hostEnv": "DB_HOST",
     "portEnv": "DB_PORT",
     "databaseEnv": "DB_NAME",
     "usernameEnv": "DB_USER",
-    "passwordEnv": "DB_PASSWORD"
+    "passwordEnv": "DB_PASSWORD",
+    "sslEnv": "DB_SSL",
+    "sslCaEnv": "DB_SSL_CA",
+    "sslCaPemEnv": "DB_SSL_CA_PEM"
   },
   "test": {
-    "dialect": "mysql",
+    "dialectEnv": "TEST_DB_DIALECT",
+    "urlEnv": "TEST_DATABASE_URL",
     "hostEnv": "TEST_DB_HOST",
     "portEnv": "TEST_DB_PORT",
     "databaseEnv": "TEST_DB_NAME",
     "usernameEnv": "TEST_DB_USER",
-    "passwordEnv": "TEST_DB_PASSWORD"
+    "passwordEnv": "TEST_DB_PASSWORD",
+    "sslEnv": "TEST_DB_SSL",
+    "sslCaEnv": "TEST_DB_SSL_CA",
+    "sslCaPemEnv": "TEST_DB_SSL_CA_PEM"
   }
 }

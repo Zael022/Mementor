@@ -1,12 +1,14 @@
 import { Op, QueryTypes } from 'sequelize';
 import {
-  Assignment, AssignmentSubmission, Course, CourseStreak, DataDeletionRequest, Enrollment, QuickQuiz, sequelize,
+  Assignment, AssignmentSubmission, Course, CourseStreak, DataDeletionRequest, Enrollment, QuickQuiz,
 } from '../models/index.js';
 import { notFound } from '../utils/AppError.js';
 import { addDays, dayKey } from '../utils/clock.js';
 import { saveRate } from './external/exchangeRateService.js';
 import { logIntegration } from './external/httpClient.js';
 import { processDeletion } from './governanceService.js';
+import { isPostgres } from '../config/database.js';
+import { runSql } from '../utils/sql.js';
 
 // Workflow 1 (n8n): recibe el tipo de cambio que n8n consultó y lo guarda.
 export async function receiveExchangeRate({ date, buy, sell }) {
@@ -24,14 +26,14 @@ export async function dailyReminders({ after = 0, limit = 200 } = {}) {
   const soon = new Date(now.getTime() + 36 * 3600000);
   const day = dayKey();
   const size = Math.min(Math.max(1, Number(limit) || 200), REMINDER_PAGE_MAX);
-  const students = await sequelize.query(
+  const students = await runSql(
     `SELECT DISTINCT u.id, u.email, u.display_name AS displayName
        FROM users u
        JOIN enrollments e ON e.student_id = u.id AND e.status = 'active'
        JOIN courses c ON c.id = e.course_id AND c.status = 'published'
        LEFT JOIN user_preferences p ON p.user_id = u.id
        LEFT JOIN reminder_deliveries d ON d.user_id = u.id AND d.reminder_day = :day AND d.status = 'sent'
-      WHERE u.status = 'active' AND u.anonymized_at IS NULL AND COALESCE(p.email_reminders, 1) = 1
+      WHERE u.status = 'active' AND u.anonymized_at IS NULL AND (p.email_reminders IS NULL OR p.email_reminders = TRUE)
         AND d.id IS NULL AND u.id > :after
       ORDER BY u.id
       LIMIT :take`,
@@ -86,9 +88,12 @@ export async function dailyReminders({ after = 0, limit = 200 } = {}) {
 // n8n informa qué recordatorios salieron. Un «enviado» no se vuelve «fallido» al repetir el aviso.
 export async function recordReminderDeliveries({ day, results }) {
   const rows = results.map(({ userId, status }) => [userId, day, status]);
-  await sequelize.query(
+  await runSql(
     `INSERT INTO reminder_deliveries (user_id, reminder_day, status, attempts) VALUES ${rows.map(() => '(?, ?, ?, 1)').join(', ')}
-     ON DUPLICATE KEY UPDATE status = IF(status = 'sent', 'sent', VALUES(status)), attempts = attempts + 1, updated_at = CURRENT_TIMESTAMP`,
+     ${isPostgres
+    ? `ON CONFLICT (user_id, reminder_day) DO UPDATE SET status = CASE WHEN reminder_deliveries.status = 'sent' THEN 'sent' ELSE EXCLUDED.status END,
+         attempts = reminder_deliveries.attempts + 1, updated_at = CURRENT_TIMESTAMP`
+    : "ON DUPLICATE KEY UPDATE status = IF(status = 'sent', 'sent', VALUES(status)), attempts = attempts + 1, updated_at = CURRENT_TIMESTAMP"}`,
     { replacements: rows.flat() },
   );
   const sent = results.filter((item) => item.status === 'sent').length;

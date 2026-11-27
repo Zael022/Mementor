@@ -1,7 +1,9 @@
 import { readFile, writeFile } from 'node:fs/promises';
-import { sequelize } from '../config/database.js';
+import { sequelize, isPostgres } from '../config/database.js';
 
 // Solo inspecciona el esquema de una base aislada migrada, nunca registros personales.
+// El diccionario oficial se genera desde MySQL (el motor de referencia del proyecto).
+if (isPostgres) throw new Error('El diccionario de datos se exporta desde MySQL: usa TEST_DB_DIALECT=mysql.');
 if (process.env.NODE_ENV !== 'test' || !/_(test|e2e)$/.test(process.env.TEST_DB_NAME || '')) throw new Error('Usa NODE_ENV=test y una base aislada.');
 const destination = new URL('../../../docs/datos/', import.meta.url);
 const original = JSON.parse(await readFile(new URL('modelo.json', destination), 'utf8'));

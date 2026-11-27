@@ -29,7 +29,7 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('integration_runs');
-    await queryInterface.dropTable('exchange_rates');
+    await queryInterface.dropTable('integration_runs', {});
+    await queryInterface.dropTable('exchange_rates', {});
   },
 };

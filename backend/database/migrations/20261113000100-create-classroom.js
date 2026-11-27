@@ -111,7 +111,7 @@ module.exports = {
 
   async down(queryInterface) {
     for (const tabla of ['assignment_submissions', 'assignments', 'lesson_comments', 'materials', 'announcements', 'session_attendance', 'class_sessions']) {
-      await queryInterface.dropTable(tabla);
+      await queryInterface.dropTable(tabla, {});
     }
     await queryInterface.removeColumn('lessons', 'video_url');
   },

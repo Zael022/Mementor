@@ -7,6 +7,7 @@ import { recordAudit } from './auditService.js';
 import { applicationInScope, crmScope, cycleInScope, expectedVersion, prospectInScope, validateResponsible } from './crmAccessService.js';
 import { STAGES } from '../validators/crmSchemas.js';
 import { buildAdmissionContext } from './crmContextService.js';
+import { likeOp } from '../utils/sql.js';
 
 export const auditCrm = (actor, action, row, metadata, transaction) => recordAudit({ actor, action: `crm.${action}`, resourceType: 'crm_application', resourceId: row.id, metadata, transaction });
 export async function eventCrm(actor, row, kind, reason, { fromStage = row.stage, effectiveAt = clock.now(), metadata = null, transaction } = {}) {
@@ -17,7 +18,7 @@ export async function listCycles(actor, filters = {}) {
   crmScope(actor, ['institution_admin', 'teacher', 'auditor']);
   const assignments = actor.role === 'teacher' ? await CrmApplication.findAll({ where: { institutionId: actor.institutionId, responsibleId: actor.id }, attributes: ['cycleId'], group: ['cycleId'] }) : null;
   const pagination = readPagination({ limit: 100, ...filters });
-  const { rows, count } = await CrmCycle.findAndCountAll({ where: { institutionId: actor.institutionId, ...(assignments ? { id: assignments.map((a) => a.cycleId) } : {}), ...(filters.buscar ? { name: { [Op.like]: `%${filters.buscar.replace(/[%_\\]/g, '')}%` } } : {}) }, order: [['id', 'DESC']], limit: pagination.limit, offset: pagination.offset });
+  const { rows, count } = await CrmCycle.findAndCountAll({ where: { institutionId: actor.institutionId, ...(assignments ? { id: assignments.map((a) => a.cycleId) } : {}), ...(filters.buscar ? { name: { [likeOp]: `%${filters.buscar.replace(/[%_\\]/g, '')}%` } } : {}) }, order: [['id', 'DESC']], limit: pagination.limit, offset: pagination.offset });
   return { data: rows, meta: pageMeta(pagination, count) };
 }
 
@@ -97,7 +98,7 @@ export async function listApplications(actor, filters) {
   const pagination = readPagination(filters);
   const prospectWhere = {};
   if (filters.procedencia) prospectWhere.origin = filters.procedencia;
-  if (filters.buscar) prospectWhere.name = { [Op.like]: `%${filters.buscar.replace(/[%_\\]/g, '')}%` };
+  if (filters.buscar) prospectWhere.name = { [likeOp]: `%${filters.buscar.replace(/[%_\\]/g, '')}%` };
   const { rows, count } = await CrmApplication.findAndCountAll({ where: applicationWhere(actor, filters), include: [
     { model: CrmProspect, as: 'prospect', where: prospectWhere, attributes: ['id', 'name', 'email', 'origin', 'anonymizedAt'] },
     { model: CrmCycle, as: 'cycle', ...(filters.sede ? { where: { campus: filters.sede } } : {}), attributes: ['id', 'name', 'campus'] },
@@ -108,7 +109,7 @@ export async function listApplications(actor, filters) {
 export async function listProspects(actor, filters) {
   const pagination = readPagination(filters);
   const where = { ...crmScope(actor), anonymizedAt: null };
-  if (filters.buscar) where[Op.or] = ['name', 'email'].map((key) => ({ [key]: { [Op.like]: `%${filters.buscar.replace(/[%_\\]/g, '')}%` } }));
+  if (filters.buscar) where[Op.or] = ['name', 'email'].map((key) => ({ [key]: { [likeOp]: `%${filters.buscar.replace(/[%_\\]/g, '')}%` } }));
   const { rows, count } = await CrmProspect.findAndCountAll({ where, order: [['name', 'ASC']], limit: pagination.limit, offset: pagination.offset });
   return { data: rows, meta: pageMeta(pagination, count) };
 }

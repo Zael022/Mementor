@@ -1,5 +1,7 @@
 'use strict';
 
+const { cambiarEnum } = require('../compat.cjs');
+
 // Gobernanza de datos (Ley 8968): rol auditor, aceptación de políticas y solicitudes de eliminación.
 const ROLES_ANTES = ['platform_admin', 'institution_admin', 'teacher', 'student'];
 const fechas = (Sequelize) => ({
@@ -12,7 +14,7 @@ const ref = (Sequelize, tabla, onDelete = 'CASCADE', allowNull = false) => ({
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.changeColumn('users', 'role', { type: Sequelize.ENUM(...ROLES_ANTES, 'auditor'), allowNull: false });
+    await cambiarEnum(queryInterface, Sequelize, 'users', 'role', [...ROLES_ANTES, 'auditor'], { allowNull: false });
     // Momento en que se anonimizó la cuenta por una solicitud de baja.
     await queryInterface.addColumn('users', 'anonymized_at', { type: Sequelize.DATE, allowNull: true });
 
@@ -45,11 +47,11 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('data_deletion_requests');
-    await queryInterface.dropTable('consent_records');
+    await queryInterface.dropTable('data_deletion_requests', {});
+    await queryInterface.dropTable('consent_records', {});
     await queryInterface.removeColumn('users', 'anonymized_at');
     // Antes de quitar el rol se desactivan las cuentas de auditoría para no romper el ENUM.
     await queryInterface.sequelize.query("UPDATE users SET role = 'teacher', status = 'disabled' WHERE role = 'auditor'");
-    await queryInterface.changeColumn('users', 'role', { type: Sequelize.ENUM(...ROLES_ANTES), allowNull: false });
+    await cambiarEnum(queryInterface, Sequelize, 'users', 'role', ROLES_ANTES, { allowNull: false });
   },
 };

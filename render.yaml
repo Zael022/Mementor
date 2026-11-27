@@ -1,4 +1,5 @@
-# Blueprint de Render para la API de MENTOR AI (plan gratuito).
+# Blueprint de Render para la API de MENTOR AI (plan gratuito), rama despliegue-nube.
+# Arquitectura: Vercel (frontend) → Render (esta API) → Supabase (PostgreSQL y archivos). Guía: docs/despliegue.md.
 # Los valores secretos (sync: false) se escriben en el panel de Render; nunca en el repositorio.
 services:
   - type: web
@@ -14,7 +15,7 @@ services:
     startCommand: npm run db:migrate && npm start
     healthCheckPath: /api/v1/health
     autoDeploy: true
-    branch: main
+    branch: despliegue-nube
     envVars:
       - key: NODE_ENV
         value: production
@@ -25,28 +26,35 @@ services:
         value: "2"
       - key: RAG_PROVIDER
         value: local
-      # El disco del plan gratuito se borra al reiniciar: los originales van a Cloud Storage.
+      # El disco del plan gratuito se borra al reiniciar: los originales van a un bucket privado de Supabase Storage.
       - key: STORAGE_DRIVER
-        value: gcs
-      - key: STORAGE_GCS_BUCKET
+        value: supabase
+      - key: SUPABASE_URL
         sync: false
-      - key: GOOGLE_APPLICATION_CREDENTIALS
-        value: /etc/secrets/gcp-mentor-storage.json
+      # Clave secreta del proyecto (sb_secret_…): solo vive en Render, nunca en Vercel ni en el navegador.
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: SUPABASE_BUCKET
+        value: mentor-originales
+      # Base de datos: PostgreSQL de Supabase por el «Session pooler» (IPv4, puerto 5432).
+      - key: DB_DIALECT
+        value: postgres
+      - key: DATABASE_URL
+        sync: false
       - key: DB_SSL
         value: "true"
+      # Certificado raíz que entrega Supabase (Database Settings → SSL Configuration), pegado completo.
+      - key: DB_SSL_CA_PEM
+        sync: false
+      # El pooler gratuito admite pocas conexiones: la API usa como máximo 5.
+      - key: DB_POOL_MAX
+        value: "5"
+      # Modo de prueba apagado: las cuentas de prueba no entran en la nube (ADR 0011).
+      - key: DEMO_MODE
+        value: "off"
       - key: FRONTEND_ORIGIN
         sync: false
       - key: APP_URL
-        sync: false
-      - key: DB_HOST
-        sync: false
-      - key: DB_PORT
-        sync: false
-      - key: DB_NAME
-        sync: false
-      - key: DB_USER
-        sync: false
-      - key: DB_PASSWORD
         sync: false
       - key: JWT_SECRET
         generateValue: true

@@ -162,7 +162,7 @@ module.exports = {
       'grade_bonus_events', 'course_streaks', 'daily_practice_answers', 'daily_practices',
       'quiz_play_answers', 'quiz_plays', 'quick_quiz_options', 'quick_quiz_questions', 'quick_quizzes', 'class_work_grades', 'class_work_items', 'course_grade_policies',
     ]) {
-      await queryInterface.dropTable(tabla);
+      await queryInterface.dropTable(tabla, {});
     }
   },
 };

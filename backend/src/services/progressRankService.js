@@ -1,5 +1,5 @@
 import { QueryTypes } from 'sequelize';
-import { sequelize } from '../models/index.js';
+import { runSql } from '../utils/sql.js';
 
 // Rango de avance por curso (ADR 0010). Mide avance, no rendimiento: no toca la nota ni el dominio.
 // Avance = (lecciones completadas + tareas entregadas) ÷ (lecciones publicadas + tareas publicadas).
@@ -58,24 +58,24 @@ export async function getProgressRanks({ courseIds, studentIds, transaction } = 
   if (!courseIds?.length || !studentIds?.length) return ranks;
   const options = { replacements: { courseIds, studentIds }, type: QueryTypes.SELECT, transaction };
   const [lessonTotals, lessonDone, assignmentTotals, assignmentDone] = await Promise.all([
-    sequelize.query(
+    runSql(
       `SELECT course_id AS courseId, COUNT(*) AS total FROM lessons
         WHERE course_id IN (:courseIds) AND status = 'published' GROUP BY course_id`,
       options,
     ),
-    sequelize.query(
+    runSql(
       `SELECT l.course_id AS courseId, lp.student_id AS studentId, COUNT(*) AS done
          FROM lesson_progress lp JOIN lessons l ON l.id = lp.lesson_id AND l.status = 'published'
         WHERE l.course_id IN (:courseIds) AND lp.student_id IN (:studentIds)
         GROUP BY l.course_id, lp.student_id`,
       options,
     ),
-    sequelize.query(
+    runSql(
       `SELECT course_id AS courseId, COUNT(*) AS total FROM assignments
         WHERE course_id IN (:courseIds) AND status = 'published' GROUP BY course_id`,
       options,
     ),
-    sequelize.query(
+    runSql(
       `SELECT a.course_id AS courseId, s.student_id AS studentId, COUNT(*) AS done
          FROM assignment_submissions s JOIN assignments a ON a.id = s.assignment_id AND a.status = 'published'
         WHERE a.course_id IN (:courseIds) AND s.student_id IN (:studentIds)
@@ -122,7 +122,7 @@ export async function getCourseRanks(courseId, studentIds) {
 // Avance de un módulo: lecciones publicadas y tareas publicadas ligadas a sus temas.
 // «justCompleted» permite celebrar «¡Terminaste el módulo!» solo en la acción que lo completa.
 export async function getModuleProgress(studentId, moduleId, { transaction } = {}) {
-  const [row] = await sequelize.query(
+  const [row] = await runSql(
     `SELECT m.id, m.title,
             (SELECT COUNT(*) FROM lessons l JOIN topics t ON t.id = l.topic_id
               WHERE t.module_id = m.id AND l.status = 'published') AS lessonsTotal,

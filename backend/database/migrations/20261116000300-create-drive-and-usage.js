@@ -75,10 +75,10 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('ai_usage_events');
+    await queryInterface.dropTable('ai_usage_events', {});
     await queryInterface.removeColumn('knowledge_sources', 'last_seen_run');
     await queryInterface.removeColumn('knowledge_sources', 'drive_link_id');
-    await queryInterface.dropTable('course_drive_links');
-    await queryInterface.dropTable('institution_drive_folders');
+    await queryInterface.dropTable('course_drive_links', {});
+    await queryInterface.dropTable('institution_drive_folders', {});
   },
 };

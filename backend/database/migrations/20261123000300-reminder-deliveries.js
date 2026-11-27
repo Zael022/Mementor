@@ -22,6 +22,6 @@ module.exports = {
 
   async down(queryInterface) {
     await queryInterface.removeColumn('user_preferences', 'email_reminders');
-    await queryInterface.dropTable('reminder_deliveries');
+    await queryInterface.dropTable('reminder_deliveries', {});
   },
 };

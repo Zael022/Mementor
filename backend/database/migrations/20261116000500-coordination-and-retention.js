@@ -41,8 +41,8 @@ module.exports = {
 
   async down(queryInterface) {
     await queryInterface.removeColumn('source_versions', 'text_purged_at');
-    await queryInterface.dropTable('ai_usage_monthly');
-    await queryInterface.dropTable('rate_limit_hits');
-    await queryInterface.dropTable('job_leases');
+    await queryInterface.dropTable('ai_usage_monthly', {});
+    await queryInterface.dropTable('rate_limit_hits', {});
+    await queryInterface.dropTable('job_leases', {});
   },
 };

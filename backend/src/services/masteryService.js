@@ -1,8 +1,9 @@
 import { QueryTypes } from 'sequelize';
-import { Module, Topic, TopicMastery, TopicPrerequisite, LearningRecommendation, sequelize } from '../models/index.js';
+import { Module, Topic, TopicMastery, TopicPrerequisite, LearningRecommendation } from '../models/index.js';
 import { forbidden } from '../utils/AppError.js';
 import { MASTERY, computeMastery, evidenceLabel, recommendationType } from '../utils/mastery.js';
 import { getCourseAccess } from './accessService.js';
+import { runSql } from '../utils/sql.js';
 
 // Obtiene los temas del curso en el orden en que se estudian.
 export async function orderedTopics(courseId, transaction) {
@@ -45,7 +46,7 @@ function buildReason(type, { correctCount, evidenceCount, score }, nextTopic) {
 export async function refreshMastery({ studentId, courseId, topicIds, transaction }) {
   const results = [];
   for (const topicId of [...new Set(topicIds)]) {
-    const rows = await sequelize.query(
+    const rows = await runSql(
       `SELECT aa.is_correct AS isCorrect
          FROM attempt_answers aa
          JOIN assessment_attempts att ON att.id = aa.attempt_id

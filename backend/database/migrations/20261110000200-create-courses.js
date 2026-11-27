@@ -94,7 +94,7 @@ module.exports = {
 
   async down(queryInterface) {
     for (const tabla of ['lesson_progress', 'lessons', 'topic_prerequisites', 'topics', 'modules', 'enrollments', 'course_teachers', 'courses']) {
-      await queryInterface.dropTable(tabla);
+      await queryInterface.dropTable(tabla, {});
     }
   },
 };

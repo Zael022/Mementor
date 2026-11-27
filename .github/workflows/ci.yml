@@ -1,5 +1,5 @@
 # Integración continua: lint, pruebas y compilación en cada push y pull request.
-# Las pruebas usan MySQL 8.4 en un contenedor y dobles de Google Cloud y del modelo: no necesitan secretos.
+# Las pruebas usan MySQL 8.4 (y PostgreSQL 17 para Supabase) en contenedores y dobles de Google Cloud y del modelo: no necesitan secretos.
 name: CI
 
 on:
@@ -51,6 +51,40 @@ jobs:
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
       - run: npm run lint
+      - run: npm test
+
+  backend-postgres:
+    # Rama despliegue-nube: las mismas pruebas contra PostgreSQL 17, el motor de Supabase.
+    name: Backend en PostgreSQL (Supabase)
+    runs-on: ubuntu-latest
+    env:
+      TEST_DB_DIALECT: postgres
+      TEST_DB_HOST: 127.0.0.1
+      TEST_DB_PORT: 5432
+      TEST_DB_NAME: mentor_ai_test
+      TEST_DB_USER: postgres
+      TEST_DB_PASSWORD: raiz_solo_ci
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: raiz_solo_ci
+          POSTGRES_DB: mentor_ai_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.22.2
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
       - run: npm test
 
   frontend:

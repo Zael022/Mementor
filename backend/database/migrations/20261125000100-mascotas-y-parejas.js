@@ -4,6 +4,8 @@
 // El rango de avance no necesita tabla: se calcula al consultar (ADR 0010).
 module.exports = {
   async up(queryInterface, Sequelize) {
+    // PostgreSQL no tiene TINYINT: allí se usa SMALLINT (MySQL queda igual).
+    const pequeno = queryInterface.sequelize.getDialect() === 'postgres' ? Sequelize.SMALLINT : Sequelize.TINYINT.UNSIGNED;
     await queryInterface.addColumn('user_preferences', 'show_mascots', { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: true });
     await queryInterface.addColumn('user_preferences', 'show_big_celebrations', { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: true });
 
@@ -23,9 +25,9 @@ module.exports = {
       module_id: fk('modules'),
       student_id: fk('users'),
       status: { type: Sequelize.ENUM('in_progress', 'finished'), allowNull: false, defaultValue: 'in_progress' },
-      pair_count: { type: Sequelize.TINYINT.UNSIGNED, allowNull: false },
+      pair_count: { type: pequeno, allowNull: false },
       board: { type: Sequelize.JSON, allowNull: false },
-      matched_pairs: { type: Sequelize.TINYINT.UNSIGNED, allowNull: false, defaultValue: 0 },
+      matched_pairs: { type: pequeno, allowNull: false, defaultValue: 0 },
       attempts: { type: Sequelize.SMALLINT.UNSIGNED, allowNull: false, defaultValue: 0 },
       started_at: { type: Sequelize.DATE(3), allowNull: false },
       finished_at: { type: Sequelize.DATE(3), allowNull: true },
@@ -37,7 +39,7 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('memory_games');
+    await queryInterface.dropTable('memory_games', {});
     await queryInterface.removeColumn('user_preferences', 'show_big_celebrations');
     await queryInterface.removeColumn('user_preferences', 'show_mascots');
   },

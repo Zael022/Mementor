@@ -426,6 +426,8 @@ export async function listAuthorizedVersions(courseId) {
       { model: Material, as: 'material', attributes: ['id', 'lessonId'], include: [{ model: Lesson, as: 'lesson', attributes: ['id', 'status'] }] },
       { model: CourseDriveLink, as: 'driveLink', attributes: ['id', 'status'] },
     ],
+    // Orden fijo: a igual puntaje, la búsqueda prefiere siempre la misma fuente en cualquier motor.
+    order: [['id', 'ASC']],
     raw: true,
     nest: true,
   });

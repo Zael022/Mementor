@@ -6,6 +6,7 @@ import { forbidden } from '../utils/AppError.js';
 import { clock, dayKey } from '../utils/clock.js';
 import { getStudentRanks } from './progressRankService.js';
 import { sessionDto } from './sessionService.js';
+import { runSql } from '../utils/sql.js';
 
 // Última actividad de aprendizaje real (no cuenta el inicio de sesión): lecciones, entregas, evaluaciones,
 // quizzes, práctica diaria, Parejas, tutor y clases en vivo.
@@ -31,7 +32,7 @@ export function daysBetween(from, to = clock.now()) {
 }
 
 export async function getLastActivity(user) {
-  const [row] = await sequelize.query(LAST_ACTIVITY_SQL, { replacements: { id: user.id }, type: QueryTypes.SELECT });
+  const [row] = await runSql(LAST_ACTIVITY_SQL, { replacements: { id: user.id }, type: QueryTypes.SELECT });
   const lastActivityAt = row?.lastActivityAt ? new Date(row.lastActivityAt) : null;
   return { lastActivityAt, daysAway: daysBetween(lastActivityAt) };
 }

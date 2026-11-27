@@ -20,6 +20,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('password_resets');
+    await queryInterface.dropTable('password_resets', {});
   },
 };

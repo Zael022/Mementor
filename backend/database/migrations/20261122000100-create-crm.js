@@ -34,6 +34,6 @@ module.exports = {
     for (const table of ['crm_admission_cycles', 'crm_message_drafts', 'crm_consent_records', 'crm_privacy_cases']) await q.addIndex(table, ['institution_id', 'created_at'], { name: `ix_${table}_institution` });
   },
   async down(q) {
-    for (const table of ['crm_privacy_cases', 'crm_consent_records', 'crm_message_drafts', 'crm_followups', 'crm_stage_events', 'crm_applications', 'crm_prospects', 'crm_admission_cycles']) await q.dropTable(table);
+    for (const table of ['crm_privacy_cases', 'crm_consent_records', 'crm_message_drafts', 'crm_followups', 'crm_stage_events', 'crm_applications', 'crm_prospects', 'crm_admission_cycles']) await q.dropTable(table, {});
   },
 };

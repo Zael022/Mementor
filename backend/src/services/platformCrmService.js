@@ -1,8 +1,8 @@
-import { Op } from 'sequelize';
 import { Institution, PlatformCrmAccount, PlatformCrmContact, sequelize } from '../models/index.js';
 import { conflict, notFound } from '../utils/AppError.js';
 import { pageMeta, readPagination } from '../utils/http.js';
 import { recordAudit } from './auditService.js';
+import { likeOp } from '../utils/sql.js';
 
 const audit = (actor, action, id, institutionId, transaction) => recordAudit({
   actor: { id: actor.id, institutionId: null }, action, resourceType: 'platform_crm', resourceId: id,
@@ -11,7 +11,7 @@ const audit = (actor, action, id, institutionId, transaction) => recordAudit({
 
 export async function listInstitutions(query) {
   const pagination = readPagination(query);
-  const where = query.search ? { name: { [Op.like]: `%${query.search}%` } } : {};
+  const where = query.search ? { name: { [likeOp]: `%${query.search}%` } } : {};
   const { rows, count } = await Institution.findAndCountAll({ where, include: [{ model: PlatformCrmAccount, as: 'platformCrmAccount' }], order: [['name', 'ASC'], ['id', 'ASC']], limit: pagination.limit, offset: pagination.offset });
   return { data: rows.map((row) => ({ id: row.id, name: row.name, status: row.status, account: row.platformCrmAccount })), meta: pageMeta(pagination, count) };
 }

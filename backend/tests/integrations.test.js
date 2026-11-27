@@ -10,6 +10,7 @@ import { setExternalFetchForTests } from '../src/services/external/httpClient.js
 import { clearHolidayCache } from '../src/services/external/holidayService.js';
 import { clock, dayKey } from '../src/utils/clock.js';
 import { closeDatabase, createPlatformAdmin, loginAs, PASSWORD, prepareDatabase, setupCourse, setupInstitution } from './helpers.js';
+import { nowMinus } from '../src/utils/sql.js';
 
 // Prueba las APIs externas (simuladas) y los endpoints de n8n.
 const ctx = {};
@@ -242,7 +243,7 @@ test('una solicitud de baja que quedó pendiente se completa en la conciliación
   const usuario = await ctx.org.invite(ctx.org.admin, '/users', { email: 'baja.pendiente@prueba.test', displayName: 'Baja Pendiente', role: 'student' });
   // Simula una baja interrumpida: la solicitud existe, pero la cuenta sigue intacta.
   const fila = await DataDeletionRequest.create({ userId: usuario.user.id, institutionId: usuario.user.institutionId, identityConfirmedAt: new Date() });
-  await sequelize.query('UPDATE data_deletion_requests SET created_at = NOW() - INTERVAL 1 HOUR WHERE id = :id', { replacements: { id: fila.id } });
+  await sequelize.query(`UPDATE data_deletion_requests SET created_at = ${nowMinus('1', 'HOUR')} WHERE id = :id`, { replacements: { id: fila.id } });
   assert.equal(await reconcilePendingDeletions(), 1);
   assert.equal((await DataDeletionRequest.findByPk(fila.id)).status, 'completed');
   assert.equal((await User.findByPk(usuario.user.id)).displayName, 'Usuario eliminado');
