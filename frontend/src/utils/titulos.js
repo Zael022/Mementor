@@ -12,6 +12,7 @@ const TITULOS = [
   [/gobernanza$/, 'Gobernanza de datos'],
   [/bitacora$/, 'Bitácora'],
   [/^\/asistentes$/, 'Asistentes de IA'],
+  [/^\/asistentes\/[^/]+$/, 'Asistente de IA'],
   [/\/tutor\//, 'Tutor'],
   [/\/citas\//, 'Fuente citada'],
   [/\/contenidos$/, 'Trabajo en clase'],
