@@ -1,6 +1,15 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-28. `npm run ia:verificar` para activar la IA y Parte A del paquete de comunidad (Pausa paseante); antes, 2026-11-27: Configuración, logo «MENTOR IA», mapa con fondo nuevo y mascotas interactivas; antes, 2026-11-26: modo de prueba con cuentas por rol y acceso rápido.
+**Última actualización** — 2026-11-27. Asistentes de IA con página propia en otra pestaña y color por asistente; antes: `npm run ia:verificar` y Parte A del paquete de comunidad (Pausa paseante); Configuración, logo «MENTOR IA», mapa con fondo nuevo y mascotas interactivas.
+
+## Sesión 2026-11-27 · Asistentes de IA: otra pestaña y más color
+Daisy pidió (video) que «Usar» abra otra pestaña en vez de mostrar el formulario abajo, y que la página tenga más color porque casi todo quedaba en dos colores. Rama `feature/asistentes-pestana-color`.
+
+- **Página propia por asistente**: nueva ruta `/asistentes/:clave` (`Pages/Asistente.jsx`, carga diferida). «Usar» es un enlace con `target="_blank"` y `rel="noopener"`, con texto para lector de pantalla «(se abre en otra pestaña)». La sesión va en cookie, así que la pestaña nueva entra sin volver a iniciar sesión. Formulario a la izquierda, resultado a la derecha (una columna en móvil), con estado vacío y los últimos 5 usos de ese asistente. Si la clave no existe o no es del rol: aviso y enlace de regreso. El tutor y el redactor de admisiones siguen abriendo su sección en la misma pestaña.
+- **Color**: cada asistente tiene acento, ícono y categoría (`utils/asistentesVisual.js`, `Componentes/IconoAsistente.jsx`; los íconos viven fuera de `Iconos.jsx` para no pesar en la carga inicial). Los tonos suaves salen de `color-mix` con `--panel`, así sirven en claro, oscuro y alto contraste. Contraste medido: blanco sobre cada acento ≥ 4,98:1; texto de acento sobre su fondo suave ≥ 6,7:1 en claro y ≥ 6,0:1 en oscuro. El color nunca va solo: siempre con nombre e ícono.
+- La lista tiene portada con degradado de colores, chips de datos, tarjetas tintadas y el historial con un chip de color por asistente; el historial se recarga al volver a la pestaña (`visibilitychange`).
+- Pruebas: `tests/Asistentes.test.jsx` (3) y e2e `gobernanza-agentes` adaptada a la pestaña nueva (8/8 en escritorio y móvil). Frontend: lint limpio, Vitest 107/107, build bien; JS inicial 97,6 KiB gzip (antes 97,5).
+- Pendiente opcional: llevar la misma paleta de acentos a otras pantallas si Daisy la aprueba.
 
 ## Sesión 2026-11-28 · Activar la IA: `npm run ia:verificar`
 Daisy pidió «habilitar todas las funciones de la IA que no funcionan». Las 9 funciones (el tutor y 8 asistentes) ya están programadas. No funcionan solo porque falta configurar la clave del proveedor: sin ella responden `AI_NOT_CONFIGURED` y nunca inventan contenido. La clave la pone Daisy en su `backend/.env`; el agente no maneja claves. Rama `feature/verificar-ia`, desde `develop`.
