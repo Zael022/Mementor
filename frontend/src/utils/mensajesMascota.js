@@ -46,3 +46,33 @@ export const MENSAJE_TUTOR_PENSANDO = 'Buscando en el material del curso…';
 
 // Racha: celebra lo logrado, nunca amenaza con perderla.
 export const mensajeRacha = (dias) => `Racha de ${plural(dias, 'día', 'días')}. ¡Bien hecho!`;
+
+// Lo que dicen Orbi y Pausa cuando alguien los toca: se recorren en orden, sin repetir seguido.
+export const FRASES_TOQUE = {
+  orbi: [
+    '¡Hola! Soy Orbi, tu guía del curso.',
+    'Cada parada del mapa te acerca a Constelación.',
+    'Si algo no queda claro, el tutor responde con el material de tu curso.',
+    '¡Choca esos cinco!',
+    'Un paso a la vez también es avanzar.',
+  ],
+  pausa: [
+    '¡Hola! Soy Pausa. Aquí vamos a tu ritmo.',
+    'Respira hondo… y seguimos.',
+    'Descansar también es parte de aprender.',
+    'Un ratito cada día suma mucho.',
+  ],
+};
+export const FRASE_DESPIERTA = 'Zzz… ¡ah, hola! Ya desperté.';
+// Orbi en el mapa, al tocarlo.
+export const mensajeOrbiMapa = (siguiente) => (siguiente ? `¡Vamos! Sigue «${siguiente}».` : '¡Recorriste todo el mapa! ¡Bien hecho!');
+// Orbi comenta la parada que la persona mira (con el puntero o el teclado). Es decorativo: el estado ya lo dice la tarjeta.
+export const FRASES_MAPA = {
+  completada: '¡Esa ya la hiciste!',
+  siguiente: '¡Esa es la que sigue!',
+  pendiente: 'Esa viene más adelante.',
+  practica: '¡Ahí practicamos con Parejas!',
+  'sin-preguntas': 'Aquí habrá práctica pronto.',
+  orbi: '¿Te llevo a la siguiente parada?',
+  orbiCompleto: '¡Tócame y celebramos!',
+};

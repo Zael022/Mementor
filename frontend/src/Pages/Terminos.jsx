@@ -6,7 +6,7 @@ export default function Terminos() {
   return (
     <DocumentoLegal titulo="Términos y condiciones" version={VERSIONES_LEGALES.terms}>
       <h2>1. Uso de la plataforma</h2>
-      <p>MENTOR AI es una herramienta educativa. Al activar tu cuenta aceptas usarla solo para fines de aprendizaje y enseñanza dentro de tu institución.</p>
+      <p>MENTOR IA es una herramienta educativa. Al activar tu cuenta aceptas usarla solo para fines de aprendizaje y enseñanza dentro de tu institución.</p>
 
       <h2>2. Responsabilidades de la persona usuaria</h2>
       <ul>
@@ -32,7 +32,7 @@ export default function Terminos() {
       </ul>
 
       <h2>5. Limitación de responsabilidad sobre la IA</h2>
-      <p>Las respuestas de la inteligencia artificial pueden contener errores u omisiones. No sustituyen al docente ni constituyen una calificación oficial. La corrección de las evaluaciones es automática y determinista, y la nota final la valida el docente. MENTOR AI no se hace responsable de decisiones tomadas solo con base en respuestas generadas por IA.</p>
+      <p>Las respuestas de la inteligencia artificial pueden contener errores u omisiones. No sustituyen al docente ni constituyen una calificación oficial. La corrección de las evaluaciones es automática y determinista, y la nota final la valida el docente. MENTOR IA no se hace responsable de decisiones tomadas solo con base en respuestas generadas por IA.</p>
 
       <h2>6. Suspensión y baja</h2>
       <p>La institución puede deshabilitar una cuenta que incumpla estos términos. Puedes darte de baja en cualquier momento desde Configuración → Privacidad y datos.</p>

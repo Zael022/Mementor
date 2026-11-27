@@ -1,9 +1,8 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import Avatar from './Avatar.jsx';
 import AvisoConsentimiento from './AvisoConsentimiento.jsx';
 import Logo from './Logo.jsx';
-import Icono from './Iconos.jsx';
 import BarraLateral from './BarraLateral.jsx';
 import { Cargando } from './Estados.jsx';
 import LimiteErrores from './LimiteErrores.jsx';
@@ -20,8 +19,7 @@ const ROLES = {
 
 // Estructura tipo aula: barra superior, barra lateral con las clases y el contenido de cada página.
 export default function Layout() {
-  const { usuario, cerrarSesion } = useSesion();
-  const navegar = useNavigate();
+  const { usuario } = useSesion();
   const { pathname } = useLocation();
   const principal = useRef(null);
   const primeraVisita = useRef(true);
@@ -39,11 +37,6 @@ export default function Layout() {
     window.scrollTo({ top: 0 });
   }, [pathname]);
 
-  async function salir() {
-    await cerrarSesion();
-    navegar('/login');
-  }
-
   return (
     <div className={`app aula ${menuAbierto ? 'menu-abierto' : ''}`}>
       <a className="saltar" href="#contenido">Saltar al contenido</a>
@@ -52,7 +45,7 @@ export default function Layout() {
           aria-controls="barra-lateral" onClick={() => setMenuAbierto((abierto) => !abierto)}>
           <span aria-hidden="true" />
         </button>
-        <Logo como={Link} to="/" aria-label="MENTOR AI, ir al inicio" />
+        <Logo como={Link} to="/" aria-label="MENTOR IA, ir al inicio" />
         <div className="perfil">
           <Link to="/configuracion" className="perfil-enlace" aria-label="Configuración de tu perfil">
             <Avatar nombre={usuario.displayName} url={usuario.avatarUrl} className="perfil-inicial" />
@@ -61,7 +54,6 @@ export default function Layout() {
             <strong>{usuario.displayName}</strong>
             <span>{ROLES[usuario.role]}{usuario.institutionName ? `, ${usuario.institutionName}` : ''}</span>
           </div>
-          <button type="button" className="boton secundario con-icono" onClick={salir}><Icono nombre="salir" tamano={18} />Cerrar sesión</button>
         </div>
       </header>
       <div className="aula-cuerpo">

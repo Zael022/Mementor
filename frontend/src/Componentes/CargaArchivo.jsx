@@ -6,7 +6,7 @@ import Icono from './Iconos.jsx';
 
 // Adaptación del componente File Upload de Aceternity UI (https://ui.aceternity.com/components/file-upload):
 // zona con patrón de cuadrícula, react-dropzone y la ficha del archivo animada con Motion.
-// Cambios de MENTOR AI: un solo archivo, botón real para teclado, formatos y tamaño del servidor, estilos del proyecto.
+// Cambios de MENTOR IA: un solo archivo, botón real para teclado, formatos y tamaño del servidor, estilos del proyecto.
 
 export const FORMATOS = {
   'application/pdf': ['.pdf'],

@@ -46,28 +46,109 @@
 /* --- Mapa del curso --- */
 .mapa { margin-top: 6px; }
 .mapa-completo { margin: 0 0 12px; font-weight: 700; color: var(--lima-hondo); }
+/* Fondo del mapa: un cielo que va de celeste a claro, con dos capas de estrellas y la retícula de puntos.
+   Todo es fondo: las tarjetas van sobre panel blanco y mantienen su contraste. */
 .mapa-ventana {
   position: relative; scroll-margin-top: 90px; max-height: min(74vh, 780px); overflow-y: auto; overscroll-behavior: contain;
   border: 1.5px solid var(--linea); border-radius: var(--radio-grande);
   background:
+    radial-gradient(circle at 18% 22%, color-mix(in srgb, var(--azul) 45%, transparent) 0 1.6px, transparent 2.2px) 0 0 / 170px 150px,
+    radial-gradient(circle at 72% 64%, color-mix(in srgb, var(--lima-hondo) 45%, transparent) 0 1.3px, transparent 1.9px) 0 0 / 130px 190px,
+    radial-gradient(circle at 46% 8%, color-mix(in srgb, var(--naranja) 40%, transparent) 0 1.1px, transparent 1.7px) 0 0 / 210px 120px,
     radial-gradient(circle at 1px 1px, var(--patron-2) 1.2px, transparent 1.6px) 0 0 / 22px 22px,
-    var(--panel);
+    linear-gradient(180deg, var(--cielo) 0, var(--panel) 360px, var(--fondo) 100%);
+  background-attachment: local;
   scroll-padding-block: 90px;
 }
-.mapa-lienzo { position: relative; padding: 18px clamp(12px, 3vw, 28px) 36px; }
+.mapa-lienzo { position: relative; isolation: isolate; padding: 18px clamp(12px, 3vw, 28px) 36px; }
 .mapa-camino { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
 .camino-base { fill: none; stroke: var(--linea-fuerte); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 0.1 14; opacity: 0.7; }
 .camino-borde { fill: none; stroke: var(--lima-hondo); stroke-width: 13; stroke-linecap: round; }
 .camino-avance { fill: none; stroke: var(--lima); stroke-width: 8; stroke-linecap: round; }
 .mapa-modulos, .mapa-paradas { list-style: none; margin: 0; padding: 0; }
-.mapa-modulo { position: relative; }
-.mapa-modulo + .mapa-modulo { margin-top: 10px; }
+/* Cada módulo es una zona con su propio tono; el fondo va detrás del camino (z-index -1 dentro del lienzo). */
+.mapa-modulo { position: relative; padding: 4px 0 18px; }
+.mapa-modulo + .mapa-modulo { margin-top: 18px; }
+.mapa-modulo::before {
+  content: ''; position: absolute; z-index: -1; inset: 0 -6px; border-radius: 36px 36px 28px 28px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tono-zona, var(--cielo)) 35%, transparent), var(--tono-zona, var(--cielo)));
+  border: 1.5px solid color-mix(in srgb, var(--tono-borde, var(--azul)) 18%, transparent);
+}
+.mapa-modulo.zona-0 { --tono-zona: var(--cielo); --tono-borde: var(--azul); --tono-adorno: var(--azul); }
+.mapa-modulo.zona-1 { --tono-zona: var(--suave-exito); --tono-borde: var(--lima-hondo); --tono-adorno: var(--lima-hondo); }
+.mapa-modulo.zona-2 { --tono-zona: var(--suave-naranja); --tono-borde: var(--naranja); --tono-adorno: var(--naranja); }
+.mapa-modulo.zona-3 { --tono-zona: var(--suave-neutro); --tono-borde: var(--azul-hondo); --tono-adorno: var(--azul-hondo); }
+.mapa-modulo.terminado::before { border-color: var(--borde-exito); box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--lima) 40%, transparent); }
+
+/* Adornos de cada zona: colinas abajo, una constelación, destellos que titilan y nubes que flotan. */
+.mapa-adornos { position: absolute; inset: 0 -6px; z-index: -1; pointer-events: none; overflow: hidden; border-radius: 36px 36px 28px 28px; }
+.zona-colinas { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 90px; }
+.zona-colinas .colina-atras { fill: var(--tono-adorno); opacity: 0.12; }
+.zona-colinas .colina-frente { fill: var(--tono-adorno); opacity: 0.2; }
+.zona-constelacion { position: absolute; top: 18px; right: 4%; width: 120px; height: 70px; stroke: var(--tono-adorno); fill: var(--tono-adorno); opacity: 0.35; }
+.zona-constelacion path { fill: none; stroke-width: 1.2; stroke-dasharray: 3 4; }
+.adorno { position: absolute; fill: var(--tono-adorno); stroke: var(--tono-adorno); opacity: 0.35; }
+.adorno.a-1 { top: 7%; left: 3%; }
+.adorno.a-2 { top: 40%; right: 4%; }
+.adorno.a-3 { bottom: 26%; left: 9%; width: 14px; height: 14px; opacity: 0.45; }
+.adorno.a-4 { top: 22%; left: 30%; }
+.adorno.a-5 { top: 60%; left: 2%; width: 12px; height: 12px; }
+.adorno.nube { stroke: none; fill: var(--panel); opacity: 0.95; filter: drop-shadow(0 3px 0 color-mix(in srgb, var(--tono-adorno) 20%, transparent)); }
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-movimiento="reducido"]) .adorno.destello { animation: titilar 3.4s ease-in-out infinite; }
+  html:not([data-movimiento="reducido"]) .adorno.a-3 { animation-delay: 1.3s; }
+  html:not([data-movimiento="reducido"]) .adorno.a-5 { animation-delay: 2.2s; }
+  html:not([data-movimiento="reducido"]) .adorno.nube { animation: derivar 26s ease-in-out infinite alternate; }
+  html:not([data-movimiento="reducido"]) .adorno.planeta { animation: flotar-planeta 7s ease-in-out infinite; }
+}
+@keyframes titilar { 0%, 100% { opacity: 0.2; transform: scale(0.85) rotate(0deg); } 50% { opacity: 0.6; transform: scale(1.1) rotate(20deg); } }
+@keyframes derivar { from { transform: translateX(0); } to { transform: translateX(-60px); } }
+@keyframes flotar-planeta { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-6px) rotate(-6deg); } }
+
+/* Resumen sobre el mapa: avance total, barra y leyenda de estados. */
+.mapa-resumen {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 16px;
+  margin-bottom: 12px; padding: 14px 18px; border-radius: var(--radio-grande);
+  background: var(--panel); border: 1.5px solid var(--linea);
+}
+.mapa-resumen-texto { display: flex; flex-direction: column; gap: 2px; }
+.mapa-resumen-texto strong { font-family: var(--titulos); font-size: 1.05rem; }
+.mapa-resumen-texto .tenue { font-size: 0.88rem; }
+.mapa-porcentaje { font-family: var(--titulos); font-weight: 800; font-size: 1.4rem; color: var(--lima-hondo); grid-row: 1; grid-column: 2; }
+.mapa-barra { grid-column: 1 / -1; height: 12px; border-radius: 999px; background: var(--suave-neutro); overflow: hidden; border: 1.5px solid var(--linea); }
+.mapa-barra span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--lima-hondo), var(--lima)); transition: width 0.6s var(--suave); }
+.mapa-leyenda { grid-column: 1 / -1; list-style: none; display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 2px 0 0; padding: 0; font-size: 0.85rem; color: var(--tenue); }
+.mapa-leyenda li { display: inline-flex; align-items: center; gap: 6px; }
+.muestra { width: 14px; height: 14px; border-radius: 50%; border: 2.5px solid var(--linea-fuerte); background: var(--panel); }
+.muestra.completada { background: var(--lima); border-color: var(--lima-hondo); }
+.muestra.siguiente { border-color: var(--naranja-visible); border-width: 3.5px; }
+.muestra.practica { background: var(--cielo); border-color: var(--azul); }
+
+/* Inicio y meta del recorrido. */
+.mapa-hito {
+  position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: fit-content; margin: 0 auto 12px; padding: 7px 16px; border-radius: 999px;
+  font-family: var(--titulos); font-weight: 700; font-size: 0.95rem;
+  background: var(--panel); color: var(--tinta); border: 2px solid var(--linea-fuerte);
+}
+.mapa-inicio { color: var(--azul-hondo); border-color: var(--azul); }
+.mapa-meta { margin: 22px auto 0; color: var(--tenue); border-style: dashed; }
+.mapa-meta.lograda { background: var(--lima); color: var(--sobre-claro); border: 2px solid var(--lima-hondo); }
 /* Cartel de cada módulo: el camino pasa por detrás. */
 .mapa-cartel {
-  position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 4px 12px;
+  position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 12px;
   width: fit-content; max-width: 100%; margin: 14px auto 12px; padding: 9px 20px;
-  background: var(--tinta); color: var(--panel); border-radius: 999px; box-shadow: 0 10px 22px -16px rgba(20, 25, 61, 0.8);
+  background: var(--tinta); color: var(--panel); border-radius: 999px; box-shadow: 0 6px 0 -1px rgba(20, 25, 61, 0.35), 0 14px 26px -16px rgba(20, 25, 61, 0.8);
 }
+.cartel-numero {
+  padding: 2px 10px; border-radius: 999px; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+  background: var(--lima); color: var(--sobre-claro);
+}
+.mapa-cartel h3 { display: inline-flex; align-items: center; gap: 6px; }
+.cartel-estrella { display: inline-flex; color: var(--lima); }
+.cartel-avance { display: inline-flex; align-items: center; gap: 8px; }
+.cartel-barra { display: inline-block; width: 54px; height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.25); overflow: hidden; }
+.cartel-barra span { display: block; height: 100%; background: var(--lima); border-radius: inherit; }
 :root[data-tema="oscuro"] .mapa-cartel { background: var(--cielo); color: var(--tinta); }
 @media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .mapa-cartel { background: var(--cielo); color: var(--tinta); } }
 .mapa-cartel h3 { font-size: 1.08rem; margin: 0; }
@@ -79,9 +160,10 @@
 .parada-nodo {
   grid-column: 2; grid-row: 1; justify-self: start; margin-left: 22px; z-index: 1;
   display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%;
-  background: var(--panel); color: var(--tenue); border: 3px solid var(--linea-fuerte);
+  background: radial-gradient(circle at 35% 30%, var(--panel) 55%, var(--suave-neutro) 100%);
+  color: var(--tenue); border: 3px solid var(--linea-fuerte);
   font-family: var(--titulos); font-weight: 700; font-size: 1.15rem;
-  box-shadow: 0 6px 0 -1px var(--linea);
+  box-shadow: 0 6px 0 -1px var(--linea), inset 0 0 0 4px var(--panel);
   transition: transform 0.22s var(--suave);
 }
 .parada.lado-der .parada-nodo { justify-self: end; margin: 0 22px 0 0; }
@@ -104,7 +186,14 @@
 /* Estados: forma del ícono + texto, además del color. */
 .parada.completada .parada-nodo { background: var(--lima); border-color: var(--lima-hondo); color: var(--sobre-claro); box-shadow: 0 6px 0 -1px var(--lima-hondo); }
 .parada.completada .parada-estado { color: var(--lima-hondo); font-weight: 700; }
-.parada.siguiente .parada-nodo { border-color: var(--naranja-visible); color: var(--naranja-visible); border-width: 4px; animation: pulso 1.8s ease-out 3; }
+.parada.siguiente .parada-nodo { border-color: var(--naranja-visible); color: var(--naranja-visible); border-width: 4px; animation: pulso 1.8s ease-out infinite; }
+/* Halo giratorio alrededor de la parada siguiente. */
+.parada.siguiente .parada-nodo::after {
+  content: ''; position: absolute; inset: -9px; border-radius: 50%;
+  border: 2.5px dashed var(--naranja-visible); opacity: 0.6; animation: girar 9s linear infinite;
+}
+.parada-nodo { position: relative; }
+@keyframes girar { to { transform: rotate(360deg); } }
 .parada.siguiente .parada-tarjeta { border: 2.5px solid var(--naranja-visible); box-shadow: 0 14px 30px -20px rgba(184, 61, 11, 0.7); }
 .parada.siguiente .parada-estado { color: var(--naranja-hondo); font-weight: 800; }
 :root[data-tema="oscuro"] .parada.siguiente .parada-estado { color: var(--naranja-visible); }
@@ -116,9 +205,19 @@
 .parada-vacio.lado-der .parada-nodo { margin: 0 36px 0 0; }
 .parada-vacia { flex-direction: row; align-items: center; gap: 10px; color: var(--tenue); border-style: dashed; background: transparent; }
 
-/* Orbi camina sobre el camino; GSAP lo ubica con transform. */
+/* Orbi camina sobre el camino; GSAP lo ubica con transform. Solo el botón recibe el puntero. */
 .mapa-orbi { position: absolute; left: 0; top: 0; z-index: 2; width: 64px; pointer-events: none; will-change: auto; }
+.mapa-orbi .mascota-toque { pointer-events: auto; border-radius: 40%; }
 .mapa-orbi svg { display: block; width: 100%; height: auto; }
+.burbuja-mapa {
+  position: absolute; bottom: calc(100% + 8px); left: 50%; width: max-content; max-width: 220px; margin: 0;
+  padding: 7px 12px; border-radius: 14px; font-size: 0.86rem; font-weight: 700; line-height: 1.3; text-align: center;
+  background: var(--tinta); color: var(--panel); box-shadow: var(--sombra-alta);
+  transform: translateX(-50%); opacity: 0; visibility: hidden; transition: opacity 0.2s, visibility 0.2s;
+}
+.burbuja-mapa.visible { opacity: 1; visibility: visible; }
+:root[data-tema="oscuro"] .burbuja-mapa { background: var(--cielo); color: var(--tinta); }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .burbuja-mapa { background: var(--cielo); color: var(--tinta); } }
 
 /* Móvil: el camino es vertical a la izquierda y las tarjetas ocupan el resto. */
 @media (max-width: 720px) {
@@ -131,6 +230,9 @@
   .parada-tarjeta { width: 100%; }
   .mapa-cartel { margin-left: 0; justify-content: flex-start; }
   .mapa-orbi { width: 52px; }
+  .mapa-modulo::before { inset: 0 -4px; border-radius: 22px; }
+  .mapa-hito { margin-left: 4px; }
+  .adorno.a-2, .adorno.a-4, .zona-constelacion { display: none; }
 }
 
 /* --- Sticker de papel (OrbiSticker) --- */
@@ -258,3 +360,25 @@
 @media (max-width: 560px) {
   .pausa-colgada .burbuja-mascota { font-size: 0.86rem; padding: 6px 10px; }
 }
+
+/* --- Mascotas interactivas: un botón sin apariencia de botón alrededor del dibujo --- */
+.mascota-toque {
+  display: block; flex: none; padding: 0; margin: 0; border: 0; background: none; cursor: pointer;
+  border-radius: 50%; line-height: 0; -webkit-tap-highlight-color: transparent;
+}
+.mascota-toque > svg { display: block; overflow: visible; transition: transform 0.25s var(--suave); }
+.mascota-toque:hover > svg { transform: rotate(-3deg) scale(1.04); }
+.mascota-toque:active > svg { transform: scale(0.96); }
+.mascota-toque:focus-visible { outline: 3px solid var(--foco); outline-offset: 4px; }
+.burbuja-toque { animation: burbuja 0.25s var(--suave); }
+
+/* --- Orbi mira el mapa: se inclina hacia la parada señalada y la comenta --- */
+.mapa-orbi .mascota-toque > svg { transition: transform 0.35s var(--suave); }
+.mapa-orbi[data-mira="izq"] .mascota-toque > svg { transform: rotate(-12deg) translateX(-3px); }
+.mapa-orbi[data-mira="der"] .mascota-toque > svg { transform: rotate(12deg) translateX(3px); }
+.mapa-orbi[data-arriba] .mascota-toque > svg { transform: translateY(-3px) rotate(-4deg); }
+.burbuja-mapa.comentario { background: var(--panel); color: var(--tinta); border: 1.5px solid var(--linea); font-weight: 600; }
+:root[data-tema="oscuro"] .burbuja-mapa.comentario { background: var(--panel); color: var(--tinta); }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .burbuja-mapa.comentario { background: var(--panel); color: var(--tinta); } }
+/* La parada que Orbi está mirando se ilumina un poco. */
+.parada.mirada .parada-nodo { transform: scale(1.1); box-shadow: 0 6px 0 -1px var(--linea), 0 0 0 6px color-mix(in srgb, var(--azul) 18%, transparent); }

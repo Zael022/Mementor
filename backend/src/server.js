@@ -21,7 +21,7 @@ try {
     if (curso.created) console.log('Curso de prueba creado con actividad simulada.');
     console.warn('Modo de prueba encendido (DEMO_MODE): cuentas de prueba y acceso rápido habilitados. Apágalo para uso real.');
   }
-  const server = app.listen(port, () => console.log(`MENTOR AI API escuchando en puerto ${port}`));
+  const server = app.listen(port, () => console.log(`MENTOR IA API escuchando en puerto ${port}`));
   const stopJobs = startBackgroundJobs();
   // Al apagar, se libera el turno de tareas para que otra instancia lo tome sin esperar.
   for (const signal of ['SIGINT', 'SIGTERM']) {
@@ -31,6 +31,6 @@ try {
     });
   }
 } catch (error) {
-  console.error('No se pudo iniciar MENTOR AI:', error.message);
+  console.error('No se pudo iniciar MENTOR IA:', error.message);
   process.exitCode = 1;
 }
