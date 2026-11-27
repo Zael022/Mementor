@@ -20,6 +20,9 @@ export const UserPreference = sequelize.define('UserPreference', {
   emailReminders: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   showMascots: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   showBigCelebrations: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+  // Pausa paseante: si puede pasear y el día local en que la persona la escondió «por hoy».
+  pausaWalks: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+  pausaHiddenOn: { type: DataTypes.DATEONLY, allowNull: true },
 }, { tableName: 'user_preferences', underscored: true });
 
 // Estado de memoria de un tema para un estudiante (repaso espaciado).

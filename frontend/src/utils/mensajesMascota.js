@@ -76,3 +76,4 @@ export const FRASES_MAPA = {
   orbi: '¿Te llevo a la siguiente parada?',
   orbiCompleto: '¡Tócame y celebramos!',
 };
+

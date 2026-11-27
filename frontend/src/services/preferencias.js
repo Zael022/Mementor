@@ -12,6 +12,8 @@ export const PREFERENCIAS_BASE = {
   emailReminders: true,
   showMascots: true,
   showBigCelebrations: true,
+  pausaWalks: true,
+  pausaHiddenToday: false,
 };
 
 const CLAVE = 'mentor.preferencias';

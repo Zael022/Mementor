@@ -382,3 +382,40 @@
 @media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .burbuja-mapa.comentario { background: var(--panel); color: var(--tinta); } }
 /* La parada que Orbi está mirando se ilumina un poco. */
 .parada.mirada .parada-nodo { transform: scale(1.1); box-shadow: 0 6px 0 -1px var(--linea), 0 0 0 6px color-mix(in srgb, var(--azul) 18%, transparent); }
+
+/* --- Pausa paseante (Parte A): capa fija bajo la barra superior que no recibe clics; solo Pausa --- */
+.pausa-paseante-capa { position: fixed; left: 0; right: 0; height: 0; z-index: 25; pointer-events: none; }
+.pausa-paseante { position: absolute; top: 0; left: 0; will-change: transform; }
+/* El dibujo empieza en las garras: se sube un poco para que se agarren del borde de la barra. */
+.pausa-paseante-boton {
+  display: block; padding: 0; margin: -11px 0 0; border: 0; background: none; cursor: pointer; line-height: 0;
+  pointer-events: auto; border-radius: 40% 40% 48% 48%; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+.pausa-paseante-boton svg { display: block; overflow: visible; filter: drop-shadow(0 6px 8px rgba(20, 25, 61, 0.18)); }
+.pausa-paseante-boton:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
+.pausa-paseante-burbuja {
+  position: absolute; top: 46%; width: max-content; max-width: min(260px, 70vw); margin: 0; padding: 9px 13px;
+  border-radius: 16px; background: var(--panel); color: var(--tinta); border: 1.5px solid var(--linea-fuerte);
+  font-size: 0.9rem; font-weight: 600; line-height: 1.35; box-shadow: var(--sombra-alta);
+  opacity: 0; visibility: hidden; transition: opacity 0.25s, visibility 0.25s; pointer-events: none;
+}
+.pausa-paseante-burbuja.izquierda { right: calc(100% + 6px); }
+.pausa-paseante-burbuja.derecha { left: calc(100% + 6px); }
+.pausa-paseante-burbuja.visible { opacity: 1; visibility: visible; }
+.pausa-corazones { position: absolute; left: 50%; top: 4%; display: flex; gap: 4px; transform: translateX(-50%); pointer-events: none; }
+.pausa-corazones svg { fill: var(--lima); stroke: var(--tinta); stroke-width: 1.6; }
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-movimiento="reducido"]) .pausa-corazones svg { animation: corazon-sube 1.6s ease-out forwards; }
+  html:not([data-movimiento="reducido"]) .pausa-corazones svg:nth-child(2) { animation-delay: 0.18s; }
+  html:not([data-movimiento="reducido"]) .pausa-corazones svg:nth-child(3) { animation-delay: 0.36s; }
+}
+@keyframes corazon-sube { from { opacity: 0; transform: translateY(8px) scale(0.6); } 20% { opacity: 1; } to { opacity: 0; transform: translateY(-34px) scale(1.1); } }
+/* Sin animación, los corazones aparecen un momento y se van con la frase. */
+.pausa-corazones { animation: corazones-fuera 0s 2.2s forwards; }
+@keyframes corazones-fuera { to { visibility: hidden; } }
+/* Con «Mostrar mascotas» apagado nunca se ve (además, la capa ni se monta). */
+:root[data-mascotas="ocultas"] .pausa-paseante-capa { display: none; }
+@media (forced-colors: active) {
+  .pausa-paseante-burbuja { border-color: CanvasText; }
+}

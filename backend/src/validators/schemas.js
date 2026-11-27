@@ -196,6 +196,8 @@ export const preferencesSchema = z.object({
   emailReminders: z.boolean().optional(),
   showMascots: z.boolean().optional(),
   showBigCelebrations: z.boolean().optional(),
+  pausaWalks: z.boolean().optional(),
+  pausaHiddenToday: z.boolean().optional(),
 }).strict().refine((data) => Object.keys(data).length > 0, 'No hay cambios.');
 
 export const selfReviewSchema = z.object({ grade: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]) });

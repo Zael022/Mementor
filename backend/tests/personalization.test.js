@@ -48,7 +48,7 @@ test('las preferencias empiezan en los valores por defecto y solo cambia lo envi
   assert.deepEqual(inicial.body.data, {
     theme: 'system', textScale: 100, highContrast: false, reducedMotion: false, readingSpacing: false,
     underlineLinks: false, timeZone: null, dailyGoalMinutes: null, practiceSize: 5, emailReminders: true,
-    showMascots: true, showBigCelebrations: true,
+    showMascots: true, showBigCelebrations: true, pausaWalks: true, pausaHiddenToday: false,
   });
 
   const cambio = await ctx.org.student.patch('/me/preferences', { theme: 'dark', textScale: 130, highContrast: true, timeZone: ZONA, practiceSize: 10 });

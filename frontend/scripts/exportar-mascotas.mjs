@@ -20,6 +20,8 @@ try {
   const piezas = [
     ...orbi.ESTADOS_ORBI.map((estado) => [`orbi-${estado}`, React.createElement(orbi.default, { estado, ancho: 480, parpadeo: false })]),
     ...pausa.ESTADOS_PAUSA.map((estado) => [`pausa-${estado}`, React.createElement(pausa.default, { estado, ancho: 480, parpadeo: false })]),
+    // Pausa paseante: cuelga de la barra superior, sin rama.
+    ...pausa.ESTADOS_PAUSA_PASEANTE.map((estado) => [`pausa-paseante-${estado}`, React.createElement(pausa.default, { estado, rama: false, ancho: 480, parpadeo: false })]),
     ...(sticker ? [['orbi-sticker', React.createElement(sticker.default, { ancho: 480 })]] : []),
   ];
 
