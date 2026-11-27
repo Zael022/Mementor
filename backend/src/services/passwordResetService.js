@@ -17,7 +17,7 @@ export async function requestReset(email) {
   await PasswordReset.create({ userId: user.id, tokenHash, expiresAt: new Date(Date.now() + RESET_MINUTES * 60000) });
   await sendMail({
     to: user.email,
-    subject: 'Restablece tu contraseña de MENTOR AI',
+    subject: 'Restablece tu contraseña de MENTOR IA',
     text: [
       `Hola, ${user.displayName}:`,
       '',

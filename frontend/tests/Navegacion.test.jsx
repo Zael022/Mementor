@@ -36,10 +36,10 @@ describe('navegación y errores', () => {
   });
 
   it('pone un título de pestaña por sección', () => {
-    expect(tituloDe('/estudiante/tutor/4')).toBe('Tutor · MENTOR AI');
-    expect(tituloDe('/docente/cursos/3/fuentes')).toBe('Fuentes del tutor · MENTOR AI');
-    expect(tituloDe('/docente/cursos')).toBe('Cursos · MENTOR AI');
-    expect(tituloDe('/desconocida')).toBe('MENTOR AI');
+    expect(tituloDe('/estudiante/tutor/4')).toBe('Tutor · MENTOR IA');
+    expect(tituloDe('/docente/cursos/3/fuentes')).toBe('Fuentes del tutor · MENTOR IA');
+    expect(tituloDe('/docente/cursos')).toBe('Cursos · MENTOR IA');
+    expect(tituloDe('/desconocida')).toBe('MENTOR IA');
   });
 
   it('una dirección inexistente muestra la página de «no encontrada» y al navegar mueve el foco al contenido', () => {
@@ -53,13 +53,13 @@ describe('navegación y errores', () => {
         </Routes>
       </MemoryRouter>,
     );
-    expect(document.title).toBe('Mi progreso · MENTOR AI');
+    expect(document.title).toBe('Mi progreso · MENTOR IA');
     expect(document.activeElement.id).not.toBe('contenido');
 
     fireEvent.click(screen.getByRole('button', { name: 'ir' }));
     expect(screen.getByRole('heading', { name: 'No encontramos esta página' })).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Volver al inicio' }).getAttribute('href')).toBe('/');
     expect(document.activeElement.id).toBe('contenido');
-    expect(document.title).toBe('MENTOR AI');
+    expect(document.title).toBe('MENTOR IA');
   });
 });

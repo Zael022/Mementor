@@ -36,5 +36,5 @@ const TITULOS = [
 
 export function tituloDe(ruta) {
   const encontrado = TITULOS.find(([patron]) => patron.test(ruta));
-  return encontrado ? `${encontrado[1]} · MENTOR AI` : 'MENTOR AI';
+  return encontrado ? `${encontrado[1]} · MENTOR IA` : 'MENTOR IA';
 }

@@ -4,7 +4,7 @@
 export const DEMO_COURSE = {
   code: 'PRUEBA-MAT7',
   title: 'Matemática 7° · curso de prueba',
-  description: 'Curso de ejemplo para recorrer MENTOR AI: fracciones, decimales, ángulos y triángulos. Tiene actividad simulada para ver cómo cada función ayuda a estudiar.',
+  description: 'Curso de ejemplo para recorrer MENTOR IA: fracciones, decimales, ángulos y triángulos. Tiene actividad simulada para ver cómo cada función ayuda a estudiar.',
 };
 
 const leccion = (title, bodyMd) => ({ title, bodyMd });

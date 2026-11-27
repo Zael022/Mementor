@@ -8,7 +8,7 @@ export default function EstadoVacio({ titulo, detalle, ilustracion, mascota, chi
   const mascotas = useMascotasVisibles();
   let figura = <div className="figuras" aria-hidden="true"><i /><i /><i /></div>;
   if (ilustracion) figura = <Ilustracion tipo={ilustracion} />;
-  if (mascota && mascotas) figura = <span className="ilustracion figura-mascota"><Pausa estado={mascota} ancho={96} parpadeo={false} /></span>;
+  if (mascota && mascotas) figura = <span className="ilustracion figura-mascota"><Pausa estado={mascota} ancho={96} parpadeo={false} viva /></span>;
   return (
     <section className="estado-vacio">
       {figura}

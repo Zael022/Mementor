@@ -6,7 +6,7 @@ export default function Privacidad() {
   return (
     <DocumentoLegal titulo="Política de privacidad" version={VERSIONES_LEGALES.privacy}>
       <h2>1. Responsable</h2>
-      <p>MENTOR AI es una plataforma educativa que usa cada institución con sus docentes y estudiantes. La institución que te invitó es la responsable de la base de datos de su comunidad; MENTOR AI actúa como encargado del tratamiento siguiendo sus instrucciones.</p>
+      <p>MENTOR IA es una plataforma educativa que usa cada institución con sus docentes y estudiantes. La institución que te invitó es la responsable de la base de datos de su comunidad; MENTOR IA actúa como encargado del tratamiento siguiendo sus instrucciones.</p>
 
       <h2>2. Qué datos recopilamos y cómo</h2>
       <table className="tabla">
@@ -24,7 +24,7 @@ export default function Privacidad() {
 
       <h2>3. Con quién se comparte</h2>
       <ul>
-        <li><strong>Proveedor de inteligencia artificial:</strong> la institución elige Anthropic (Claude) u OpenAI y puede informarte cuál usa. Antes de enviar cualquier texto que escribe una persona, MENTOR AI reemplaza cédulas, teléfonos, correos y enlaces por etiquetas como «[correo oculto]». Nunca se envían el nombre ni el correo de tu cuenta. Aun así, no escribas datos personales de nadie en preguntas, entregas ni textos para los asistentes: los nombres propios no se pueden detectar de forma automática.</li>
+        <li><strong>Proveedor de inteligencia artificial:</strong> la institución elige Anthropic (Claude) u OpenAI y puede informarte cuál usa. Antes de enviar cualquier texto que escribe una persona, MENTOR IA reemplaza cédulas, teléfonos, correos y enlaces por etiquetas como «[correo oculto]». Nunca se envían el nombre ni el correo de tu cuenta. Aun así, no escribas datos personales de nadie en preguntas, entregas ni textos para los asistentes: los nombres propios no se pueden detectar de forma automática.</li>
         <li><strong>Google Cloud (si tu institución lo activa):</strong> guarda los archivos originales de los materiales y las fotos de perfil en un almacenamiento privado, guarda el material del curso para buscar las fuentes del tutor y, si se usa Google Drive, lee las carpetas que la institución autoriza.</li>
         <li><strong>Ministerio de Hacienda (tipo de cambio) y Nager.Date (feriados):</strong> solo se consultan datos públicos; no se envía ningún dato tuyo.</li>
         <li><strong>n8n (automatizaciones):</strong> recibe tu correo únicamente para enviarte avisos (recordatorios o confirmación de baja). Puedes apagar los recordatorios en Configuración; se guarda qué día se envió cada uno para no repetirlo.</li>

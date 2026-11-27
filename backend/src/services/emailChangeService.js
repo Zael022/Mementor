@@ -30,11 +30,11 @@ export async function requestEmailChange(user, { currentPassword, newEmail }) {
 
   await sendMail({
     to: target,
-    subject: 'Confirma tu nuevo correo de MENTOR AI',
+    subject: 'Confirma tu nuevo correo de MENTOR IA',
     text: [
       `Hola, ${row.displayName}:`,
       '',
-      `Pediste usar esta dirección para entrar a MENTOR AI. El enlace vence en ${CHANGE_MINUTES} minutos y sirve una sola vez:`,
+      `Pediste usar esta dirección para entrar a MENTOR IA. El enlace vence en ${CHANGE_MINUTES} minutos y sirve una sola vez:`,
       `${appUrl()}/confirmar-correo?token=${token}`,
       '',
       'Si no lo pediste, ignora este correo: no se hará ningún cambio.',
@@ -43,11 +43,11 @@ export async function requestEmailChange(user, { currentPassword, newEmail }) {
   // Aviso a la dirección actual por si la solicitud no la hizo la persona dueña de la cuenta.
   await sendMail({
     to: row.email,
-    subject: 'Solicitud de cambio de correo en MENTOR AI',
+    subject: 'Solicitud de cambio de correo en MENTOR IA',
     text: [
       `Hola, ${row.displayName}:`,
       '',
-      'Se pidió cambiar el correo con el que entras a MENTOR AI. El cambio solo se aplica si se confirma desde la nueva dirección.',
+      'Se pidió cambiar el correo con el que entras a MENTOR IA. El cambio solo se aplica si se confirma desde la nueva dirección.',
       'Si no fuiste tú, cambia tu contraseña y avisa a la administración de tu institución.',
     ].join('\n'),
   });
@@ -87,11 +87,11 @@ export async function confirmEmailChange({ token }) {
   if (previous && previous !== user.email) {
     await sendMail({
       to: previous,
-      subject: 'Tu correo de MENTOR AI cambió',
+      subject: 'Tu correo de MENTOR IA cambió',
       text: [
         `Hola, ${user.displayName}:`,
         '',
-        'El correo con el que entras a MENTOR AI se cambió a otra dirección confirmada.',
+        'El correo con el que entras a MENTOR IA se cambió a otra dirección confirmada.',
         'Si no fuiste tú, contacta de inmediato a la administración de tu institución.',
       ].join('\n'),
     }).catch(() => {});

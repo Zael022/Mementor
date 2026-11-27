@@ -815,8 +815,6 @@ img.con-foto { object-fit: cover; background: var(--suave-neutro); padding: 0; }
 .documento-legal li { margin-bottom: 6px; }
 .enlaces-legales { display: flex; gap: 14px; flex-wrap: wrap; }
 .enlaces-legales { margin-top: 32px; padding-top: 14px; border-top: 1px solid var(--linea); }
-.barra-lateral .barra-legal a { padding-block: 7px; font-size: 0.86rem; font-weight: 500; color: var(--tenue); }
-.barra-lateral .barra-legal a.active { color: var(--azul-hondo); }
 .casilla { display: flex; align-items: flex-start; gap: 10px; margin: 10px 0; cursor: pointer; }
 .casilla input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--azul); flex: none; }
 .dialogo-consentimiento { max-width: 520px; border: 0; border-radius: var(--radio-grande); padding: 26px; box-shadow: var(--sombra-alta); background: var(--panel); color: var(--tinta); }
@@ -902,3 +900,7 @@ img.con-foto { object-fit: cover; background: var(--suave-neutro); padding: 0; }
 @media (max-width: 639px) {
   .recorrido-tarjeta, .recorrido-tarjeta[style*="top"] { left: 12px; right: 12px; bottom: 12px; top: auto; width: auto; }
 }
+
+/* Configuración: documentos legales y cierre de sesión. */
+.config-legales { list-style: none; padding: 0; margin: 0 0 12px; display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.config-legales a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 600; }

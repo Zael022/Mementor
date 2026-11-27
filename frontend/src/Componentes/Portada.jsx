@@ -50,7 +50,7 @@ function TarjetaRasgo({ rasgo }) {
 
 // Portada pública para ingresar y activar la cuenta, con una cuadrícula discreta detrás del título.
 export default function Portada({ titulo, children }) {
-  useEffect(() => { document.title = `${titulo} · MENTOR AI`; }, [titulo]);
+  useEffect(() => { document.title = `${titulo} · MENTOR IA`; }, [titulo]);
   const detalles = useRef(null);
   const [animar, setAnimar] = useState(false);
 
@@ -74,7 +74,7 @@ export default function Portada({ titulo, children }) {
         {/* Pausa se agarra del borde inferior de esta barra y saluda una vez; es decorativa y respeta
             «Mostrar mascotas» y «Menos movimiento». */}
         <Suspense fallback={null}>
-          <Mascota personaje="pausa" estado="bienvenida" rama={false} animacion={1} mensaje={MENSAJE_PORTADA} className="pausa-colgada" />
+          <Mascota personaje="pausa" estado="bienvenida" rama={false} animacion={1} mensaje={MENSAJE_PORTADA} className="pausa-colgada" interactiva />
         </Suspense>
       </header>
 

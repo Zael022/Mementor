@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import BienvenidaRegreso from '../src/Componentes/BienvenidaRegreso.jsx';
@@ -107,10 +107,35 @@ describe('mascotas', () => {
     const textos = Object.values(mensajes).flatMap((valor) => {
       if (typeof valor === 'string') return [valor];
       if (typeof valor === 'function') return [valor(3, 5), valor(base)].filter((texto) => typeof texto === 'string');
-      if (valor && typeof valor === 'object') return Object.values(valor).map((item) => (typeof item === 'function' ? item(3, 5) : item));
+      // Objetos de textos (Parejas) o de listas de frases (al tocar a Orbi o a Pausa).
+      if (valor && typeof valor === 'object') return Object.values(valor).flat().map((item) => (typeof item === 'function' ? item(3, 5) : item));
       return [];
     });
     expect(textos.length).toBeGreaterThan(12);
     for (const texto of textos) expect(texto).not.toMatch(/perder|pierdes|apúrate|última oportunidad|deberías|rápido/i);
+  });
+});
+
+describe('mascotas interactivas', () => {
+  it('al tocar a Pausa reacciona con una frase que se anuncia y vuelve al mensaje normal', async () => {
+    vi.useFakeTimers();
+    try {
+      render(<Mascota personaje="pausa" estado="bienvenida" mensaje="Hola" interactiva />);
+      const boton = screen.getByRole('button', { name: 'Saludar a Pausa' });
+      expect(screen.getByText('Hola')).toBeTruthy();
+      act(() => boton.click());
+      expect(screen.getByText(mensajes.FRASES_TOQUE.pausa[0]).getAttribute('aria-live')).toBe('polite');
+      act(() => boton.click());
+      expect(screen.getByText(mensajes.FRASES_TOQUE.pausa[1])).toBeTruthy();
+      act(() => vi.advanceTimersByTime(5000));
+      expect(screen.getByText('Hola')).toBeTruthy();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('sin «interactiva» la mascota sigue siendo solo un dibujo, sin botón', () => {
+    render(<Mascota personaje="orbi" estado="saludo" mensaje="Hola" />);
+    expect(screen.queryByRole('button')).toBeNull();
   });
 });
