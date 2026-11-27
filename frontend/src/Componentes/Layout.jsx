@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import Avatar from './Avatar.jsx';
 import AvisoConsentimiento from './AvisoConsentimiento.jsx';
@@ -8,6 +8,10 @@ import { Cargando } from './Estados.jsx';
 import LimiteErrores from './LimiteErrores.jsx';
 import { useSesion } from '../context/SesionContext.jsx';
 import { tituloDe } from '../utils/titulos.js';
+import { rutaConPausa } from '../utils/rutasPausa.js';
+
+// Pausa paseante se carga aparte: no pesa en la carga inicial ni en las páginas donde no aparece.
+const PausaPaseante = lazy(() => import('./PausaPaseante.jsx'));
 
 const ROLES = {
   platform_admin: 'Administración de plataforma',
@@ -19,8 +23,11 @@ const ROLES = {
 
 // Estructura tipo aula: barra superior, barra lateral con las clases y el contenido de cada página.
 export default function Layout() {
-  const { usuario } = useSesion();
+  const { usuario, preferencias } = useSesion();
   const { pathname } = useLocation();
+  // Solo estudiantes, en sus páginas generales, con las mascotas visibles y sin esconderla por hoy.
+  const conPausa = usuario.role === 'student' && rutaConPausa(pathname)
+    && preferencias?.showMascots !== false && !preferencias?.pausaHiddenToday;
   const principal = useRef(null);
   const primeraVisita = useRef(true);
   const [menuAbierto, setMenuAbierto] = useState(false);
@@ -65,6 +72,7 @@ export default function Layout() {
           <LimiteErrores><Suspense fallback={<Cargando />}><Outlet /></Suspense></LimiteErrores>
         </main>
       </div>
+      {conPausa && <Suspense fallback={null}><PausaPaseante /></Suspense>}
     </div>
   );
 }
