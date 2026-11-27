@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { createRequire } from 'node:module';
 import app from './app.js';
 import { sequelize } from './config/database.js';
 import { startBackgroundJobs } from './services/backgroundJobs.js';
@@ -7,6 +8,8 @@ import { ensureDemoCourse } from './services/demoCourseService.js';
 import { demoEnabled } from './utils/demo.js';
 import { jwtSecret } from './utils/jwt.js';
 
+const { protegerEsquema } = createRequire(import.meta.url)('../database/compat.cjs');
+
 // Inicia el servidor después de validar la base de datos.
 const port = Number(process.env.PORT || 3001);
 try {
@@ -14,6 +17,8 @@ try {
   jwtSecret();
   if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_ORIGIN) throw new Error('Configura FRONTEND_ORIGIN con la URL pública del frontend.');
   await sequelize.authenticate();
+  // En Supabase (PostgreSQL), las tablas nuevas también quedan fuera de la Data API (ADR 0012).
+  await protegerEsquema(sequelize);
   // Modo de prueba: crea o repara las cuentas de prueba y lo avisa en la consola.
   if (demoEnabled()) {
     await ensureDemoAccounts();

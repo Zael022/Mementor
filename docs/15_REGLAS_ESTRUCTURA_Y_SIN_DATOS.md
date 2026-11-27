@@ -41,7 +41,7 @@ backend/
 └── .env.example
 ```
 
-Persistencia real **MySQL + Sequelize**. `db.json` NO guarda cursos, contraseñas, estudiantes ni registros: solo metadatos de conexión como nombres de variables `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`. El adaptador Sequelize lee valores reales de `.env` de forma segura. No publicar credenciales.
+Persistencia real **MySQL + Sequelize** (en la rama `despliegue-nube`, también PostgreSQL de Supabase para publicar; ADR 0012). `db.json` NO guarda cursos, contraseñas, estudiantes ni registros: solo metadatos de conexión como nombres de variables `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`. El adaptador Sequelize lee valores reales de `.env` de forma segura. No publicar credenciales.
 
 ## Sin datos de prueba precargados
 - Excepción: cuentas de prueba por rol con el modo de prueba (`DEMO_MODE=on`, ADR 0011). Se marcan con `users.is_demo`, se crean al arrancar o con `npm run demo:cuentas` y solo entran con el modo encendido.

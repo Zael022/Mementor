@@ -1,6 +1,22 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-26. Modo de prueba con cuentas por rol y acceso rápido (rama `feature/cuentas-de-prueba`); antes, 2026-11-25: Mapa del curso, rango de avance, mascotas Orbi y Pausa, sticker de papel y Parejas (rama `feature/mapa-mascota-parejas`); antes, las 8 capas de la IA (rama `feature/capas-ia`, con `main` integrado: CRM de admisiones y de plataforma); antes, CRM institucional y seguridad OWASP (PR #13); antes, correcciones de la auditoría de salida a producción (rama `fix/auditoria-produccion`); antes, correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+**Última actualización** — 2026-11-27. Rama `despliegue-nube`: Vercel + Render + Supabase (ADR 0012) y, en `feature/configuracion-mentor-ia`, Configuración con sesión y documentos, logo «MENTOR IA», mapa con más diseño y mascotas interactivas; antes, 2026-11-26: modo de prueba con cuentas por rol y acceso rápido (rama `feature/cuentas-de-prueba`); antes, 2026-11-25: Mapa del curso, rango de avance, mascotas Orbi y Pausa, sticker de papel y Parejas (rama `feature/mapa-mascota-parejas`); antes, las 8 capas de la IA (rama `feature/capas-ia`, con `main` integrado: CRM de admisiones y de plataforma); antes, CRM institucional y seguridad OWASP (PR #13); antes, correcciones de la auditoría de salida a producción (rama `fix/auditoria-produccion`); antes, correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+
+## Sesión 2026-11-27 · Rama `despliegue-nube`: Vercel + Render + Supabase
+Daisy pidió (por el profesor) que el proyecto se publique como en JJ SecureVault: Vercel, Render y Supabase. Además tiene que seguir abriéndose en la computadora. Las demás ramas quedan como estaban. Decisiones en `docs/adr/0012-despliegue-vercel-render-supabase.md` y guía en `docs/despliegue.md`.
+- **Dos motores con el mismo código:**
+  - `config/connection.cjs`: `DB_DIALECT`, `DATABASE_URL`, TLS verificado con `DB_SSL_CA` o `DB_SSL_CA_PEM`, y `DB_POOL_MAX`.
+  - `src/utils/sql.js`: `runSql`, `nowMinus`, `nowPlus`, `yearMonth`, `affectedRows` y `likeOp`.
+  - `database/compat.cjs`: `cambiarEnum`. Además, TINYINT pasa a SMALLINT en PostgreSQL y `dropTable` recibe `{}`.
+  - En PostgreSQL, las listas sin orden explícito se ordenan por `id`.
+- **Supabase:** la migración `20261127000200-proteger-esquema-supabase` aplica RLS y quita permisos a los roles de la Data API; el servidor lo repite al arrancar (`protegerEsquema` en `database/compat.cjs`). `STORAGE_DRIVER=supabase` usa un bucket privado (`src/services/supabaseStorage.js`). `render.yaml` apunta a la rama `despliegue-nube`.
+- **Pruebas nuevas:** `supabaseStorage.test.js` y `supabaseSeguridad.test.js`. Las de coordinación, CRM y registro técnico ahora funcionan en los dos motores. CI tiene un trabajo nuevo con PostgreSQL 17.
+- **Verificación (local, registrada):**
+  - Backend: 261/261 en PostgreSQL 16 y 260/260 en MySQL (la prueba de RLS se omite en MySQL).
+  - Playwright: 47/47 con la API en PostgreSQL y 47/47 en MySQL.
+  - Migraciones en PostgreSQL: aplicar, deshacer todo y volver a aplicar, sin errores.
+  - Arranque con `DEMO_MODE=on` sobre PostgreSQL: crea las cuentas y el curso de prueba.
+- **Pendiente:** probar contra un proyecto real de Supabase, Render y Vercel, y llenar el registro de aceptación de `docs/despliegue.md` §5.
 
 ## Sesión 2026-11-27 · Configuración, logo «MENTOR IA», mapa con más diseño y mascotas interactivas
 Rama `feature/configuracion-mentor-ia` (desde `develop`).

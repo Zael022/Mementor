@@ -1,45 +1,47 @@
-# Guía de despliegue de MENTOR AI
+# Guía de despliegue de MENTOR IA (rama `despliegue-nube`)
 
-Arquitectura elegida (justificada en el Plan de Producción):
+Esta rama se abre **en tu computadora** igual que `main` (MySQL) y además se publica con **Vercel + Render + Supabase**. Las decisiones están en `docs/adr/0012-despliegue-vercel-render-supabase.md`.
 
 | Componente | Proveedor | URL |
 | --- | --- | --- |
 | Frontend (React + Vite) | Vercel, plan Hobby | `https://mentor-ai.vercel.app` (ajustar al nombre real) |
 | API (Node + Express) | Render, web service gratuito | `https://mentor-api.onrender.com/api/v1` |
-| Base de datos MySQL | TiDB Cloud Starter (compatible con MySQL, TLS obligatorio) | Host privado de TiDB, solo con TLS |
-| Workflows | n8n Cloud (prueba de 14 días) o n8n propio en Render | `https://<tu-espacio>.app.n8n.cloud` |
+| Base de datos | Supabase (PostgreSQL) por el *Session pooler* | `aws-0-<región>.pooler.supabase.com:5432` |
+| Archivos originales | Supabase Storage, bucket **privado** | Solo la API lo usa |
+| Workflows | n8n Cloud o n8n propio en Render | `https://<tu-espacio>.app.n8n.cloud` |
 | IA | Anthropic (Claude) | API del proveedor |
 
-El navegador solo habla con Vercel. Vercel reenvía `/api/*` a Render, así que la cookie de sesión es del mismo origen y no hace falta abrir CORS a otros dominios.
+El navegador solo habla con Vercel. Vercel reenvía `/api/*` a Render, así que la cookie de sesión es del mismo origen y no hace falta abrir CORS. El navegador **nunca** habla con Supabase: la clave secreta de Supabase vive solo en Render.
 
-## 1. Base de datos (TiDB Cloud Starter)
-1. Crea una cuenta en tidbcloud.com y un clúster **Starter** en la región más cercana (por ejemplo AWS us-east-1).
-2. En *Connect*, genera la contraseña y copia host, puerto (4000), usuario y nombre de base. Crea la base `mentor_ai` con `CREATE DATABASE mentor_ai;` desde el SQL Editor.
-3. No subas estos datos al repositorio: van solo en Render.
+## 0. Abrirlo en tu computadora
+Igual que siempre, con MySQL:
+1. `cd backend && npm install`, copia `.env.example` a `.env` y deja `DB_DIALECT=mysql` con tus datos de MySQL.
+2. `npm run db:migrate` y `npm run dev`. En otra terminal: `cd frontend && npm install && npm run dev`.
+3. Abre `http://localhost:5173`.
 
-## 2. Archivos originales (Google Cloud Storage)
-El disco de Render gratis se borra al reiniciar, redesplegar o suspender el servicio. Por eso los materiales y las fotos de perfil se guardan en un bucket privado (`STORAGE_DRIVER=gcs`). MySQL guarda la huella SHA-256 de cada material para comprobar que el archivo descargado es idéntico al original.
-1. En Google Cloud, crea un bucket **privado** (acceso uniforme, sin acceso público) en una región cercana, por ejemplo `us-east1`. Activa el versionado de objetos para poder recuperar un archivo borrado por error.
-2. Crea una cuenta de servicio solo con el rol **Storage Object Admin** sobre ese bucket. Descarga su clave JSON y no la subas al repositorio.
-3. En Render, *Environment → Secret Files*: crea `gcp-mentor-storage.json` con el contenido de la clave. `render.yaml` ya apunta `GOOGLE_APPLICATION_CREDENTIALS` a `/etc/secrets/gcp-mentor-storage.json` (ADC la lee de ahí).
-4. Completa `STORAGE_GCS_BUCKET` con el nombre del bucket. `/api/v1/health` debe mostrar `files: { driver: "gcs", configured: true }`.
-5. Prueba de aceptación: sube un material, anota el encabezado `X-Content-SHA256` de su descarga, pulsa *Manual Deploy → Restart service* y descárgalo de nuevo: la huella debe ser la misma.
+Opcional: para probar en tu computadora contra el mismo Supabase de la nube, pon en `backend/.env` `DB_DIALECT=postgres`, `DATABASE_URL=…`, `DB_SSL=true` y `DB_SSL_CA=` con la ruta del certificado (paso 1.4). Hazlo con un proyecto de prueba, no con el de producción.
 
-Sin Google Cloud, la alternativa es un plan de Render con disco persistente (`STORAGE_DRIVER=local` y `UPLOAD_DIR` dentro del disco) con respaldo propio.
+## 1. Supabase (base de datos y archivos)
+1. Crea una cuenta en supabase.com y un proyecto nuevo en la región más cercana a Render (por ejemplo *East US*). Guarda la contraseña de la base en un lugar seguro.
+2. **Apaga la Data API.** En *Project Settings → Data API* desactívala. Si al crear el proyecto aparece la opción de no exponer las tablas automáticamente, desmárcala. MENTOR no usa la Data API: solo la API de Render entra a la base. Además, la migración `20261127000200-proteger-esquema-supabase` activa RLS y quita los permisos de `anon`, `authenticated` y `service_role`.
+3. **Cadena de conexión.** Pulsa *Connect* y elige **Session pooler**. Es IPv4 y usa el puerto 5432. No uses *Direct connection*, porque es solo IPv6 y Render no llega a ella. La cadena tiene esta forma: `postgresql://postgres.<proyecto>:<contraseña>@aws-0-<región>.pooler.supabase.com:5432/postgres`.
+4. **Certificado.** En *Database Settings → SSL Configuration* descarga el certificado raíz y ábrelo con un editor de texto. Su contenido completo va en `DB_SSL_CA_PEM` (paso 2). La API siempre verifica el certificado: si falta, la conexión falla con «self-signed certificate in certificate chain».
+5. **Bucket de archivos.** En *Storage → New bucket* crea `mentor-originales` y **déjalo privado**: no marques *Public bucket*. Los materiales y las fotos de perfil se guardan ahí. La base guarda la huella SHA-256 de cada material para comprobar que la descarga es idéntica al original.
+6. **Clave secreta.** En *Project Settings → API Keys* crea o copia una **Secret key** (`sb_secret_…`). La antigua `service_role` también sirve. Va solo en Render (`SUPABASE_SECRET_KEY`), **nunca** en Vercel, en el frontend ni en el repositorio.
+7. Copia la *Project URL* (`https://<proyecto>.supabase.co`) para `SUPABASE_URL`.
 
-## 3. API en Render
-1. En Render: *New → Blueprint* y elige el repositorio. Render lee `render.yaml` y crea `mentor-api` en la rama `main`.
+## 2. API en Render
+1. En Render: *New → Blueprint* y elige el repositorio. Render lee `render.yaml` y crea `mentor-api` en la rama **`despliegue-nube`**.
 2. Completa las variables marcadas `sync: false`. `JWT_SECRET` y `N8N_INTEGRATION_KEY` las genera Render.
-   - `DB_HOST`, `DB_PORT=4000`, `DB_NAME=mentor_ai`, `DB_USER`, `DB_PASSWORD`.
+   - `DATABASE_URL`: la cadena del *Session pooler*, con tu contraseña.
+   - `DB_SSL_CA_PEM`: el contenido completo del certificado del paso 1.4, incluidas las líneas `-----BEGIN CERTIFICATE-----` y `-----END CERTIFICATE-----`. `render.yaml` ya pone `DB_DIALECT=postgres`, `DB_SSL=true` y `DB_POOL_MAX=5`.
+   - `SUPABASE_URL` y `SUPABASE_SECRET_KEY`. `render.yaml` ya pone `STORAGE_DRIVER=supabase` y `SUPABASE_BUCKET=mentor-originales`.
    - `FRONTEND_ORIGIN=https://mentor-ai.vercel.app` y `APP_URL` con el mismo valor.
-   - `AI_PROVIDER=anthropic`, `AI_MODEL`, `AI_API_KEY`.
-   - Router de modelos (opcional): `AI_MODEL_RAPIDO` para anuncios, resúmenes, Coach y analista, y `AI_MODEL_AVANZADO` para el tutor, la retroalimentación, el generador de preguntas y cumplimiento. Si quedan vacíos se usa `AI_MODEL`, así que un despliegue anterior sigue igual. Verifica en la consola del proveedor que los dos identificadores existen en tu cuenta.
-   - Caché: `AI_RESPONSE_CACHE=on` (resúmenes de lección por institución) y `AI_PROMPT_CACHE=off` hasta medir si el proveedor guarda los bloques (columna `cache_read_tokens` de `agent_runs`).
-   - Antes de cambiar un prompt o un modelo en producción, corre `npm run evals` con la clave real (ver `docs/agentes-ia.md`).
+   - `AI_PROVIDER=anthropic`, `AI_MODEL`, `AI_API_KEY` y, si quieres, `AI_MODEL_RAPIDO` y `AI_MODEL_AVANZADO` (ver `docs/adr/0009-capas-ia.md`).
    - `SMTP_*` para recuperación de contraseña, recordatorios y avisos de baja.
-3. Al arrancar se ejecuta `npm run db:migrate` (crea o actualiza las tablas) y luego `npm start`. El estado se ve en `https://mentor-api.onrender.com/api/v1/health`.
-   - En el plan gratuito no existe el paso previo al despliegue (`preDeployCommand` es solo para planes de pago), por eso la migración va en el arranque. En un plan de pago, muévela a `preDeployCommand: npm run db:migrate` y deja `startCommand: npm start`: así una migración fallida detiene el despliegue sin tumbar la versión que está en uso.
-   - Las migraciones siguen la regla «ampliar y luego contraer»: una versión solo **agrega** (tablas, columnas con valor por defecto, índices). Lo que se borra o renombra va en una versión posterior, cuando el código anterior ya no lo usa. Así la versión anterior sigue funcionando con el esquema nuevo y se puede volver a ella sin deshacer migraciones.
+3. Al arrancar se ejecuta `npm run db:migrate`, que crea las tablas en Supabase, y luego `npm start`. Comprueba en `https://mentor-api.onrender.com/api/v1/health` que salga `database: "connected"` y `files: { driver: "supabase", configured: true }`.
+   - En el plan gratuito no existe el paso previo al despliegue (`preDeployCommand` es de los planes de pago), por eso la migración va en el arranque. En un plan de pago, muévela a `preDeployCommand: npm run db:migrate` y deja `startCommand: npm start`.
+   - Las migraciones siguen la regla «ampliar y luego contraer»: una versión solo **agrega** cosas. Lo que se borra o se renombra va en una versión posterior.
 4. **`TRUST_PROXY`.** Con Vercel delante, una petición pasa por dos proxies (Vercel y Render) y `render.yaml` usa `2`. Pero la URL de Render también responde directo, con un solo proxy: ahí el primer valor de `X-Forwarded-For` lo escribe el cliente. Antes de abrir el servicio:
    - Desde fuera, `curl -H 'X-Forwarded-For: 1.2.3.4' https://mentor-api.onrender.com/api/v1/health` varias veces y por Vercel `https://mentor-ai.vercel.app/api/v1/health`; revisa en los registros qué IP ve el servidor en cada camino.
    - Si la IP del cliente se puede cambiar por el camino directo, usa `TRUST_PROXY=1` o la lista de direcciones de los proxies conocidos, y anota el resultado en el registro de aceptación.
@@ -47,19 +49,20 @@ Sin Google Cloud, la alternativa es un plan de Render con disco persistente (`ST
 5. Primer administrador: en Render, *Shell* → `npm run admin:create`. La primera vez que entre, la plataforma le pedirá aceptar los términos.
 6. Cuentas de prueba (opcional, para una demostración): agrega `DEMO_MODE=on` en las variables de Render y, si quieres, `DEMO_PASSWORD`. Al reiniciar se crean las cuentas por rol y aparece «Acceso rápido de prueba». Bórrala o ponla en `off` al terminar: las cuentas dejan de entrar y sus sesiones se cierran.
 
-## 4. Frontend en Vercel
+## 3. Frontend en Vercel
 1. En `frontend/vercel.json`, cambia `https://mentor-api.onrender.com` por la URL real de la API si es distinta.
 2. En Vercel: *Add New → Project*, elige el repositorio y pon **Root Directory = `frontend`**. Vercel detecta Vite y usa `npm run build`.
-3. Cada push a `main` despliega solo. Los pull requests reciben una URL de vista previa.
+3. En *Settings → Git*, pon **Production Branch = `despliegue-nube`**. Cada push a esa rama despliega solo; las demás ramas reciben una URL de vista previa.
 
-## 5. n8n
+## 4. n8n
 1. Crea el espacio en n8n Cloud o despliega la imagen `n8nio/n8n` en Render.
 2. Importa los tres archivos de `n8n/` y sigue `n8n/README.md`: credenciales, `apiUrl` y activación.
 3. Para el workflow de baja, copia la URL del webhook en `N8N_DELETION_WEBHOOK_URL` y pon `DELETION_PROCESSOR=n8n` en Render.
 
-## 6. Comprobaciones posteriores (sobre la URL pública)
+## 5. Comprobaciones posteriores (sobre la URL pública)
 - El frontend carga en computadora y en celular, y usa HTTPS (candado).
-- Inicio de sesión. En la base, `users.password_hash` empieza con `$2b$` (bcrypt).
+- Inicio de sesión. En Supabase (*Table Editor* o *SQL Editor*), `users.password_hash` empieza con `$2b$` (bcrypt).
+- Con la Data API apagada, `https://<proyecto>.supabase.co/rest/v1/users` no devuelve datos, ni con la clave publicable.
 - Cada rol ve sus pantallas, y una ruta de otro rol responde 403.
 - Asistentes IA responden; sin clave, muestran un error claro.
 - Consumo IA muestra el tipo de cambio del día y el calendario muestra los feriados.
@@ -80,31 +83,32 @@ El README solo debe decir que la plataforma está publicada cuando esta tabla es
 | `GET /api/v1/health` responde `ok` | | | | |
 | Inicio de sesión de cada rol y 403 en rutas ajenas | | | | |
 | Tutor responde con citas (o error claro sin clave) | | | | |
-| Material sobrevive a un reinicio de Render (misma `X-Content-SHA256`) | | | | |
+| Material sobrevive a un reinicio de Render (misma `X-Content-SHA256`) y aparece en el bucket privado de Supabase | | | | |
+| La Data API de Supabase no expone las tablas (`/rest/v1/users` sin datos) | | | | |
 | Correos de recuperación y de cambio de correo llegan | | | | |
 | Workflows de n8n registrados en `integration_runs` | | | | |
-| Respaldo restaurado y verificado (sección 8) | | | | |
+| Respaldo restaurado y verificado (sección 7) | | | | |
 | `TRUST_PROXY` comprobado por Vercel y por la URL directa de Render | | | | |
-| Migraciones y pruebas del backend sobre TiDB de prueba | | | | |
+| Migraciones y pruebas del backend sobre un proyecto Supabase de prueba | | | | |
 | Recordatorios: todos los destinatarios y reintento sin duplicar | | | | |
 
-## 7. Reversión
-- **Render:** *Events → Rollback* a la versión anterior (en el plan gratuito, solo a los dos despliegues más recientes). Como las migraciones solo agregan (sección 3), la versión anterior funciona con el esquema nuevo y **no hace falta deshacer migraciones**.
-- **No uses `npm run db:migrate:undo` en producción** salvo que esa migración se haya ensayado antes en una copia: deshacer puede borrar columnas con datos. Si una migración dejó datos mal, restaura desde el respaldo (sección 8) en un entorno de prueba, compara y corrige con una migración nueva.
+## 6. Reversión
+- **Render:** *Events → Rollback* a la versión anterior (en el plan gratuito, solo a los dos despliegues más recientes). Como las migraciones solo agregan (sección 2), la versión anterior funciona con el esquema nuevo y **no hace falta deshacer migraciones**.
+- **No uses `npm run db:migrate:undo` en producción** salvo que esa migración se haya ensayado antes en una copia: deshacer puede borrar columnas con datos. Si una migración dejó datos mal, restaura desde el respaldo (sección 7) en un entorno de prueba, compara y corrige con una migración nueva.
 - **Vercel:** *Deployments → Promote to Production* sobre la versión anterior.
 - **Código:** `git revert` del commit en `main`. El despliegue automático publica la versión corregida.
 
-## 8. Respaldos
-- TiDB Cloud Starter hace respaldos automáticos diarios (revisa la retención en *Backup*).
-- Además, cada semana: `mysqldump --ssl-mode=VERIFY_IDENTITY -h <host> -P 4000 -u <usuario> -p mentor_ai > respaldo.sql`, guardado fuera del repositorio.
-- Originales: el bucket con versionado de objetos conserva los archivos borrados o reemplazados. Para un respaldo externo, `gcloud storage cp -r gs://<bucket>/mentor-ai/originales ./respaldo-originales` el mismo día que el dump.
-- Para restaurar: `mysql ... mentor_ai < respaldo.sql`, luego `npm run db:migrate` si hay migraciones nuevas, y copia los originales al bucket si se perdieron.
+## 7. Respaldos
+- El plan gratuito de Supabase **no** hace respaldos automáticos (el plan Pro guarda 7 días). Por eso, cada semana:
+  `pg_dump "postgresql://postgres.<proyecto>:<contraseña>@aws-0-<región>.pooler.supabase.com:5432/postgres?sslmode=verify-full&sslrootcert=supabase.crt" -Fc -f respaldo.dump`, guardado fuera del repositorio.
+- Originales: descarga el bucket desde *Storage* (o con la CLI de Supabase) el mismo día que el dump.
+- Para restaurar: `pg_restore -d <cadena de un proyecto de prueba> respaldo.dump`, luego `npm run db:migrate` si hay migraciones nuevas, y sube los originales al bucket si se perdieron.
 - Comprobación de la restauración: elige tres materiales, compara `materials.content_sha256` con `sha256sum` del archivo descargado y anota fecha, duración y resultado.
 
 ## Limitaciones conocidas del plan gratuito
-- **Render** apaga el servicio tras 15 minutos sin tráfico. La primera petición tarda hasta un minuto y el disco local se pierde al reiniciar; por eso los originales van a Cloud Storage (sección 2).
-- **Vercel** espera hasta 120 segundos el primer byte de una petición reenviada a Render; después la conexión sigue abierta mientras el servidor envíe algo al menos cada 120 segundos. El chat del tutor envía su primer evento enseguida y una señal de vida cada 15 s (`SSE_PING_MS`), así que no debería cortarse; hay que comprobarlo con respuestas largas y con Render recién despertado, que puede tardar casi un minuto en responder.
+- **Supabase** pausa el proyecto tras una semana sin uso: hay que reactivarlo desde el panel. El plan gratuito da 500 MB de base, 1 GB de archivos y no hace respaldos automáticos (sección 7).
+- **Render** apaga el servicio tras 15 minutos sin tráfico. La primera petición tarda hasta un minuto y el disco local se pierde al reiniciar: por eso los originales van a Supabase Storage.
+- **Vercel** espera hasta 120 segundos el primer byte de una petición reenviada a Render; después la conexión sigue abierta mientras el servidor envíe algo al menos cada 120 segundos. El chat del tutor envía su primer evento enseguida y una señal de vida cada 15 s (`SSE_PING_MS`); hay que comprobarlo con Render recién despertado.
 - **n8n Cloud** es una prueba de 14 días con 1000 ejecuciones. Una instalación propia en Render gratuito se duerme y no ejecuta los horarios mientras está apagada.
-- **Tareas periódicas.** Las importaciones, la limpieza, la retención y Drive corren dentro del servidor web con temporizadores. Si Render lo duerme, no corren a su hora: se ponen al día cuando vuelve a despertar. Para uso real hace falta un servicio que no se duerma y, si crece, un proceso aparte con una cola persistente.
-- **Compatibilidad con TiDB.** Las pruebas automáticas corren en MySQL 8.4. Antes de abrir el servicio, ejecuta las migraciones y la suite del backend contra una base TiDB de prueba (no la de producción) y anota el resultado.
-- **Aiven** ya no permite crear MySQL gratis (desde el 6 de noviembre de 2026). Por eso se eligió TiDB Cloud Starter.
+- **Tareas periódicas.** Las importaciones, la limpieza, la retención y Drive corren dentro del servidor web con temporizadores. Si Render lo duerme, no corren a su hora: se ponen al día cuando despierta.
+- **Dos motores.** Las pruebas automáticas corren en MySQL 8.4 y en PostgreSQL 17 (CI). Antes de abrir el servicio, ejecuta las migraciones y la suite del backend contra un proyecto Supabase de prueba (no el de producción) y anota el resultado.

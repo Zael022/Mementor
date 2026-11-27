@@ -6,7 +6,7 @@ Actúa como desarrollador senior full-stack, arquitecto de datos, ingeniero de I
 MENTOR AI es un LMS adaptativo para instituciones, docentes y estudiantes. Administra cursos, lecciones, tareas, cuestionarios y progreso; un tutor de IA consulta material publicado del curso para dar explicaciones con fuentes, y el motor adaptativo recomienda práctica según resultados objetivos. Profesores revisan borradores generados y supervisan decisiones académicas; el sistema **no** cambia calificaciones oficiales por decisión del LLM.
 
 ## REGLAS OBLIGATORIAS — NO NEGOCIABLES
-1. **Stack:** frontend React + Vite **en JavaScript/JSX**, backend Node.js + Express **en JavaScript**, MySQL 8+ como almacenamiento persistente, **Sequelize ORM** para modelos, asociaciones y migraciones. API REST con JSON. No cambiar a MongoDB, Firebase, PostgreSQL, Prisma o archivos JSON como base de datos.
+1. **Stack:** frontend React + Vite **en JavaScript/JSX**, backend Node.js + Express **en JavaScript**, MySQL 8+ como almacenamiento persistente, **Sequelize ORM** para modelos, asociaciones y migraciones. API REST con JSON. No cambiar a MongoDB, Firebase, PostgreSQL, Prisma o archivos JSON como base de datos. (Única excepción: la rama `despliegue-nube` también publica sobre PostgreSQL de Supabase sin dejar MySQL; ver ADR 0012.)
 2. **Carpetas de frontend con nombres EXACTOS** (importaciones respetan mayúsculas/minúsculas):
    - `frontend/src/Componentes/`: elementos reutilizables, formularios, barra lateral, cards.
    - `frontend/src/Pages/`: páginas completas según rol, página de inicio, cursos, login, tutor, progreso, evaluación.

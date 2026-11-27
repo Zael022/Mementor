@@ -2,7 +2,7 @@
 
 Implementa MENTOR AI como plataforma educativa real. Antes de programar, lee `01_PROMPT_MAESTRO_CLAUDE.md` y `15_REGLAS_ESTRUCTURA_Y_SIN_DATOS.md`.
 
-1. Tecnologías obligatorias: React + Vite en JSX, Node.js + Express, MySQL y **Sequelize ORM** con migraciones. Nada de JSON Server ni ORM alternativo.
+1. Tecnologías obligatorias: React + Vite en JSX, Node.js + Express, MySQL y **Sequelize ORM** con migraciones. Nada de JSON Server ni ORM alternativo. Excepción solo en la rama `despliegue-nube` (ADR 0012): el mismo código también corre en PostgreSQL de Supabase para publicar en Vercel + Render + Supabase; MySQL sigue siendo el motor local y de referencia, y el SQL a mano pasa por `src/utils/sql.js`.
 2. Estructura frontend exacta: `src/Componentes/`, `src/Pages/`, `src/Rutas/`, `src/App.jsx`, `src/main.jsx`, `frontend/index.html`.
 3. Backend en capas: config, models, controllers, services, routes, middlewares, validators; conexión real Sequelize; `config/db.json` sin secretos, `.env` no versionado.
 4. **Cuentas de prueba solo con el modo de prueba** (`DEMO_MODE=on`, ADR 0011): una por rol, marcadas con `users.is_demo`, creadas al arrancar o con `npm run demo:cuentas`, y el «Acceso rápido de prueba» en el inicio de sesión. Con el modo apagado no entran. No se precargan cursos ni contenido académico: lo crean los usuarios desde la interfaz. Mantén estados vacíos reales.

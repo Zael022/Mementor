@@ -9,7 +9,9 @@ Plataforma educativa adaptativa: cursos, lecciones, cuestionarios con correcció
 
 **Seguimiento institucional de plataforma (avance parcial):** módulo separado de admisiones para `platform_admin`. Permite listar instituciones, configurar una ficha y registrar contactos profesionales; aún faltan tareas, soporte, incorporación verificable y políticas de conservación. Requiere la migración `20261124000100`; véase [la decisión y pendientes](docs/adr/0007-crm-instituciones.md). No aplicar la migración en producción como parte de esta entrega.
 
-**Despliegue:** pendiente de verificar. Las direcciones previstas son https://mentor-ai.vercel.app (frontend) y https://mentor-api.onrender.com/api/v1 (API), pero no cuentan como publicadas hasta completar el registro de aceptación de `docs/despliegue.md` (sección 6) sobre la URL pública.
+**Rama `despliegue-nube`:** se abre en tu computadora igual que `main` (MySQL) y además se publica con **Vercel (frontend) + Render (API) + Supabase (PostgreSQL y archivos)**. Guía paso a paso en `docs/despliegue.md` y decisiones en `docs/adr/0012-despliegue-vercel-render-supabase.md`.
+
+**Despliegue:** pendiente de verificar. Las direcciones previstas son https://mentor-ai.vercel.app (frontend) y https://mentor-api.onrender.com/api/v1 (API), pero no cuentan como publicadas hasta completar el registro de aceptación de `docs/despliegue.md` (sección 5) sobre la URL pública.
 
 ## Entregables del Proyecto Final (FWD Costa Rica)
 | Documento | Word y PDF |
@@ -212,13 +214,13 @@ Las pruebas automáticas **nunca** llaman a Google Cloud ni al proveedor de IA: 
 
 ## 6. Producción
 
-Despliegue paso a paso (TiDB Cloud, Render, Vercel y n8n) en `docs/despliegue.md`; justificación, costos, respaldos y pruebas en el Plan de Producción. Las variables necesarias están en `backend/.env.example` (solo nombres).
+Despliegue paso a paso (Supabase, Render, Vercel y n8n) en `docs/despliegue.md`; justificación, costos, respaldos y pruebas en el Plan de Producción. Las variables necesarias están en `backend/.env.example` (solo nombres).
 
 
 - **Proxy o balanceador.** Define `TRUST_PROXY` con la cantidad de proxies delante del backend (normalmente `1`) o sus direcciones. Sin esto, todas las peticiones parecen venir de la IP del proxy y los límites de intentos se comparten entre todos los usuarios. El valor `true` se rechaza porque permitiría falsificar la IP.
 - **Varias instancias.** Con `RATE_LIMIT_STORE=mysql` los límites por IP se cuentan en MySQL y valen para todas las instancias. Las tareas periódicas (importaciones, limpieza, retención y Drive) solo las ejecuta la instancia que tiene el turno en `job_leases`; si se apaga, otra lo toma en 90 segundos. La cuota diaria del tutor ya se reserva en MySQL.
 - **Chat en vivo.** El servidor envía `: ping` cada `SSE_PING_MS` (15 s) para que los proxies no corten la conexión. Si usas nginx, mantén `proxy_buffering off` para `/api/v1/tutor/`.
-- **Originales duraderos.** Con `STORAGE_DRIVER=gcs` los materiales y fotos de perfil se copian a un bucket privado de Cloud Storage (ADC) y el disco solo se usa como paso temporal; `materials.content_sha256` guarda la huella y la descarga la envía en `X-Content-SHA256`. Una carga se registra con su auditoría en una sola transacción: si algo falla antes de confirmar, el original se descarta y no queda fila huérfana; si falla la indexación, el material queda guardado y la fuente se reintenta. Guía en `docs/despliegue.md` (sección 2).
+- **Originales duraderos.** Con `STORAGE_DRIVER=supabase` (o `gcs`) los materiales y fotos de perfil se copian a un bucket privado de Supabase Storage (o de Cloud Storage con ADC) y el disco solo se usa como paso temporal; `materials.content_sha256` guarda la huella y la descarga la envía en `X-Content-SHA256`. Una carga se registra con su auditoría en una sola transacción: si algo falla antes de confirmar, el original se descarta y no queda fila huérfana; si falla la indexación, el material queda guardado y la fuente se reintenta. Guía en `docs/despliegue.md` (sección 1).
 - **Consentimiento.** Con términos o privacidad pendientes, el servidor rechaza cualquier operación nueva (`403 CONSENT_REQUIRED`) salvo aceptar, cerrar sesión, leer y pedir la baja; la interfaz vuelve a mostrar el diálogo.
 - **Notas emitidas.** El puntaje máximo de una tarea con entregas calificadas no se puede cambiar (`409 GRADED_MAX_LOCKED`).
 - **Seguridad web.** Inyección SQL, XSS (CSP en `frontend/vercel.json`), CSRF y CORS estricto (`403 ORIGIN_NOT_ALLOWED`): medidas, investigación, laboratorio y evidencias en `docs/seguridad/`.

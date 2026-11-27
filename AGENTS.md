@@ -4,6 +4,7 @@ Este archivo es coherente con `CLAUDE.md`; si hay contradicción, mandan `CLAUDE
 
 ## Stack y estructura
 - React + Vite en JavaScript/JSX (`frontend/src/{Componentes,Pages,Rutas}`), Node.js 22.22.2+ (o 24.15+) con Express, MySQL 8 con Sequelize y migraciones.
+- Rama `despliegue-nube` (ADR 0012): además corre en PostgreSQL de Supabase (Vercel + Render + Supabase). El SQL escrito a mano usa `runSql`, `nowMinus`, `nowPlus` y `affectedRows` de `src/utils/sql.js`; las migraciones usan `database/compat.cjs`; `main` y `develop` siguen solo con MySQL.
 - Backend en capas: `config`, `models`, `controllers`, `services`, `routes`, `middlewares`, `validators`, `utils`. API bajo `/api/v1`, sesión por cookie httpOnly y token CSRF en `x-csrf-token`.
 - Interfaz y comentarios en español, breves y generales.
 
@@ -26,7 +27,7 @@ Este archivo es coherente con `CLAUDE.md`; si hay contradicción, mandan `CLAUDE
 ## Antes de entregar
 - `backend`: `npm run lint` y `npm test` (MySQL de pruebas).
 - `frontend`: `npm run lint`, `npm test` y `npm run build`; si cambia un recorrido de la interfaz, `npm run test:e2e` (base `_e2e`).
-- GitHub Actions (`.github/workflows/ci.yml`) repite todo con MySQL 8.4 en cada push.
+- GitHub Actions (`.github/workflows/ci.yml`) repite todo con MySQL 8.4 en cada push y, en `despliegue-nube`, el backend también con PostgreSQL 17.
 - Actualiza `docs/ESTADO_DESARROLLO_PARA_CLAUDE.md` con resultados reales. Separa las pruebas con dobles de las que usaron servicios reales.
 
 ## Documentos
