@@ -83,13 +83,23 @@ Para actualizar una instalación anterior, ejecuta `npm ci` en ambas carpetas y 
 
 En una prueba en memoria con 100 documentos de unos 17.000 caracteres, la mediana de 15 búsquedas con la caché preparada pasó de **62,85 ms a 1,74 ms**. Esta medición cubre la selección local de fragmentos. El JavaScript inicial completo, sumando sus dependencias estáticas, mide **90,59 kB gzip antes y 90,71 kB después**. La separación de dependencias permite reutilizarlas al actualizar la aplicación. Los resultados de validación están en `docs/ESTADO_DESARROLLO_PARA_CLAUDE.md`.
 
-## 2. Tutor de IA
-Sin configuración, el tutor responde `AI_NOT_CONFIGURED` y el resto de la plataforma funciona. En `backend/.env`:
+## 2. Tutor de IA y asistentes
+Las 9 funciones de IA (el tutor y los 8 asistentes de `docs/agentes-ia.md`) usan la misma configuración. Sin ella responden `AI_NOT_CONFIGURED` y el resto de la plataforma funciona. MENTOR nunca inventa respuestas cuando falta la clave.
+
+**Activarla, paso a paso:**
+1. Crea una cuenta en la consola de Anthropic, agrega créditos en la facturación y crea una clave (empieza con `sk-ant-`).
+2. En `backend/.env` (nunca en el repositorio):
 ```
 AI_PROVIDER=anthropic            # o openai
-AI_API_KEY=tu_clave
-AI_MODEL=identificador_disponible_en_tu_cuenta   # por ejemplo claude-opus-5-5
+AI_API_KEY=tu_clave              # la pegas tú; no la compartas ni la subas a GitHub
+AI_MODEL=claude-sonnet-5-5       # o el identificador disponible en tu cuenta
+AI_MODEL_RAPIDO=claude-haiku-5-5     # opcional: anuncios, resúmenes, Coach y analista
+AI_MODEL_AVANZADO=claude-sonnet-5-5  # opcional: tutor, retroalimentación, preguntas y cumplimiento
+AI_BASE_URL=                     # vacío para usar el proveedor real
 ```
+3. En `backend`, corre `npm run ia:verificar`. Hace una llamada mínima por modelo (5 tokens) y dice qué funciones quedaron listas. Si algo falla, explica en español qué falta: la clave, los créditos, el modelo o la conexión. Nunca muestra la clave.
+4. Reinicia el backend (`npm run dev`) para que tome los cambios.
+5. En la nube (rama `despliegue-nube`), estas mismas variables se ponen en el panel de Render. No van en Vercel.
 - Con `anthropic` el chat usa **streaming** (SDK oficial) y se puede detener, pero el servidor **retiene el texto hasta validarlo**: el navegador solo ve el avance. Con `openai` la respuesta llega completa.
 - Validación: cada oración con contenido se compara con el pasaje que cita (números presentes en la fuente y términos en común). Una frase como «dos más dos son nueve» citando «dos más dos son cuatro» se rechaza. No es una garantía pedagógica: por eso cada cita abre su pasaje.
 - Si el curso no cubre la pregunta, el estudiante recibe un aviso de material insuficiente y **no se llama al modelo**.
