@@ -872,3 +872,33 @@ img.con-foto { object-fit: cover; background: var(--suave-neutro); padding: 0; }
 .campo-compacto { max-width: 340px; margin: 6px 0 0; }
 .campo-compacto label { font-size: 0.86rem; }
 .campo-compacto select { padding-block: 6px; }
+
+/* --- Recorrido guiado: resalta una función y explica cómo ayuda a estudiar --- */
+.boton-recorrido { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 4px 12px; border: 1px dashed var(--linea-fuerte); border-radius: 999px; background: transparent; color: var(--enlace); font: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
+.boton-recorrido:hover { border-style: solid; }
+.boton-recorrido.claro { color: #fff; border-color: rgba(255, 255, 255, 0.7); }
+.recorrido { position: fixed; inset: 0; z-index: 1000; pointer-events: none; }
+.recorrido-foco {
+  position: fixed; border-radius: 14px; pointer-events: none;
+  box-shadow: 0 0 0 200vmax rgba(8, 12, 40, 0.55); outline: 3px solid var(--lima); outline-offset: 0;
+  transition: top 0.35s var(--suave), left 0.35s var(--suave), width 0.35s var(--suave), height 0.35s var(--suave);
+}
+.recorrido-tarjeta {
+  position: fixed; right: 16px; bottom: 16px; pointer-events: auto; width: min(420px, calc(100vw - 24px));
+  padding: 16px 18px; border: 1px solid var(--linea); border-radius: var(--radio-grande); background: var(--panel); color: var(--tinta);
+  box-shadow: 0 24px 50px -16px rgba(8, 12, 40, 0.55); transition: top 0.3s var(--suave), left 0.3s var(--suave);
+}
+.recorrido-tarjeta[style*="top"] { right: auto; bottom: auto; }
+.recorrido-cabecera { display: flex; align-items: center; gap: 10px; }
+.recorrido-cabecera .mascota { flex: none; }
+.recorrido-progreso { margin: 0; font-size: 0.8rem; font-weight: 700; color: var(--tenue); }
+.recorrido-tarjeta h2 { margin: 0; font-size: 1.12rem; }
+.recorrido-tarjeta h2:focus { outline: none; }
+.recorrido-tarjeta > p { margin: 10px 0 14px; line-height: 1.5; }
+.recorrido-acciones { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.recorrido-flechas { display: flex; gap: 8px; }
+.recorrido-flechas .boton { padding: 7px 18px; }
+.recorrido.sin-movimiento .recorrido-foco, .recorrido.sin-movimiento .recorrido-tarjeta { transition: none; }
+@media (max-width: 639px) {
+  .recorrido-tarjeta, .recorrido-tarjeta[style*="top"] { left: 12px; right: 12px; bottom: 12px; top: auto; width: auto; }
+}

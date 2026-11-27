@@ -47,7 +47,11 @@ npm run admin:create             # pide correo, nombre y contraseña del primer 
 npm run dev                      # API en http://localhost:3001
 ```
 
-**Cuentas de prueba (opcional).** Agrega `DEMO_MODE=on` al `.env` del backend y reinícialo: se crea una «Institución de prueba» con una cuenta por rol, y en el inicio de sesión aparece el enlace discreto «Acceso rápido de prueba» para entrar sin contraseña. También puedes crearlas o repararlas con `npm run demo:cuentas`.
+**Cuentas y curso de prueba (opcional).** Agrega `DEMO_MODE=on` al `.env` del backend y reinícialo. Se crean:
+- una «Institución de prueba» con una cuenta por rol;
+- el curso «Matemática 7° · curso de prueba», con actividad simulada: avance, racha, tareas calificadas, Parejas listo y dos compañeros.
+
+En el inicio de sesión aparece el enlace discreto «Acceso rápido de prueba» para entrar sin contraseña. Con la cuenta de estudiante se abre solo un **recorrido guiado** que explica cómo cada función ayuda a estudiar; cualquiera puede verlo con «¿Cómo me ayuda esta página?». Para crearlo o repararlo: `npm run demo:cuentas`; para dejar el curso como nuevo: `npm run demo:cuentas -- --reiniciar`.
 
 | Rol | Correo | Contraseña |
 |---|---|---|

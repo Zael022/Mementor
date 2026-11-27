@@ -20,6 +20,8 @@ export function publicUser(user) {
     institutionId: user.institutionId,
     institutionName: user.institution?.name ?? null,
     avatarUrl: avatarUrl(user),
+    // Cuenta de prueba: el frontend abre solo el recorrido guiado la primera vez.
+    isDemo: Boolean(user.isDemo),
   };
 }
 

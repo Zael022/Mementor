@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import { prepareDatabase, closeDatabase, request, app } from './helpers.js';
 import { User } from '../src/models/index.js';
 import { DEMO_ACCOUNTS, ensureDemoAccounts } from '../src/services/demoService.js';
+import { ensureDemoCourse } from '../src/services/demoCourseService.js';
+import { DEMO_CLASSMATES, DEMO_COURSE } from '../src/services/demoContent.js';
+import { Course } from '../src/models/index.js';
 import { hashPassword } from '../src/utils/security.js';
 
 // Modo de prueba: cuentas por rol y acceso rápido, solo con DEMO_MODE encendido.
@@ -29,7 +32,8 @@ test('con DEMO_MODE encendido se crea una cuenta por rol, sin duplicar al repeti
   await ensureDemoAccounts();
   assert.equal(primera.accounts.length, DEMO_ACCOUNTS.length);
   const usuarios = await User.findAll({ where: { isDemo: true } });
-  assert.equal(usuarios.length, DEMO_ACCOUNTS.length);
+  // Una cuenta por rol más los compañeros simulados.
+  assert.equal(usuarios.length, DEMO_ACCOUNTS.length + DEMO_CLASSMATES.length);
   for (const cuenta of DEMO_ACCOUNTS) {
     const usuario = usuarios.find((item) => item.email === cuenta.email);
     assert.equal(usuario.role, cuenta.role);
@@ -75,4 +79,46 @@ test('nunca toma una cuenta real que use el mismo correo', async () => {
   const sigue = await User.findByPk(real.id);
   assert.equal(sigue.isDemo, false);
   await sigue.update({ isDemo: true });
+});
+
+test('el curso de prueba trae actividad simulada calculada por los servicios reales', async () => {
+  encender();
+  await ensureDemoAccounts();
+  const resultado = await ensureDemoCourse();
+  assert.equal(resultado.created, true);
+  const ana = request.agent(app);
+  await ana.post(`${API}/auth/demo`).send({ role: 'student' });
+  const inicio = await ana.get(`${API}/me/home`);
+  const curso = inicio.body.data.courses.find((item) => item.id === resultado.courseId);
+  // 4 de 8 lecciones y 1 de 3 tareas: 5 de 11 = 45 % → Luz.
+  assert.equal(curso.rank.percent, 45);
+  assert.equal(curso.rank.name, 'Luz');
+  const detalle = await ana.get(`${API}/courses/${resultado.courseId}`);
+  const numeros = detalle.body.data.modules.find((modulo) => modulo.title === 'Números');
+  assert.equal(numeros.practicePairs, 6);
+  const practica = await ana.get(`${API}/courses/${resultado.courseId}/daily-practice`);
+  // Cuatro días seguidos hasta ayer: hoy le toca mantener la racha.
+  assert.equal(practica.body.data.streak.current, 4);
+  assert.equal(practica.body.data.streak.atRisk, true);
+  const tareas = await ana.get(`${API}/courses/${resultado.courseId}/assignments`);
+  const ejercicios = tareas.body.data.find((item) => item.title === 'Ejercicios de fracciones');
+  assert.equal(ejercicios.submitted, true);
+  assert.equal(ejercicios.gradePoints, 88);
+  // El docente ve a los tres estudiantes con su rango en la analítica.
+  const docente = request.agent(app);
+  await docente.post(`${API}/auth/demo`).send({ role: 'teacher' });
+  const analitica = await docente.get(`${API}/teacher/courses/${resultado.courseId}/analytics`);
+  assert.equal(analitica.body.data.students.length, 3);
+});
+
+test('el curso de prueba no se duplica y con reiniciar se archiva el anterior', async () => {
+  encender();
+  const antes = await Course.findOne({ where: { code: DEMO_COURSE.code } });
+  assert.equal((await ensureDemoCourse()).created, false);
+  const nuevo = await ensureDemoCourse({ reiniciar: true });
+  assert.equal(nuevo.created, true);
+  assert.notEqual(nuevo.courseId, antes.id);
+  const viejo = await Course.findByPk(antes.id);
+  assert.equal(viejo.status, 'archived');
+  assert.notEqual(viejo.code, DEMO_COURSE.code);
 });

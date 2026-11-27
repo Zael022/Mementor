@@ -5,6 +5,7 @@ import { hashPassword, verifyPassword } from '../utils/security.js';
 import { recordAudit } from './auditService.js';
 import { startSession } from './authService.js';
 import { acceptPolicies, POLICY_VERSIONS } from './consentService.js';
+import { DEMO_CLASSMATES } from './demoContent.js';
 
 // Cuentas de prueba (ADR 0011): una por rol, en una institución de prueba.
 // Solo existen y entran con DEMO_MODE encendido; el dominio .test nunca recibe correo real.
@@ -25,8 +26,10 @@ export async function ensureDemoAccounts() {
   const [institution] = await Institution.findOrCreate({ where: { slug: DEMO_INSTITUTION.slug }, defaults: { name: DEMO_INSTITUTION.name, status: 'active' } });
   if (institution.status !== 'active') await institution.update({ status: 'active' });
 
+  // Además de una cuenta por rol, dos compañeros de clase simulados (sin acceso rápido).
+  const companeros = DEMO_CLASSMATES.map(({ email, displayName }) => ({ role: 'student', email, displayName, companero: true }));
   const cuentas = [];
-  for (const cuenta of DEMO_ACCOUNTS) {
+  for (const cuenta of [...DEMO_ACCOUNTS, ...companeros]) {
     const institutionId = cuenta.role === 'platform_admin' ? null : institution.id;
     let user = await User.findOne({ where: { email: cuenta.email } });
     // Nunca se toma una cuenta real que casualmente use el mismo correo.
@@ -47,7 +50,7 @@ export async function ensureDemoAccounts() {
       // Los términos quedan aceptados para entrar directo (son cuentas de prueba).
       await acceptPolicies(user.id, Object.keys(POLICY_VERSIONS), { transaction });
     });
-    cuentas.push({ ...cuenta, id: user.id });
+    if (!cuenta.companero) cuentas.push({ ...cuenta, id: user.id });
   }
   return { institution: { id: institution.id, ...DEMO_INSTITUTION }, accounts: cuentas, password };
 }
