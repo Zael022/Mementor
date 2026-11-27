@@ -2,6 +2,8 @@ import 'dotenv/config';
 import app from './app.js';
 import { sequelize } from './config/database.js';
 import { startBackgroundJobs } from './services/backgroundJobs.js';
+import { ensureDemoAccounts } from './services/demoService.js';
+import { demoEnabled } from './utils/demo.js';
 import { jwtSecret } from './utils/jwt.js';
 
 // Inicia el servidor después de validar la base de datos.
@@ -11,6 +13,11 @@ try {
   jwtSecret();
   if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_ORIGIN) throw new Error('Configura FRONTEND_ORIGIN con la URL pública del frontend.');
   await sequelize.authenticate();
+  // Modo de prueba: crea o repara las cuentas de prueba y lo avisa en la consola.
+  if (demoEnabled()) {
+    await ensureDemoAccounts();
+    console.warn('Modo de prueba encendido (DEMO_MODE): cuentas de prueba y acceso rápido habilitados. Apágalo para uso real.');
+  }
   const server = app.listen(port, () => console.log(`MENTOR AI API escuchando en puerto ${port}`));
   const stopJobs = startBackgroundJobs();
   // Al apagar, se libera el turno de tareas para que otra instancia lo tome sin esperar.

@@ -375,6 +375,13 @@ tbody tr:hover { background: var(--fila-hover); }
 .formulario-portada > h2 { background: var(--oscuro); color: #fff; margin: 0; padding: 18px 26px; font-size: 1.25rem; }
 .formulario-cuerpo { padding: 24px 26px 26px; display: flex; flex-direction: column; }
 .formulario-cuerpo .boton { align-self: flex-start; margin-top: 6px; }
+/* Acceso rápido de prueba: discreto (texto pequeño plegado) y solo con DEMO_MODE encendido. */
+.acceso-rapido { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--linea); }
+.acceso-rapido summary { display: inline-flex; align-items: center; min-height: 24px; cursor: pointer; font-size: 0.85rem; color: var(--tenue); text-decoration: underline dotted; text-underline-offset: 3px; }
+.acceso-rapido summary:hover { color: var(--tinta); }
+.acceso-rapido[open] summary { margin-bottom: 4px; }
+.acceso-rapido-roles { display: flex; flex-wrap: wrap; gap: 6px; }
+.acceso-rapido .chip { font-size: 0.82rem; padding: 4px 12px; }
 .flecha-abajo { position: absolute; left: 50%; bottom: 16px; z-index: 2; width: 36px; height: 36px; margin-left: -18px; border-radius: 50%; background: var(--lima); color: var(--sobre-claro); display: grid; place-items: center; font-weight: 800; text-decoration: none; animation: rebote 1.6s ease-in-out infinite; }
 .portada-detalles { padding: clamp(36px, 6vw, 72px) clamp(16px, 6vw, 90px); background: var(--fondo); }
 .portada-detalles h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: 26px; }

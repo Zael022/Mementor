@@ -3,7 +3,7 @@
 Plataforma educativa adaptativa: cursos, lecciones, cuestionarios con corrección automática, dominio por tema, recomendaciones explicadas, aula (clases en vivo, materiales, tareas) y un **tutor de IA que responde solo con el material autorizado del curso y cita la fuente**.
 
 **Stack:** React + Vite (JSX) · Node.js + Express · MySQL 8 + Sequelize (migraciones) · Google Cloud RAG Engine (opcional) · Anthropic u OpenAI para generar respuestas.
-**Sin datos precargados:** después de migrar, la base queda vacía (solo el catálogo de roles). No hay seeds, cuentas demo ni IA simulada.
+**Sin contenido precargado:** después de migrar, la base queda vacía (solo el catálogo de roles); no hay cursos de ejemplo ni IA simulada. Para probar rápido existe un **modo de prueba** opcional (`DEMO_MODE=on`) con una cuenta por rol y un botón discreto «Acceso rápido de prueba» en el inicio de sesión (ver más abajo).
 
 **Admisiones CRM:** convocatorias por curso, nueve etapas, historial y seguimientos, métricas de cohortes, matrícula transaccional, borradores revisados y derechos de prospectos. Recorrido, configuración, pruebas aisladas de 40 solicitudes y estado de requisitos en [docs/CRM.md](docs/CRM.md). No requiere IA para gestionar admisiones. Las migraciones nuevas son `20261122000100` y `20261122000200`.
 
@@ -46,6 +46,18 @@ npm run db:migrate               # crea las tablas, sin insertar filas
 npm run admin:create             # pide correo, nombre y contraseña del primer administrador
 npm run dev                      # API en http://localhost:3001
 ```
+
+**Cuentas de prueba (opcional).** Agrega `DEMO_MODE=on` al `.env` del backend y reinícialo: se crea una «Institución de prueba» con una cuenta por rol, y en el inicio de sesión aparece el enlace discreto «Acceso rápido de prueba» para entrar sin contraseña. También puedes crearlas o repararlas con `npm run demo:cuentas`.
+
+| Rol | Correo | Contraseña |
+|---|---|---|
+| Estudiante | `estudiante@prueba.mentorai.test` | `MentorPrueba2026` (o la de `DEMO_PASSWORD`) |
+| Docente | `docente@prueba.mentorai.test` | igual |
+| Admin. de institución | `admin.institucion@prueba.mentorai.test` | igual |
+| Auditoría | `auditoria@prueba.mentorai.test` | igual |
+| Admin. de plataforma | `admin.plataforma@prueba.mentorai.test` | igual |
+
+Con `DEMO_MODE=off` (o sin la variable) el botón desaparece y estas cuentas no pueden entrar, ni siquiera con su contraseña. No lo dejes encendido en un uso real.
 
 ### Frontend (otra terminal)
 ```powershell
@@ -228,6 +240,7 @@ Despliegue paso a paso (TiDB Cloud, Render, Vercel y n8n) en `docs/despliegue.md
 | backend | `npm run dev` / `npm start` | Inicia la API y las tareas periódicas (importaciones, limpieza, Drive) |
 | backend | `npm run db:migrate` · `db:migrate:status` · `db:migrate:undo` | Migraciones Sequelize |
 | backend | `npm run admin:create` | Crea el primer administrador |
+| backend | `npm run demo:cuentas` | Crea o repara las cuentas de prueba (requiere `DEMO_MODE=on`) |
 | backend | `npm test` | Pruebas en `TEST_DB_NAME` |
 | frontend | `npm run dev` · `npm run build` · `npm test` | Desarrollo, compilación y pruebas de componentes |
 | frontend | `npm run test:e2e` | Pruebas en navegador con Playwright (base `_e2e`) |

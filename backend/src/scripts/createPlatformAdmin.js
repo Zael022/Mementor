@@ -29,7 +29,8 @@ async function ask(question, { hidden = false } = {}) {
 
 async function main() {
   await sequelize.authenticate();
-  if (await User.count({ where: { role: 'platform_admin' } })) {
+  // La cuenta de prueba de plataforma no cuenta: el administrador real se puede crear igual.
+  if (await User.count({ where: { role: 'platform_admin', isDemo: false } })) {
     throw new Error('Ya existe un administrador de plataforma. Este comando solo se usa en la instalación inicial.');
   }
 

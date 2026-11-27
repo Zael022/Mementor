@@ -68,8 +68,8 @@ export function SesionProvider({ children }) {
     return () => window.removeEventListener('mentor:consentimiento-pendiente', alFaltarConsentimiento);
   }, []);
 
-  const iniciarSesion = useCallback(async (email, password) => {
-    const { data } = await api.post('/auth/login', { email, password });
+  // Deja lista la sesión que entregó el backend (inicio normal o acceso rápido de prueba).
+  const abrirSesion = useCallback(async (data) => {
     setCsrfToken(data.csrfToken);
     setUsuario(data.user);
     setPendientes(data.pendingConsents || []);
@@ -77,6 +77,17 @@ export function SesionProvider({ children }) {
     await cargarPreferencias();
     return data.user;
   }, [cargarPreferencias]);
+
+  const iniciarSesion = useCallback(async (email, password) => {
+    const { data } = await api.post('/auth/login', { email, password });
+    return abrirSesion(data);
+  }, [abrirSesion]);
+
+  // Acceso rápido con la cuenta de prueba de un rol (solo si el backend tiene DEMO_MODE encendido).
+  const entrarComoPrueba = useCallback(async (role) => {
+    const { data } = await api.post('/auth/demo', { role });
+    return abrirSesion(data);
+  }, [abrirSesion]);
 
   const cerrarSesion = useCallback(async () => {
     try {
@@ -117,10 +128,10 @@ export function SesionProvider({ children }) {
 
   const valor = useMemo(
     () => ({
-      usuario, cargando, vencida, pendientes, iniciarSesion, cerrarSesion, actualizarUsuario, preferencias, guardarPreferencias,
+      usuario, cargando, vencida, pendientes, iniciarSesion, entrarComoPrueba, cerrarSesion, actualizarUsuario, preferencias, guardarPreferencias,
       consentimientosAceptados, sesionEliminada,
     }),
-    [usuario, cargando, vencida, pendientes, iniciarSesion, cerrarSesion, actualizarUsuario, preferencias, guardarPreferencias,
+    [usuario, cargando, vencida, pendientes, iniciarSesion, entrarComoPrueba, cerrarSesion, actualizarUsuario, preferencias, guardarPreferencias,
       consentimientosAceptados, sesionEliminada],
   );
   return <SesionContext.Provider value={valor}>{children}</SesionContext.Provider>;

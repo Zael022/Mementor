@@ -15,6 +15,8 @@ export const User = sequelize.define('User', {
     validate: { isIn: [['platform_admin', 'institution_admin', 'teacher', 'student', 'auditor']] },
   },
   status: { type: DataTypes.ENUM('invited', 'active', 'disabled'), allowNull: false, defaultValue: 'invited' },
+  // Cuenta de prueba: solo entra con DEMO_MODE encendido.
+  isDemo: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
   invitationTokenHash: { type: DataTypes.CHAR(64), allowNull: true },
   invitationExpiresAt: { type: DataTypes.DATE, allowNull: true },
   failedLoginCount: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },

@@ -1,6 +1,6 @@
 # Diccionario de datos de MENTOR AI
 
-Generado desde las migraciones de Sequelize (76 tablas, 765 columnas, 159 llaves foráneas). Motor: MySQL 8 (utf8mb4).
+Generado desde las migraciones de Sequelize (76 tablas, 766 columnas, 159 llaves foráneas). Motor: MySQL 8 (utf8mb4).
 
 Convenciones: PK = llave primaria, FK = llave foránea, UQ = valor único. Todas las tablas tienen `created_at` y `updated_at` salvo las indicadas.
 
@@ -44,6 +44,7 @@ Personas que usan la plataforma, su rol, institución y datos de perfil.
 | `avatar_file` | `varchar(64)` | Sí |  | Nombre interno del archivo de la foto de perfil. |
 | `avatar_updated_at` | `datetime` | Sí |  | Fecha del último cambio de foto. |
 | `anonymized_at` | `datetime` | Sí |  | Fecha en que se anonimizó la cuenta tras la baja. |
+| `is_demo` | `tinyint(1)` | No |  | Si es una cuenta de prueba (solo entra con DEMO_MODE encendido). |
 
 ### `user_sessions`
 
