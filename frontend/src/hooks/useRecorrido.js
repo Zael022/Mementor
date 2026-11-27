@@ -1,13 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSesion } from '../context/SesionContext.jsx';
 
-// Abre y cierra el recorrido guiado de una página. Con una cuenta de prueba se abre solo la primera vez
-// (se recuerda en este navegador); cualquiera puede volver a verlo con el botón «¿Cómo me ayuda esta página?».
+const PREFIJO = 'mentor.recorrido.';
+
+// Olvida qué recorridos ya se vieron, para que vuelvan a abrirse solos (se usa al entrar con una cuenta de prueba).
+export function reiniciarRecorridos() {
+  try {
+    Object.keys(localStorage).filter((llave) => llave.startsWith(PREFIJO)).forEach((llave) => localStorage.removeItem(llave));
+  } catch { /* sin almacenamiento: los recorridos ya se muestran siempre */ }
+}
+
+// Abre y cierra el recorrido guiado de una página. Con una cuenta de prueba se abre solo en cada inicio de sesión
+// (al cerrarlo se recuerda hasta la siguiente entrada); cualquiera puede volver a verlo con «¿Cómo me ayuda esta página?».
 export function useRecorrido(clave, listo) {
   const { usuario } = useSesion();
   const [abierto, setAbierto] = useState(false);
   const boton = useRef(null);
-  const llave = `mentor.recorrido.${clave}`;
+  const llave = `${PREFIJO}${clave}`;
 
   useEffect(() => {
     if (!listo || !usuario?.isDemo) return;
