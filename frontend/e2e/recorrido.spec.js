@@ -53,7 +53,7 @@ test.describe('Mapa del curso y rango de avance @movil', () => {
     await expect(rango.getByText('Te falta 1 lección para Luz.')).toBeVisible();
     // Orbi espera junto a la parada siguiente; al tocarlo dice a dónde sigue y lleva el foco a esa parada.
     await page.getByRole('button', { name: 'Orbi: ir a la siguiente parada' }).click();
-    await expect(page.locator('.burbuja-mapa')).toHaveText('¡Vamos! Sigue «Fracciones equivalentes».');
+    await expect(page.locator('.burbuja-mapa[aria-live]')).toHaveText('¡Vamos! Sigue «Fracciones equivalentes».');
     await expect(mapa.getByRole('link', { name: 'Lección 2. Fracciones equivalentes. Continúa aquí' })).toBeFocused();
     await sinInfracciones(page, 'main');
     await capturar(page, `mapa-03-avance-${testInfo.project.name}`);

@@ -66,3 +66,13 @@ export const FRASES_TOQUE = {
 export const FRASE_DESPIERTA = 'Zzz… ¡ah, hola! Ya desperté.';
 // Orbi en el mapa, al tocarlo.
 export const mensajeOrbiMapa = (siguiente) => (siguiente ? `¡Vamos! Sigue «${siguiente}».` : '¡Recorriste todo el mapa! ¡Bien hecho!');
+// Orbi comenta la parada que la persona mira (con el puntero o el teclado). Es decorativo: el estado ya lo dice la tarjeta.
+export const FRASES_MAPA = {
+  completada: '¡Esa ya la hiciste!',
+  siguiente: '¡Esa es la que sigue!',
+  pendiente: 'Esa viene más adelante.',
+  practica: '¡Ahí practicamos con Parejas!',
+  'sin-preguntas': 'Aquí habrá práctica pronto.',
+  orbi: '¿Te llevo a la siguiente parada?',
+  orbiCompleto: '¡Tócame y celebramos!',
+};

@@ -5,7 +5,7 @@ import { leerAvance, olvidarAvance } from '../utils/avanceMapa.js';
 import { muestrear, puntoEn, puntosEntre, trazoPor, trazoRecto } from '../utils/caminoMapa.js';
 import { fechaHora } from '../utils/fechas.js';
 import { gsap } from '../utils/gsapMapa.js';
-import { MENSAJE_MAPA_COMPLETO, mensajeOrbiMapa } from '../utils/mensajesMascota.js';
+import { FRASES_MAPA, MENSAJE_MAPA_COMPLETO, mensajeOrbiMapa } from '../utils/mensajesMascota.js';
 import EstadoVacio from './EstadoVacio.jsx';
 import { useMascotasVisibles, useToqueMascota } from './Mascota.jsx';
 import Orbi from './Orbi.jsx';
@@ -100,28 +100,46 @@ function IconoNodo({ parada, estado }) {
   return <span>{parada.numero}</span>;
 }
 
-// Adornos de cada zona del mapa (decorativos): destellos como el de la marca, planetas y nubes.
+// Adornos de cada zona del mapa (decorativos): destellos como el de la marca, planetas, nubes, colinas y una constelación.
 function Destello({ className }) {
-  return <svg className={`adorno ${className}`} viewBox="0 0 24 24" width="22" height="22"><path d="M12 1.5c.9 5.6 4.9 9.6 10.5 10.5-5.6.9-9.6 4.9-10.5 10.5C11.1 16.9 7.1 12.9 1.5 12 7.1 11.1 11.1 7.1 12 1.5z" /></svg>;
+  return <svg className={`adorno destello ${className}`} viewBox="0 0 24 24" width="22" height="22"><path d="M12 1.5c.9 5.6 4.9 9.6 10.5 10.5-5.6.9-9.6 4.9-10.5 10.5C11.1 16.9 7.1 12.9 1.5 12 7.1 11.1 11.1 7.1 12 1.5z" /></svg>;
 }
 function Planeta({ className }) {
   return (
-    <svg className={`adorno ${className}`} viewBox="0 0 60 40" width="60" height="40">
+    <svg className={`adorno planeta ${className}`} viewBox="0 0 60 40" width="60" height="40">
       <circle cx="30" cy="20" r="11" />
       <ellipse cx="30" cy="21" rx="26" ry="7" fill="none" strokeWidth="3" transform="rotate(-14 30 21)" />
     </svg>
   );
 }
 function Nube({ className }) {
-  return <svg className={`adorno ${className}`} viewBox="0 0 64 30" width="64" height="30"><path d="M14 28h38a10 10 0 0 0 0-20 14 14 0 0 0-26-2 11 11 0 0 0-12 22z" /></svg>;
+  return <svg className={`adorno nube ${className}`} viewBox="0 0 64 30" width="64" height="30"><path d="M14 28h38a10 10 0 0 0 0-20 14 14 0 0 0-26-2 11 11 0 0 0-12 22z" /></svg>;
 }
+// Colinas con la silueta variando por zona, para que cada módulo se vea como un terreno distinto.
+const COLINAS = [
+  ['M0 90V52Q60 18 130 44T260 40T400 34V90Z', 'M0 90V66Q80 40 170 62T330 56T400 60V90Z'],
+  ['M0 90V40Q90 10 180 38T400 46V90Z', 'M0 90V62Q70 44 150 66T300 58T400 64V90Z'],
+  ['M0 90V48Q50 30 110 46T230 30T400 50V90Z', 'M0 90V68Q100 48 200 70T400 58V90Z'],
+  ['M0 90V44Q120 20 220 46T400 36V90Z', 'M0 90V64Q60 50 140 64T280 54T400 66V90Z'],
+];
 function AdornosZona({ indice }) {
+  const [atras, frente] = COLINAS[indice % COLINAS.length];
   return (
     <div className="mapa-adornos" aria-hidden="true">
+      <svg className="zona-colinas" viewBox="0 0 400 90" preserveAspectRatio="none">
+        <path className="colina-atras" d={atras} />
+        <path className="colina-frente" d={frente} />
+      </svg>
+      <svg className="zona-constelacion" viewBox="0 0 120 70">
+        <path d={indice % 2 ? 'M8 50L36 24L70 34L108 10' : 'M10 14L42 40L78 22L110 52'} />
+        {(indice % 2 ? [[8, 50], [36, 24], [70, 34], [108, 10]] : [[10, 14], [42, 40], [78, 22], [110, 52]])
+          .map(([x, y]) => <circle key={`${x}-${y}`} cx={x} cy={y} r="2.6" stroke="none" />)}
+      </svg>
       <Destello className="a-1" />
       {indice % 2 ? <Nube className="a-2" /> : <Planeta className="a-2" />}
       <Destello className="a-3" />
       {indice % 2 ? <Planeta className="a-4" /> : <Nube className="a-4" />}
+      <Destello className="a-5" />
     </div>
   );
 }
@@ -203,6 +221,9 @@ export default function RutaLecciones({ modulos, tareas = [], cursoId }) {
   const [fraseOrbi, setFraseOrbi] = useState('');
   const esperaFrase = useRef(0);
   useEffect(() => () => clearTimeout(esperaFrase.current), []);
+  // Lo que Orbi está mirando en el mapa: hacia qué lado se inclina y qué comenta.
+  const [mirada, setMirada] = useState(null);
+  const ultimoSaludo = useRef(0);
   const completo = hayParadas && siguiente === -1;
   const cuentanTodas = lista.filter((parada) => parada.tipo === 'leccion' || parada.tipo === 'tarea');
   const hechasTodas = cuentanTodas.filter((parada) => parada.hecha).length;
@@ -303,6 +324,8 @@ export default function RutaLecciones({ modulos, tareas = [], cursoId }) {
 
   // Al tocar a Orbi en el mapa: reacciona, dice a dónde sigue y lleva el foco a esa parada.
   function tocarOrbi() {
+    // El foco que se mueve a la parada no debe disparar otra reacción.
+    ultimoSaludo.current = Date.now();
     tocar();
     const meta = siguiente >= 0 ? lista[siguiente] : null;
     setFraseOrbi(mensajeOrbiMapa(meta?.titulo));
@@ -312,6 +335,33 @@ export default function RutaLecciones({ modulos, tareas = [], cursoId }) {
     const enlace = lienzo.current?.querySelectorAll('.parada')[siguiente]?.querySelector('a');
     enlace?.scrollIntoView?.({ block: 'center', behavior: prefiereMenosMovimiento() ? 'auto' : 'smooth' });
     enlace?.focus({ preventScroll: true });
+  }
+
+  // Orbi sigue con la mirada la parada que se señala (puntero o foco del teclado): se inclina hacia ella,
+  // la comenta y, de vez en cuando, saluda. Si la parada es la siguiente, da un saltito de ánimo.
+  function mirarParada(evento) {
+    const fila = evento.target.closest?.('.parada');
+    if (!fila || !geometria?.descanso) return;
+    const indice = Number(fila.dataset.indice);
+    const parada = lista[indice];
+    const estado = estadoDe(parada, siguiente);
+    const texto = FRASES_MAPA[estado];
+    if (!texto || mirada?.clave === parada.clave) return;
+    const punto = geometria.puntos[indice];
+    const dx = punto.x - geometria.descanso.x;
+    setMirada({ clave: parada.clave, texto, lado: dx < -24 ? 'izq' : dx > 24 ? 'der' : 'centro', arriba: punto.y < geometria.descanso.y - 40 });
+    if (Date.now() - ultimoSaludo.current > 1400) {
+      ultimoSaludo.current = Date.now();
+      if (estado === 'siguiente') tocar();
+      else setSaludo((valor) => valor + 1);
+    }
+  }
+  function mirarOrbi() {
+    setMirada({ clave: 'orbi', texto: completo ? FRASES_MAPA.orbiCompleto : FRASES_MAPA.orbi, lado: 'centro', arriba: false });
+  }
+  function dejarDeMirar(evento) {
+    if (evento.type === 'blur' && lienzo.current?.contains(evento.relatedTarget)) return;
+    setMirada(null);
   }
 
   if (!hayParadas) {
@@ -341,10 +391,10 @@ export default function RutaLecciones({ modulos, tareas = [], cursoId }) {
       </div>
       {completo && <p className="mapa-completo" role="status">{MENSAJE_MAPA_COMPLETO}</p>}
       <div className="mapa-ventana" ref={ventana}>
-        <div className="mapa-lienzo" ref={lienzo}>
+        <div className="mapa-lienzo" ref={lienzo} onPointerOver={mirarParada} onFocus={mirarParada}
+          onPointerLeave={dejarDeMirar} onBlur={dejarDeMirar}>
           {geometria && (
             <svg className="mapa-camino" width={medidas.ancho} height={medidas.alto} viewBox={`0 0 ${medidas.ancho} ${medidas.alto}`} aria-hidden="true" focusable="false">
-              <path className="camino-suelo" d={geometria.base} />
               <path className="camino-base" d={geometria.base} />
               {geometria.avance && <path className="camino-borde" d={geometria.avance} />}
               {geometria.avance && <path className="camino-avance" d={geometria.avance} />}
@@ -374,7 +424,8 @@ export default function RutaLecciones({ modulos, tareas = [], cursoId }) {
                       const estado = estadoDe(parada, siguiente);
                       lado += 1;
                       return (
-                        <li key={parada.clave} className={`parada parada-${parada.tipo} ${estado} lado-${lado % 2 ? 'izq' : 'der'}`}>
+                        <li key={parada.clave} className={`parada parada-${parada.tipo} ${estado} lado-${lado % 2 ? 'izq' : 'der'} ${mirada?.clave === parada.clave ? 'mirada' : ''}`}
+                          data-indice={parada.indice}>
                           <span className="parada-nodo" data-nodo aria-hidden="true"><IconoNodo parada={parada} estado={estado} /></span>
                           <div className="parada-cuerpo">
                             <CuerpoParada parada={parada} estado={estado} cursoId={cursoId} mascotas={mascotas} />
@@ -389,15 +440,17 @@ export default function RutaLecciones({ modulos, tareas = [], cursoId }) {
           </ol>
           <div className={`mapa-hito mapa-meta ${completo ? 'lograda' : ''}`} aria-hidden="true"><Estrella />Meta: Constelación</div>
           {mascotas && geometria?.descanso && (
-            <div className="mapa-orbi" ref={orbi}>
+            <div className="mapa-orbi" ref={orbi} data-mira={mirada?.lado} data-arriba={mirada?.arriba ? '' : undefined}>
               <div>
-                <button type="button" className="mascota-toque" onClick={tocarOrbi}
+                <button type="button" className="mascota-toque" onClick={tocarOrbi} onPointerEnter={mirarOrbi} onFocus={mirarOrbi}
                   aria-label={completo ? 'Orbi: celebrar el recorrido' : 'Orbi: ir a la siguiente parada'}>
                   <Orbi estado={completo ? 'celebrando' : 'saludo'} ancho={64} animacion={saludo} parpadeo={false} viva toque={toque} />
                 </button>
               </div>
-              {/* La frase se anuncia y desaparece sola; el mapa sigue igual. */}
+              {/* La frase del toque se anuncia y desaparece sola. El comentario al mirar una parada es solo visual:
+                  el nombre de cada tarjeta ya dice su estado. */}
               <p className={`burbuja-mapa ${fraseOrbi ? 'visible' : ''}`} aria-live="polite">{fraseOrbi}</p>
+              <p className={`burbuja-mapa comentario ${!fraseOrbi && mirada ? 'visible' : ''}`} aria-hidden="true">{mirada?.texto}</p>
             </div>
           )}
         </div>

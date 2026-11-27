@@ -1,4 +1,4 @@
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import RangoAvance from '../src/Componentes/RangoAvance.jsx';
@@ -76,6 +76,25 @@ describe('mapa del curso', () => {
     pintar([{ id: 3, title: 'Vacío', practicePairs: 0, topics: [{ id: 30, title: 'Tema', prerequisiteIds: [], lessons: [] }] }], []);
     expect(screen.getByRole('heading', { name: 'Este curso aún no tiene lecciones publicadas' })).toBeTruthy();
     expect(screen.queryByRole('link')).toBeNull();
+  });
+
+  it('Orbi comenta la parada señalada y, al tocarlo, lleva el foco a la siguiente', () => {
+    const { container } = pintar();
+    const comentario = () => container.querySelector('.burbuja-mapa.comentario');
+    // Señalar la parada siguiente: Orbi la comenta (solo visual; el enlace ya dice su estado).
+    fireEvent.pointerOver(screen.getByRole('link', { name: /Equivalentes\. Continúa aquí/ }));
+    expect(comentario().textContent).toBe('¡Esa es la que sigue!');
+    expect(comentario().getAttribute('aria-hidden')).toBe('true');
+    expect(container.querySelector('.parada.mirada')?.dataset.indice).toBe('1');
+    // Con el teclado también: una parada completada.
+    act(() => screen.getByRole('link', { name: /Qué es una fracción\. Completada/ }).focus());
+    expect(comentario().textContent).toBe('¡Esa ya la hiciste!');
+    fireEvent.pointerLeave(container.querySelector('.mapa-lienzo'));
+    expect(comentario().className).not.toContain('visible');
+    // Tocar a Orbi: anuncia a dónde sigue y mueve el foco a esa parada.
+    act(() => screen.getByRole('button', { name: 'Orbi: ir a la siguiente parada' }).click());
+    expect(container.querySelector('.burbuja-mapa[aria-live]').textContent).toBe('¡Vamos! Sigue «Equivalentes».');
+    expect(document.activeElement).toBe(screen.getByRole('link', { name: /Equivalentes\. Continúa aquí/ }));
   });
 
   it('el rango muestra nombre, barra y lo que falta también como texto', () => {
