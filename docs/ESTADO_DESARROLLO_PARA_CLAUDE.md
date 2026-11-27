@@ -1,6 +1,38 @@
 # Estado de desarrollo — mantener actualizado
 
-**Última actualización** — 2026-11-25. Mapa del curso, rango de avance, mascotas Orbi y Pausa, sticker de papel y Parejas (rama `feature/mapa-mascota-parejas`); antes, las 8 capas de la IA (rama `feature/capas-ia`, con `main` integrado: CRM de admisiones y de plataforma); antes, CRM institucional y seguridad OWASP (PR #13); antes, correcciones de la auditoría de salida a producción (rama `fix/auditoria-produccion`); antes, correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+**Última actualización** — 2026-11-26. Modo de prueba con cuentas por rol y acceso rápido (rama `feature/cuentas-de-prueba`); antes, 2026-11-25: Mapa del curso, rango de avance, mascotas Orbi y Pausa, sticker de papel y Parejas (rama `feature/mapa-mascota-parejas`); antes, las 8 capas de la IA (rama `feature/capas-ia`, con `main` integrado: CRM de admisiones y de plataforma); antes, CRM institucional y seguridad OWASP (PR #13); antes, correcciones de la auditoría de salida a producción (rama `fix/auditoria-produccion`); antes, correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
+
+## Sesión 2026-11-26 · Modo de prueba: cuentas por rol y acceso rápido
+Rama `feature/cuentas-de-prueba` desde `main` (1234bcd). Daisy pidió quitar la regla que prohibía las cuentas de prueba y tener un botón discreto para entrar rápido. Decisiones en `docs/adr/0011-modo-de-prueba.md`; la regla 4 de `CLAUDE.md`, `AGENTS.md`, los documentos 00, 01, 12 y 15, el README y `despliegue.md` quedaron actualizados.
+
+| Pieza | Dónde | Cómo se comprobó |
+| --- | --- | --- |
+| Migración `20261127000100-cuentas-de-prueba` (`users.is_demo`) | `backend/database/migrations/` | Subir, bajar y volver a subir en una base aislada; también en el e2e, que recrea la base desde cero |
+| Interruptor `DEMO_MODE` y `DEMO_PASSWORD` | `utils/demo.js`, `.env.example` | `tests/demo.test.js` |
+| Cuentas por rol en «Institución de prueba», sin duplicar y sin tomar cuentas reales; se crean al arrancar o con `npm run demo:cuentas` | `services/demoService.js`, `server.js`, `scripts/createDemoAccounts.js` | `demo.test.js` |
+| Con el modo apagado no entran (ni con contraseña) y sus sesiones caen; `admin:create` ignora el admin. de prueba | `authService.js`, `createPlatformAdmin.js` | `demo.test.js` |
+| `GET/POST /auth/demo` | `authRoutes.js`, `authController.js`, `schemas.js` | `demo.test.js` |
+| Enlace plegado «Acceso rápido de prueba» con un botón por rol | `Componentes/AccesoRapido.jsx`, `Login.jsx`, `SesionContext.jsx` | `AccesoRapido.test.jsx`; recorrido en navegador con `DEMO_MODE=on` (claro y oscuro, axe sin fallos, entra como docente) |
+
+Ejecutado el 2026-11-26:
+- Backend: lint y 257/257 (7 nuevas en `demo.test.js`).
+- Frontend: lint, 89/89 (4 nuevas) y build; JS inicial comprimido 99 310 bytes.
+- Playwright: 47/47 con el modo apagado (el uso normal no cambia).
+- Modelo de datos (76 tablas, con `users.is_demo`) y entregables en Word y PDF regenerados.
+
+Ampliación del mismo día (Daisy pidió un curso de ejemplo con «simulaciones de cómo las funciones ayudan a estudiar», y eligió las dos opciones: historial simulado y recorrido guiado):
+
+| Pieza | Dónde | Cómo se comprobó |
+| --- | --- | --- |
+| Curso «Matemática 7° · curso de prueba» con actividad simulada, hecho con los servicios reales; reloj movido solo para los días pasados; `--reiniciar` archiva el anterior | `services/demoCourseService.js`, `services/demoContent.js`, `server.js`, `scripts/createDemoAccounts.js` | `demo.test.js`: rango Luz 45 %, racha 4 en riesgo, 6 parejas, tarea con 88, analítica con 3 estudiantes, sin duplicar y con archivo al reiniciar |
+| Compañeros simulados Sofía y Diego (sin acceso rápido) | `demoService.js` | `demo.test.js` |
+| `isDemo` en el usuario público | `authService.js` | Recorrido automático en el navegador |
+| Recorrido guiado: 3 pasos en inicio y 10 en el curso, con cambio de pestaña, portal, teclado, foco y menos movimiento | `RecorridoGuiado.jsx`, `BotonRecorrido.jsx`, `hooks/useRecorrido.js`, `utils/pasosRecorrido.js`, `EstudianteInicio.jsx`, `EstudianteCurso.jsx` | `Recorrido.test.jsx`; recorrido completo en escritorio y móvil con `DEMO_MODE=on`, axe sin fallos y capturas revisadas |
+
+Corrección encontrada en la revisión visual: el resaltado salía corrido porque el contenedor de la página tiene `transform` por la animación de entrada; el recorrido ahora va en un portal sobre `<body>`.
+
+Pendiente:
+- El tutor IA del curso de prueba necesita una clave de IA real; no se simulan respuestas.
 
 ## Sesión 2026-11-25 · Mapa del curso, rango, mascotas y Parejas
 Rama `feature/mapa-mascota-parejas` desde `main` (04af749). Reúne tres encargos aprobados: mapa con rango y Parejas, mascotas oficiales Orbi y Pausa, y animaciones de papel del sticker de Orbi. Decisiones en `docs/adr/0010-mapa-rango-mascotas-parejas.md`; contrato en `docs/07_CONTRATOS_API.md`; ficha de marca en `docs/marca/mascotas/`.

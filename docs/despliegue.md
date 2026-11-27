@@ -45,6 +45,7 @@ Sin Google Cloud, la alternativa es un plan de Render con disco persistente (`ST
    - Si la IP del cliente se puede cambiar por el camino directo, usa `TRUST_PROXY=1` o la lista de direcciones de los proxies conocidos, y anota el resultado en el registro de aceptación.
    - Los límites que protegen cuentas no dependen de la IP: el bloqueo tras 5 intentos fallidos, el tope de enlaces de recuperación por correo y el tope de cambios de contraseña o correo por cuenta.
 5. Primer administrador: en Render, *Shell* → `npm run admin:create`. La primera vez que entre, la plataforma le pedirá aceptar los términos.
+6. Cuentas de prueba (opcional, para una demostración): agrega `DEMO_MODE=on` en las variables de Render y, si quieres, `DEMO_PASSWORD`. Al reiniciar se crean las cuentas por rol y aparece «Acceso rápido de prueba». Bórrala o ponla en `off` al terminar: las cuentas dejan de entrar y sus sesiones se cierran.
 
 ## 4. Frontend en Vercel
 1. En `frontend/vercel.json`, cambia `https://mentor-api.onrender.com` por la URL real de la API si es distinta.

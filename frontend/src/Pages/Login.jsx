@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
+import AccesoRapido from '../Componentes/AccesoRapido.jsx';
 import Campo from '../Componentes/Campo.jsx';
 import { Aviso, MensajeError } from '../Componentes/Estados.jsx';
 import Portada from '../Componentes/Portada.jsx';
@@ -8,7 +9,7 @@ import { useEnvio } from '../hooks/useEnvio.js';
 
 // Permite iniciar sesión con correo y contraseña.
 export default function Login() {
-  const { usuario, iniciarSesion, vencida } = useSesion();
+  const { usuario, iniciarSesion, entrarComoPrueba, vencida } = useSesion();
   const navegar = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,6 +20,11 @@ export default function Login() {
   async function enviar(evento) {
     evento.preventDefault();
     const sesion = await ejecutar(() => iniciarSesion(email, password));
+    if (sesion) navegar(rutaInicial(sesion.role));
+  }
+
+  async function entrarRapido(rol) {
+    const sesion = await ejecutar(() => entrarComoPrueba(rol));
     if (sesion) navegar(rutaInicial(sesion.role));
   }
 
@@ -33,6 +39,7 @@ export default function Login() {
         <p className="pequeno"><Link className="enlace-tactil" to="/recuperar">¿Olvidaste tu contraseña?</Link></p>
         <p className="tenue pequeno">Las cuentas se crean por invitación de la administración de tu institución.</p>
       </form>
+      <AccesoRapido alEntrar={entrarRapido} deshabilitado={enviando} />
     </Portada>
   );
 }

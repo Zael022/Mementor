@@ -5,7 +5,7 @@ Implementa MENTOR AI como plataforma educativa real. Antes de programar, lee `01
 1. Tecnologías obligatorias: React + Vite en JSX, Node.js + Express, MySQL y **Sequelize ORM** con migraciones. Nada de JSON Server ni ORM alternativo.
 2. Estructura frontend exacta: `src/Componentes/`, `src/Pages/`, `src/Rutas/`, `src/App.jsx`, `src/main.jsx`, `frontend/index.html`.
 3. Backend en capas: config, models, controllers, services, routes, middlewares, validators; conexión real Sequelize; `config/db.json` sin secretos, `.env` no versionado.
-4. **No crear ni cargar datos de prueba, mocks académicos, seeds, contraseñas demo ni cuentas ficticias.** Los registros nacen en MySQL tras operaciones de usuarios autorizados. Mantén estados vacíos reales.
+4. **Cuentas de prueba solo con el modo de prueba** (`DEMO_MODE=on`, ADR 0011): una por rol, marcadas con `users.is_demo`, creadas al arrancar o con `npm run demo:cuentas`, y el «Acceso rápido de prueba» en el inicio de sesión. Con el modo apagado no entran. No se precargan cursos ni contenido académico: lo crean los usuarios desde la interfaz. Mantén estados vacíos reales.
 5. Comentarios **breves y generales en español** solo en partes útiles; no comentar cada línea. Nombres de variables, funciones y carpetas claros.
 6. Implementa un monolito modular, RBAC backend, autorización por recurso, aislamiento por institución y transacciones para resultados de evaluación.
 7. Corrección de preguntas objetiva determinista; LLM para tutor y borradores solo con materiales autorizados y citas verificables. IA sin clave => error claro, nunca contenido falso.

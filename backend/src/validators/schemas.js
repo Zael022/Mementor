@@ -7,6 +7,7 @@ const id = z.number().int().positive();
 const email = z.string().trim().toLowerCase().email('Correo no válido.').max(190);
 
 export const loginSchema = z.object({ email, password: z.string().min(1).max(200) });
+export const demoLoginSchema = z.object({ role: z.enum(['student', 'teacher', 'institution_admin', 'auditor', 'platform_admin']) });
 // La activación exige aceptar de forma explícita los términos y la política de privacidad.
 const mustAccept = (message) => z.literal(true, { error: message });
 export const activateSchema = z.object({

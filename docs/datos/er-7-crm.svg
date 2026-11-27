@@ -5,11 +5,11 @@
  -->
 <!-- Title: ER Pages: 1 -->
 <svg width="873pt" height="1710pt"
- viewBox="0.00 0.00 873.20 1710.06" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(21.6 1688.46)">
+ viewBox="0.00 0.00 873.20 1710.02" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(21.6 1688.42)">
 <title>ER</title>
-<polygon fill="white" stroke="transparent" points="-21.6,21.6 -21.6,-1688.46 851.6,-1688.46 851.6,21.6 -21.6,21.6"/>
-<text text-anchor="start" x="179" y="-1646.26" font-family="Figtree" font-weight="bold" font-size="22.00">MENTOR AI · CRM de admisiones y plataforma</text>
+<polygon fill="white" stroke="transparent" points="-21.6,21.6 -21.6,-1688.42 851.6,-1688.42 851.6,21.6 -21.6,21.6"/>
+<text text-anchor="start" x="179" y="-1646.22" font-family="Figtree" font-weight="bold" font-size="22.00">MENTOR AI · CRM de admisiones y plataforma</text>
 <!-- crm_admission_cycles -->
 <g id="node1" class="node">
 <title>crm_admission_cycles</title>
@@ -56,25 +56,8 @@
 <text text-anchor="start" x="553" y="-741.2" font-family="Figtree" font-size="11.00">updated_at</text>
 <text text-anchor="start" x="630" y="-741.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
 </g>
-<!-- courses -->
-<g id="node11" class="node">
-<title>courses</title>
-<path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M817,-879C817,-879 787,-879 787,-879 781,-879 775,-873 775,-867 775,-867 775,-855 775,-855 775,-849 781,-843 787,-843 787,-843 817,-843 817,-843 823,-843 829,-849 829,-855 829,-855 829,-867 829,-867 829,-873 823,-879 817,-879"/>
-<text text-anchor="middle" x="802" y="-858.2" font-family="Figtree" font-size="11.00" fill="#5b6280">courses</text>
-</g>
-<!-- crm_admission_cycles&#45;&gt;courses -->
-<g id="edge2" class="edge">
-<title>crm_admission_cycles&#45;&gt;courses</title>
-<path fill="none" stroke="#8a91b4" d="M711.75,-861C730.65,-861 749.29,-861 764.61,-861"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="703.55,-861 693.55,-856.5 698.55,-861 693.55,-861 693.55,-861 693.55,-861 698.55,-861 693.55,-865.5 703.55,-861 703.55,-861"/>
-<ellipse fill="none" stroke="#8a91b4" cx="707.55" cy="-861" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="773.65,-856 773.65,-866 771.65,-866 771.65,-856 773.65,-856"/>
-<polyline fill="none" stroke="#8a91b4" points="774.65,-861 769.65,-861 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="768.65,-856 768.65,-866 766.65,-866 766.65,-856 768.65,-856"/>
-<polyline fill="none" stroke="#8a91b4" points="769.65,-861 764.65,-861 "/>
-</g>
 <!-- institutions -->
-<g id="node14" class="node">
+<g id="node12" class="node">
 <title>institutions</title>
 <path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M818,-1335C818,-1335 786,-1335 786,-1335 780,-1335 774,-1329 774,-1323 774,-1323 774,-1311 774,-1311 774,-1305 780,-1299 786,-1299 786,-1299 818,-1299 818,-1299 824,-1299 830,-1305 830,-1311 830,-1311 830,-1323 830,-1323 830,-1329 824,-1335 818,-1335"/>
 <text text-anchor="middle" x="802" y="-1314.2" font-family="Figtree" font-size="11.00" fill="#5b6280">institutions</text>
@@ -89,6 +72,23 @@
 <polyline fill="none" stroke="#8a91b4" points="797.59,-1298.79 796.61,-1293.89 "/>
 <polygon fill="#8a91b4" stroke="#8a91b4" points="801.32,-1291.93 791.52,-1293.88 791.12,-1291.92 800.93,-1289.97 801.32,-1291.93"/>
 <polyline fill="none" stroke="#8a91b4" points="796.61,-1293.89 795.64,-1288.98 "/>
+</g>
+<!-- courses -->
+<g id="node14" class="node">
+<title>courses</title>
+<path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M817,-879C817,-879 787,-879 787,-879 781,-879 775,-873 775,-867 775,-867 775,-855 775,-855 775,-849 781,-843 787,-843 787,-843 817,-843 817,-843 823,-843 829,-849 829,-855 829,-855 829,-867 829,-867 829,-873 823,-879 817,-879"/>
+<text text-anchor="middle" x="802" y="-858.2" font-family="Figtree" font-size="11.00" fill="#5b6280">courses</text>
+</g>
+<!-- crm_admission_cycles&#45;&gt;courses -->
+<g id="edge2" class="edge">
+<title>crm_admission_cycles&#45;&gt;courses</title>
+<path fill="none" stroke="#8a91b4" d="M711.75,-861C730.65,-861 749.29,-861 764.61,-861"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="703.55,-861 693.55,-856.5 698.55,-861 693.55,-861 693.55,-861 693.55,-861 698.55,-861 693.55,-865.5 703.55,-861 703.55,-861"/>
+<ellipse fill="none" stroke="#8a91b4" cx="707.55" cy="-861" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="773.65,-856 773.65,-866 771.65,-866 771.65,-856 773.65,-856"/>
+<polyline fill="none" stroke="#8a91b4" points="774.65,-861 769.65,-861 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="768.65,-856 768.65,-866 766.65,-866 766.65,-856 768.65,-856"/>
+<polyline fill="none" stroke="#8a91b4" points="769.65,-861 764.65,-861 "/>
 </g>
 <!-- crm_prospects -->
 <g id="node2" class="node">
@@ -130,6 +130,17 @@
 <text text-anchor="start" x="551" y="-1069.2" font-family="Figtree" font-size="11.00">updated_at</text>
 <text text-anchor="start" x="631" y="-1069.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
 </g>
+<!-- crm_prospects&#45;&gt;institutions -->
+<g id="edge21" class="edge">
+<title>crm_prospects&#45;&gt;institutions</title>
+<path fill="none" stroke="#8a91b4" d="M709.69,-1246.09C731.32,-1262.89 752.75,-1279.53 769.42,-1292.47"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="703.08,-1240.96 697.95,-1231.27 699.14,-1237.89 695.19,-1234.83 695.19,-1234.83 695.19,-1234.83 699.14,-1237.89 692.43,-1238.38 703.08,-1240.96 703.08,-1240.96"/>
+<ellipse fill="none" stroke="#8a91b4" cx="706.24" cy="-1243.41" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="779.95,-1294.32 773.81,-1302.22 772.23,-1300.99 778.37,-1293.09 779.95,-1294.32"/>
+<polyline fill="none" stroke="#8a91b4" points="777.67,-1298.88 773.72,-1295.82 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="776,-1291.25 769.86,-1299.15 768.29,-1297.92 774.42,-1290.03 776,-1291.25"/>
+<polyline fill="none" stroke="#8a91b4" points="773.72,-1295.82 769.77,-1292.75 "/>
+</g>
 <!-- users -->
 <g id="node13" class="node">
 <title>users</title>
@@ -146,17 +157,6 @@
 <polyline fill="none" stroke="#8a91b4" points="800.95,-347.15 800.89,-352.15 "/>
 <polygon fill="#8a91b4" stroke="#8a91b4" points="795.88,-353.09 805.88,-353.21 805.85,-355.21 795.85,-355.09 795.88,-353.09"/>
 <polyline fill="none" stroke="#8a91b4" points="800.89,-352.15 800.83,-357.15 "/>
-</g>
-<!-- crm_prospects&#45;&gt;institutions -->
-<g id="edge21" class="edge">
-<title>crm_prospects&#45;&gt;institutions</title>
-<path fill="none" stroke="#8a91b4" d="M709.69,-1246.09C731.32,-1262.89 752.75,-1279.53 769.42,-1292.47"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="703.08,-1240.96 697.95,-1231.27 699.14,-1237.89 695.19,-1234.83 695.19,-1234.83 695.19,-1234.83 699.14,-1237.89 692.43,-1238.38 703.08,-1240.96 703.08,-1240.96"/>
-<ellipse fill="none" stroke="#8a91b4" cx="706.24" cy="-1243.41" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="779.95,-1294.32 773.81,-1302.22 772.23,-1300.99 778.37,-1293.09 779.95,-1294.32"/>
-<polyline fill="none" stroke="#8a91b4" points="777.67,-1298.88 773.72,-1295.82 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="776,-1291.25 769.86,-1299.15 768.29,-1297.92 774.42,-1290.03 776,-1291.25"/>
-<polyline fill="none" stroke="#8a91b4" points="773.72,-1295.82 769.77,-1292.75 "/>
 </g>
 <!-- crm_applications -->
 <g id="node3" class="node">
@@ -253,30 +253,8 @@
 <polygon fill="#8a91b4" stroke="#8a91b4" points="529.48,-1056.57 521.24,-1062.24 520.11,-1060.59 528.34,-1054.92 529.48,-1056.57"/>
 <polyline fill="none" stroke="#8a91b4" points="525.93,-1060.23 523.09,-1056.11 "/>
 </g>
-<!-- crm_applications&#45;&gt;users -->
-<g id="edge6" class="edge">
-<title>crm_applications&#45;&gt;users</title>
-<path fill="none" stroke="#8a91b4" d="M452.87,-522.72C482.57,-461.33 508.63,-409.99 515,-405 584.46,-350.61 624.3,-387.69 709,-363 727.86,-357.5 748.4,-350.06 765.28,-343.53"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="449.38,-529.95 440.99,-537.01 447.21,-534.46 445.04,-538.96 445.04,-538.96 445.04,-538.96 447.21,-534.46 449.09,-540.92 449.38,-529.95 449.38,-529.95"/>
-<ellipse fill="none" stroke="#8a91b4" cx="451.12" cy="-526.35" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="772,-335.53 775.65,-344.84 773.79,-345.57 770.14,-336.26 772,-335.53"/>
-<polyline fill="none" stroke="#8a91b4" points="774.76,-339.82 770.1,-341.64 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="767.35,-337.35 771,-346.67 769.13,-347.39 765.49,-338.08 767.35,-337.35"/>
-<polyline fill="none" stroke="#8a91b4" points="770.1,-341.64 765.45,-343.47 "/>
-</g>
-<!-- crm_applications&#45;&gt;institutions -->
-<g id="edge3" class="edge">
-<title>crm_applications&#45;&gt;institutions</title>
-<path fill="none" stroke="#8a91b4" d="M461.85,-949.87C477.92,-968.25 495.65,-985.12 515,-999 587.44,-1050.96 643.65,-989.36 709,-1050 778.6,-1114.58 795.55,-1234.25 799.67,-1288.7"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="456.58,-943.56 453.62,-933.01 453.37,-939.73 450.16,-935.89 450.16,-935.89 450.16,-935.89 453.37,-939.73 446.71,-938.78 456.58,-943.56 456.58,-943.56"/>
-<ellipse fill="none" stroke="#8a91b4" cx="459.15" cy="-946.63" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="805.28,-1297.66 795.3,-1298.32 795.17,-1296.32 805.15,-1295.66 805.28,-1297.66"/>
-<polyline fill="none" stroke="#8a91b4" points="800.36,-1298.99 800.02,-1294 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="804.95,-1292.67 794.97,-1293.33 794.84,-1291.34 804.81,-1290.67 804.95,-1292.67"/>
-<polyline fill="none" stroke="#8a91b4" points="800.02,-1294 799.69,-1289.01 "/>
-</g>
 <!-- enrollments -->
-<g id="node15" class="node">
+<g id="node11" class="node">
 <title>enrollments</title>
 <path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M629,-659C629,-659 595,-659 595,-659 589,-659 583,-653 583,-647 583,-647 583,-635 583,-635 583,-629 589,-623 595,-623 595,-623 629,-623 629,-623 635,-623 641,-629 641,-635 641,-635 641,-647 641,-647 641,-653 635,-659 629,-659"/>
 <text text-anchor="middle" x="612" y="-638.2" font-family="Figtree" font-size="11.00" fill="#5b6280">enrollments</text>
@@ -292,160 +270,182 @@
 <polygon fill="#8a91b4" stroke="#8a91b4" points="575.41,-649.18 578.98,-658.52 577.12,-659.24 573.54,-649.9 575.41,-649.18"/>
 <polyline fill="none" stroke="#8a91b4" points="578.13,-653.49 573.46,-655.28 "/>
 </g>
+<!-- crm_applications&#45;&gt;institutions -->
+<g id="edge3" class="edge">
+<title>crm_applications&#45;&gt;institutions</title>
+<path fill="none" stroke="#8a91b4" d="M461.85,-949.87C477.92,-968.25 495.65,-985.12 515,-999 587.44,-1050.96 643.65,-989.36 709,-1050 778.6,-1114.58 795.55,-1234.25 799.67,-1288.7"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="456.58,-943.56 453.62,-933.01 453.37,-939.73 450.16,-935.89 450.16,-935.89 450.16,-935.89 453.37,-939.73 446.71,-938.78 456.58,-943.56 456.58,-943.56"/>
+<ellipse fill="none" stroke="#8a91b4" cx="459.15" cy="-946.63" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="805.28,-1297.66 795.3,-1298.32 795.17,-1296.32 805.15,-1295.66 805.28,-1297.66"/>
+<polyline fill="none" stroke="#8a91b4" points="800.36,-1298.99 800.02,-1294 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="804.95,-1292.67 794.97,-1293.33 794.84,-1291.34 804.81,-1290.67 804.95,-1292.67"/>
+<polyline fill="none" stroke="#8a91b4" points="800.02,-1294 799.69,-1289.01 "/>
+</g>
+<!-- crm_applications&#45;&gt;users -->
+<g id="edge6" class="edge">
+<title>crm_applications&#45;&gt;users</title>
+<path fill="none" stroke="#8a91b4" d="M452.87,-522.72C482.57,-461.33 508.63,-409.99 515,-405 584.46,-350.61 624.3,-387.69 709,-363 727.86,-357.5 748.4,-350.06 765.28,-343.53"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="449.38,-529.95 440.99,-537.01 447.21,-534.46 445.04,-538.96 445.04,-538.96 445.04,-538.96 447.21,-534.46 449.09,-540.92 449.38,-529.95 449.38,-529.95"/>
+<ellipse fill="none" stroke="#8a91b4" cx="451.12" cy="-526.35" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="772,-335.53 775.65,-344.84 773.79,-345.57 770.14,-336.26 772,-335.53"/>
+<polyline fill="none" stroke="#8a91b4" points="774.76,-339.82 770.1,-341.64 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="767.35,-337.35 771,-346.67 769.13,-347.39 765.49,-338.08 767.35,-337.35"/>
+<polyline fill="none" stroke="#8a91b4" points="770.1,-341.64 765.45,-343.47 "/>
+</g>
 <!-- crm_stage_events -->
 <g id="node4" class="node">
 <title>crm_stage_events</title>
-<path fill="none" stroke="#d7dcf2" d="M161,-1009C161,-1009 18,-1009 18,-1009 12,-1009 6,-1003 6,-997 6,-997 6,-769 6,-769 6,-763 12,-757 18,-757 18,-757 161,-757 161,-757 167,-757 173,-763 173,-769 173,-769 173,-997 173,-997 173,-1003 167,-1009 161,-1009"/>
-<polygon fill="#8a5a00" stroke="transparent" points="6.5,-991 6.5,-1009 173.5,-1009 173.5,-991 6.5,-991"/>
-<text text-anchor="start" x="44" y="-998.2" font-family="Figtree" font-weight="bold" font-size="11.00" fill="white">crm_stage_events</text>
-<text text-anchor="start" x="9.5" y="-979.2" font-family="Figtree" font-size="11.00" fill="#5b6280">PK</text>
-<text text-anchor="start" x="28.5" y="-980.2" font-family="Figtree" font-weight="bold" font-size="11.00">id</text>
-<text text-anchor="start" x="107.5" y="-979.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
-<text text-anchor="start" x="9.5" y="-961.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
-<text text-anchor="start" x="28.5" y="-961.2" font-family="Figtree" font-size="11.00">institution_id</text>
-<text text-anchor="start" x="107.5" y="-961.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
-<text text-anchor="start" x="9.5" y="-943.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
-<text text-anchor="start" x="28.5" y="-943.2" font-family="Figtree" font-size="11.00">application_id</text>
-<text text-anchor="start" x="107.5" y="-943.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
-<text text-anchor="start" x="9.5" y="-925.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="28.5" y="-925.2" font-family="Figtree" font-size="11.00">from_stage</text>
-<text text-anchor="start" x="107.5" y="-925.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(30)</text>
-<text text-anchor="start" x="9.5" y="-907.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="28.5" y="-907.2" font-family="Figtree" font-size="11.00">to_stage</text>
-<text text-anchor="start" x="107.5" y="-907.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(30)</text>
-<text text-anchor="start" x="9.5" y="-889.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="28.5" y="-889.2" font-family="Figtree" font-size="11.00">kind</text>
-<text text-anchor="start" x="107.5" y="-889.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(25)</text>
-<text text-anchor="start" x="9.5" y="-871.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="28.5" y="-871.2" font-family="Figtree" font-size="11.00">reason</text>
-<text text-anchor="start" x="107.5" y="-871.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(500)</text>
-<text text-anchor="start" x="9.5" y="-853.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
-<text text-anchor="start" x="28.5" y="-853.2" font-family="Figtree" font-size="11.00">actor_id</text>
-<text text-anchor="start" x="107.5" y="-853.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
-<text text-anchor="start" x="9.5" y="-835.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="28.5" y="-835.2" font-family="Figtree" font-size="11.00">effective_at</text>
-<text text-anchor="start" x="107.5" y="-835.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
-<text text-anchor="start" x="9.5" y="-817.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="28.5" y="-817.2" font-family="Figtree" font-size="11.00">recorded_at</text>
-<text text-anchor="start" x="107.5" y="-817.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
-<text text-anchor="start" x="9.5" y="-799.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="28.5" y="-799.2" font-family="Figtree" font-size="11.00">metadata_json</text>
-<text text-anchor="start" x="107.5" y="-799.2" font-family="Figtree" font-size="11.00" fill="#5b6280">json</text>
-<text text-anchor="start" x="9.5" y="-781.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="28.5" y="-781.2" font-family="Figtree" font-size="11.00">created_at</text>
-<text text-anchor="start" x="107.5" y="-781.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
-<text text-anchor="start" x="9.5" y="-763.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="28.5" y="-763.2" font-family="Figtree" font-size="11.00">updated_at</text>
-<text text-anchor="start" x="107.5" y="-763.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+<path fill="none" stroke="#d7dcf2" d="M161,-745C161,-745 18,-745 18,-745 12,-745 6,-739 6,-733 6,-733 6,-505 6,-505 6,-499 12,-493 18,-493 18,-493 161,-493 161,-493 167,-493 173,-499 173,-505 173,-505 173,-733 173,-733 173,-739 167,-745 161,-745"/>
+<polygon fill="#8a5a00" stroke="transparent" points="6.5,-727 6.5,-745 173.5,-745 173.5,-727 6.5,-727"/>
+<text text-anchor="start" x="44" y="-734.2" font-family="Figtree" font-weight="bold" font-size="11.00" fill="white">crm_stage_events</text>
+<text text-anchor="start" x="9.5" y="-715.2" font-family="Figtree" font-size="11.00" fill="#5b6280">PK</text>
+<text text-anchor="start" x="28.5" y="-716.2" font-family="Figtree" font-weight="bold" font-size="11.00">id</text>
+<text text-anchor="start" x="107.5" y="-715.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
+<text text-anchor="start" x="9.5" y="-697.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
+<text text-anchor="start" x="28.5" y="-697.2" font-family="Figtree" font-size="11.00">institution_id</text>
+<text text-anchor="start" x="107.5" y="-697.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
+<text text-anchor="start" x="9.5" y="-679.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
+<text text-anchor="start" x="28.5" y="-679.2" font-family="Figtree" font-size="11.00">application_id</text>
+<text text-anchor="start" x="107.5" y="-679.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
+<text text-anchor="start" x="9.5" y="-661.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="28.5" y="-661.2" font-family="Figtree" font-size="11.00">from_stage</text>
+<text text-anchor="start" x="107.5" y="-661.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(30)</text>
+<text text-anchor="start" x="9.5" y="-643.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="28.5" y="-643.2" font-family="Figtree" font-size="11.00">to_stage</text>
+<text text-anchor="start" x="107.5" y="-643.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(30)</text>
+<text text-anchor="start" x="9.5" y="-625.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="28.5" y="-625.2" font-family="Figtree" font-size="11.00">kind</text>
+<text text-anchor="start" x="107.5" y="-625.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(25)</text>
+<text text-anchor="start" x="9.5" y="-607.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="28.5" y="-607.2" font-family="Figtree" font-size="11.00">reason</text>
+<text text-anchor="start" x="107.5" y="-607.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(500)</text>
+<text text-anchor="start" x="9.5" y="-589.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
+<text text-anchor="start" x="28.5" y="-589.2" font-family="Figtree" font-size="11.00">actor_id</text>
+<text text-anchor="start" x="107.5" y="-589.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
+<text text-anchor="start" x="9.5" y="-571.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="28.5" y="-571.2" font-family="Figtree" font-size="11.00">effective_at</text>
+<text text-anchor="start" x="107.5" y="-571.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+<text text-anchor="start" x="9.5" y="-553.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="28.5" y="-553.2" font-family="Figtree" font-size="11.00">recorded_at</text>
+<text text-anchor="start" x="107.5" y="-553.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+<text text-anchor="start" x="9.5" y="-535.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="28.5" y="-535.2" font-family="Figtree" font-size="11.00">metadata_json</text>
+<text text-anchor="start" x="107.5" y="-535.2" font-family="Figtree" font-size="11.00" fill="#5b6280">json</text>
+<text text-anchor="start" x="9.5" y="-517.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="28.5" y="-517.2" font-family="Figtree" font-size="11.00">created_at</text>
+<text text-anchor="start" x="107.5" y="-517.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+<text text-anchor="start" x="9.5" y="-499.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="28.5" y="-499.2" font-family="Figtree" font-size="11.00">updated_at</text>
+<text text-anchor="start" x="107.5" y="-499.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
 </g>
 <!-- crm_stage_events&#45;&gt;crm_applications -->
 <g id="edge24" class="edge">
 <title>crm_stage_events&#45;&gt;crm_applications</title>
-<path fill="none" stroke="#8a91b4" d="M189.2,-830.08C204.09,-822.09 219.54,-813.81 234.68,-805.69"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="181.91,-833.98 170.97,-834.74 177.51,-836.35 173.1,-838.71 173.1,-838.71 173.1,-838.71 177.51,-836.35 175.23,-842.68 181.91,-833.98 181.91,-833.98"/>
-<ellipse fill="none" stroke="#8a91b4" cx="185.44" cy="-832.09" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="240.31,-797 245.03,-805.81 243.27,-806.76 238.54,-797.95 240.31,-797"/>
-<polyline fill="none" stroke="#8a91b4" points="243.55,-800.93 239.14,-803.3 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="235.9,-799.36 240.62,-808.18 238.86,-809.12 234.14,-800.31 235.9,-799.36"/>
-<polyline fill="none" stroke="#8a91b4" points="239.14,-803.3 234.74,-805.66 "/>
-</g>
-<!-- crm_stage_events&#45;&gt;users -->
-<g id="edge25" class="edge">
-<title>crm_stage_events&#45;&gt;users</title>
-<path fill="none" stroke="#8a91b4" d="M178.53,-741.18C209.44,-623.48 172.76,-364.51 244,-303 321.82,-235.81 653.93,-298.01 764.8,-321.15"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="176.09,-748.94 168.79,-757.13 174.59,-753.71 173.09,-758.48 173.09,-758.48 173.09,-758.48 174.59,-753.71 177.38,-759.83 176.09,-748.94 176.09,-748.94"/>
-<ellipse fill="none" stroke="#8a91b4" cx="177.29" cy="-745.12" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="774.88,-318.16 772.82,-327.95 770.86,-327.53 772.92,-317.75 774.88,-318.16"/>
-<polyline fill="none" stroke="#8a91b4" points="774.83,-323.26 769.93,-322.23 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="769.99,-317.13 767.92,-326.91 765.97,-326.5 768.03,-316.72 769.99,-317.13"/>
-<polyline fill="none" stroke="#8a91b4" points="769.93,-322.23 765.04,-321.2 "/>
+<path fill="none" stroke="#8a91b4" d="M189.47,-668.19C204.16,-675.49 219.38,-683.06 234.3,-690.48"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="182.06,-664.51 175.1,-656.03 177.58,-662.28 173.1,-660.06 173.1,-660.06 173.1,-660.06 177.58,-662.28 171.1,-664.09 182.06,-664.51 182.06,-664.51"/>
+<ellipse fill="none" stroke="#8a91b4" cx="185.64" cy="-666.29" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="244.88,-690.15 240.43,-699.11 238.64,-698.22 243.09,-689.26 244.88,-690.15"/>
+<polyline fill="none" stroke="#8a91b4" points="243.55,-695.08 239.07,-692.85 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="240.4,-687.93 235.95,-696.88 234.16,-695.99 238.61,-687.04 240.4,-687.93"/>
+<polyline fill="none" stroke="#8a91b4" points="239.07,-692.85 234.59,-690.62 "/>
 </g>
 <!-- crm_stage_events&#45;&gt;institutions -->
 <g id="edge23" class="edge">
 <title>crm_stage_events&#45;&gt;institutions</title>
-<path fill="none" stroke="#8a91b4" d="M103.43,-1027.28C122.4,-1201.72 164.48,-1479.85 244,-1543 405.84,-1671.52 537.51,-1658.34 709,-1543 775.81,-1498.07 794.13,-1395.29 799.13,-1345.32"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="102.56,-1019.11 105.98,-1008.69 102.03,-1014.13 101.5,-1009.16 101.5,-1009.16 101.5,-1009.16 102.03,-1014.13 97.03,-1009.64 102.56,-1019.11 102.56,-1019.11"/>
-<ellipse fill="none" stroke="#8a91b4" cx="102.99" cy="-1023.08" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="794.96,-1335.77 804.92,-1336.66 804.74,-1338.65 794.78,-1337.76 794.96,-1335.77"/>
-<polyline fill="none" stroke="#8a91b4" points="800.03,-1335.22 799.59,-1340.2 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="794.52,-1340.75 804.48,-1341.64 804.3,-1343.63 794.34,-1342.74 794.52,-1340.75"/>
-<polyline fill="none" stroke="#8a91b4" points="799.59,-1340.2 799.14,-1345.18 "/>
+<path fill="none" stroke="#8a91b4" d="M178.3,-759.07C225.23,-942.03 126.95,-1384.85 244,-1492 320.22,-1561.78 620.55,-1545.43 709,-1492 762.24,-1459.84 786.21,-1385.51 795.67,-1344.84"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="175.97,-751.26 177.43,-740.39 174.54,-746.47 173.11,-741.67 173.11,-741.67 173.11,-741.67 174.54,-746.47 168.8,-742.96 175.97,-751.26 175.97,-751.26"/>
+<ellipse fill="none" stroke="#8a91b4" cx="177.11" cy="-755.09" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="792.72,-1334.94 802.49,-1337.08 802.06,-1339.03 792.29,-1336.89 792.72,-1334.94"/>
+<polyline fill="none" stroke="#8a91b4" points="797.82,-1335.03 796.74,-1339.91 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="791.65,-1339.82 801.41,-1341.96 800.99,-1343.92 791.22,-1341.77 791.65,-1339.82"/>
+<polyline fill="none" stroke="#8a91b4" points="796.74,-1339.91 795.67,-1344.8 "/>
 </g>
-<!-- crm_followups -->
-<g id="node5" class="node">
-<title>crm_followups</title>
-<path fill="none" stroke="#d7dcf2" d="M160,-732C160,-732 19,-732 19,-732 13,-732 7,-726 7,-720 7,-720 7,-510 7,-510 7,-504 13,-498 19,-498 19,-498 160,-498 160,-498 166,-498 172,-504 172,-510 172,-510 172,-720 172,-720 172,-726 166,-732 160,-732"/>
-<polygon fill="#8a5a00" stroke="transparent" points="7.5,-714 7.5,-732 172.5,-732 172.5,-714 7.5,-714"/>
-<text text-anchor="start" x="52" y="-721.2" font-family="Figtree" font-weight="bold" font-size="11.00" fill="white">crm_followups</text>
-<text text-anchor="start" x="10.5" y="-702.2" font-family="Figtree" font-size="11.00" fill="#5b6280">PK</text>
-<text text-anchor="start" x="29.5" y="-703.2" font-family="Figtree" font-weight="bold" font-size="11.00">id</text>
-<text text-anchor="start" x="106.5" y="-702.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
-<text text-anchor="start" x="10.5" y="-684.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
-<text text-anchor="start" x="29.5" y="-684.2" font-family="Figtree" font-size="11.00">institution_id</text>
-<text text-anchor="start" x="106.5" y="-684.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
-<text text-anchor="start" x="10.5" y="-666.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
-<text text-anchor="start" x="29.5" y="-666.2" font-family="Figtree" font-size="11.00">application_id</text>
-<text text-anchor="start" x="106.5" y="-666.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
-<text text-anchor="start" x="10.5" y="-648.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
-<text text-anchor="start" x="29.5" y="-648.2" font-family="Figtree" font-size="11.00">responsible_id</text>
-<text text-anchor="start" x="106.5" y="-648.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
-<text text-anchor="start" x="10.5" y="-630.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="29.5" y="-630.2" font-family="Figtree" font-size="11.00">due_at</text>
-<text text-anchor="start" x="106.5" y="-630.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
-<text text-anchor="start" x="10.5" y="-612.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="29.5" y="-612.2" font-family="Figtree" font-size="11.00">type</text>
-<text text-anchor="start" x="106.5" y="-612.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(30)</text>
-<text text-anchor="start" x="10.5" y="-594.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="29.5" y="-594.2" font-family="Figtree" font-size="11.00">status</text>
-<text text-anchor="start" x="106.5" y="-594.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(20)</text>
-<text text-anchor="start" x="10.5" y="-576.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="29.5" y="-576.2" font-family="Figtree" font-size="11.00">note</text>
-<text text-anchor="start" x="106.5" y="-576.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(500)</text>
-<text text-anchor="start" x="10.5" y="-558.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="29.5" y="-558.2" font-family="Figtree" font-size="11.00">result</text>
-<text text-anchor="start" x="106.5" y="-558.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(300)</text>
-<text text-anchor="start" x="10.5" y="-540.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="29.5" y="-540.2" font-family="Figtree" font-size="11.00">completed_at</text>
-<text text-anchor="start" x="106.5" y="-540.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
-<text text-anchor="start" x="10.5" y="-522.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="29.5" y="-522.2" font-family="Figtree" font-size="11.00">created_at</text>
-<text text-anchor="start" x="106.5" y="-522.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
-<text text-anchor="start" x="10.5" y="-504.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
-<text text-anchor="start" x="29.5" y="-504.2" font-family="Figtree" font-size="11.00">updated_at</text>
-<text text-anchor="start" x="106.5" y="-504.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
-</g>
-<!-- crm_followups&#45;&gt;crm_applications -->
-<g id="edge11" class="edge">
-<title>crm_followups&#45;&gt;crm_applications</title>
-<path fill="none" stroke="#8a91b4" d="M188.11,-665.05C203.32,-672.85 219.13,-680.95 234.62,-688.89"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="180.94,-661.37 174.1,-652.81 176.49,-659.09 172.04,-656.81 172.04,-656.81 172.04,-656.81 176.49,-659.09 169.99,-660.81 180.94,-661.37 180.94,-661.37"/>
-<ellipse fill="none" stroke="#8a91b4" cx="184.5" cy="-663.2" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="245.09,-688.64 240.52,-697.54 238.74,-696.63 243.31,-687.73 245.09,-688.64"/>
-<polyline fill="none" stroke="#8a91b4" points="243.69,-693.55 239.24,-691.26 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="240.64,-686.36 236.07,-695.26 234.29,-694.34 238.86,-685.45 240.64,-686.36"/>
-<polyline fill="none" stroke="#8a91b4" points="239.24,-691.26 234.8,-688.98 "/>
-</g>
-<!-- crm_followups&#45;&gt;users -->
-<g id="edge12" class="edge">
-<title>crm_followups&#45;&gt;users</title>
-<path fill="none" stroke="#8a91b4" d="M131.35,-480.55C161.58,-391.01 204.25,-285.15 244,-259 330.33,-202.21 611.08,-225.98 709,-259 735.22,-267.84 759.89,-287.47 777.06,-303.69"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="128.82,-488.14 121.39,-496.21 127.24,-492.89 125.66,-497.63 125.66,-497.63 125.66,-497.63 127.24,-492.89 129.93,-499.05 128.82,-488.14 128.82,-488.14"/>
-<ellipse fill="none" stroke="#8a91b4" cx="130.08" cy="-484.35" rx="4" ry="4"/>
+<!-- crm_stage_events&#45;&gt;users -->
+<g id="edge25" class="edge">
+<title>crm_stage_events&#45;&gt;users</title>
+<path fill="none" stroke="#8a91b4" d="M133.68,-475.53C163.64,-386.67 205.03,-284.75 244,-259 330.21,-202.04 611.08,-225.98 709,-259 735.22,-267.84 759.89,-287.47 777.06,-303.69"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="131.09,-483.32 123.66,-491.39 129.51,-488.07 127.94,-492.81 127.94,-492.81 127.94,-492.81 129.51,-488.07 132.21,-494.23 131.09,-483.32 131.09,-483.32"/>
+<ellipse fill="none" stroke="#8a91b4" cx="132.35" cy="-479.52" rx="4" ry="4"/>
 <polygon fill="#8a91b4" stroke="#8a91b4" points="787.18,-306.58 780.2,-313.74 778.77,-312.34 785.75,-305.18 787.18,-306.58"/>
 <polyline fill="none" stroke="#8a91b4" points="784.41,-310.86 780.83,-307.37 "/>
 <polygon fill="#8a91b4" stroke="#8a91b4" points="783.61,-303.09 776.62,-310.25 775.19,-308.85 782.17,-301.69 783.61,-303.09"/>
 <polyline fill="none" stroke="#8a91b4" points="780.83,-307.37 777.25,-303.87 "/>
 </g>
+<!-- crm_followups -->
+<g id="node5" class="node">
+<title>crm_followups</title>
+<path fill="none" stroke="#d7dcf2" d="M160,-1004C160,-1004 19,-1004 19,-1004 13,-1004 7,-998 7,-992 7,-992 7,-782 7,-782 7,-776 13,-770 19,-770 19,-770 160,-770 160,-770 166,-770 172,-776 172,-782 172,-782 172,-992 172,-992 172,-998 166,-1004 160,-1004"/>
+<polygon fill="#8a5a00" stroke="transparent" points="7.5,-986 7.5,-1004 172.5,-1004 172.5,-986 7.5,-986"/>
+<text text-anchor="start" x="52" y="-993.2" font-family="Figtree" font-weight="bold" font-size="11.00" fill="white">crm_followups</text>
+<text text-anchor="start" x="10.5" y="-974.2" font-family="Figtree" font-size="11.00" fill="#5b6280">PK</text>
+<text text-anchor="start" x="29.5" y="-975.2" font-family="Figtree" font-weight="bold" font-size="11.00">id</text>
+<text text-anchor="start" x="106.5" y="-974.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
+<text text-anchor="start" x="10.5" y="-956.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
+<text text-anchor="start" x="29.5" y="-956.2" font-family="Figtree" font-size="11.00">institution_id</text>
+<text text-anchor="start" x="106.5" y="-956.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
+<text text-anchor="start" x="10.5" y="-938.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
+<text text-anchor="start" x="29.5" y="-938.2" font-family="Figtree" font-size="11.00">application_id</text>
+<text text-anchor="start" x="106.5" y="-938.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
+<text text-anchor="start" x="10.5" y="-920.2" font-family="Figtree" font-size="11.00" fill="#5b6280">FK</text>
+<text text-anchor="start" x="29.5" y="-920.2" font-family="Figtree" font-size="11.00">responsible_id</text>
+<text text-anchor="start" x="106.5" y="-920.2" font-family="Figtree" font-size="11.00" fill="#5b6280">bigint</text>
+<text text-anchor="start" x="10.5" y="-902.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="29.5" y="-902.2" font-family="Figtree" font-size="11.00">due_at</text>
+<text text-anchor="start" x="106.5" y="-902.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+<text text-anchor="start" x="10.5" y="-884.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="29.5" y="-884.2" font-family="Figtree" font-size="11.00">type</text>
+<text text-anchor="start" x="106.5" y="-884.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(30)</text>
+<text text-anchor="start" x="10.5" y="-866.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="29.5" y="-866.2" font-family="Figtree" font-size="11.00">status</text>
+<text text-anchor="start" x="106.5" y="-866.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(20)</text>
+<text text-anchor="start" x="10.5" y="-848.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="29.5" y="-848.2" font-family="Figtree" font-size="11.00">note</text>
+<text text-anchor="start" x="106.5" y="-848.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(500)</text>
+<text text-anchor="start" x="10.5" y="-830.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="29.5" y="-830.2" font-family="Figtree" font-size="11.00">result</text>
+<text text-anchor="start" x="106.5" y="-830.2" font-family="Figtree" font-size="11.00" fill="#5b6280">varchar(300)</text>
+<text text-anchor="start" x="10.5" y="-812.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="29.5" y="-812.2" font-family="Figtree" font-size="11.00">completed_at</text>
+<text text-anchor="start" x="106.5" y="-812.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+<text text-anchor="start" x="10.5" y="-794.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="29.5" y="-794.2" font-family="Figtree" font-size="11.00">created_at</text>
+<text text-anchor="start" x="106.5" y="-794.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+<text text-anchor="start" x="10.5" y="-776.2" font-family="Figtree" font-size="11.00" fill="#5b6280"> </text>
+<text text-anchor="start" x="29.5" y="-776.2" font-family="Figtree" font-size="11.00">updated_at</text>
+<text text-anchor="start" x="106.5" y="-776.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
+</g>
+<!-- crm_followups&#45;&gt;crm_applications -->
+<g id="edge11" class="edge">
+<title>crm_followups&#45;&gt;crm_applications</title>
+<path fill="none" stroke="#8a91b4" d="M187.84,-833.28C203.12,-824.85 219.01,-816.08 234.57,-807.49"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="180.8,-837.17 169.87,-838.06 176.42,-839.58 172.04,-842 172.04,-842 172.04,-842 176.42,-839.58 174.22,-845.94 180.8,-837.17 180.8,-837.17"/>
+<ellipse fill="none" stroke="#8a91b4" cx="184.3" cy="-835.23" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="240.4,-798.56 245.23,-807.32 243.48,-808.29 238.65,-799.53 240.4,-798.56"/>
+<polyline fill="none" stroke="#8a91b4" points="243.69,-802.46 239.32,-804.87 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="236.03,-800.98 240.86,-809.74 239.11,-810.7 234.27,-801.95 236.03,-800.98"/>
+<polyline fill="none" stroke="#8a91b4" points="239.32,-804.87 234.94,-807.29 "/>
+</g>
 <!-- crm_followups&#45;&gt;institutions -->
 <g id="edge10" class="edge">
 <title>crm_followups&#45;&gt;institutions</title>
-<path fill="none" stroke="#8a91b4" d="M178.91,-743.74C178.94,-743.82 178.97,-743.91 179,-744 235.27,-901.07 121.02,-1379.24 244,-1492 320.16,-1561.83 620.55,-1545.43 709,-1492 762.24,-1459.84 786.21,-1385.51 795.67,-1344.84"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="175.91,-736.45 176.26,-725.49 174,-731.83 172.1,-727.21 172.1,-727.21 172.1,-727.21 174,-731.83 167.94,-728.92 175.91,-736.45 175.91,-736.45"/>
-<ellipse fill="none" stroke="#8a91b4" cx="177.43" cy="-740.15" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="792.72,-1334.94 802.49,-1337.08 802.06,-1339.03 792.29,-1336.89 792.72,-1334.94"/>
-<polyline fill="none" stroke="#8a91b4" points="797.82,-1335.03 796.74,-1339.91 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="791.65,-1339.82 801.41,-1341.96 800.99,-1343.92 791.22,-1341.77 791.65,-1339.82"/>
-<polyline fill="none" stroke="#8a91b4" points="796.74,-1339.91 795.67,-1344.8 "/>
+<path fill="none" stroke="#8a91b4" d="M102.66,-1022.13C121.32,-1194.86 163.62,-1479.26 244,-1543 405.93,-1671.41 537.51,-1658.34 709,-1543 775.81,-1498.07 794.13,-1395.29 799.13,-1345.32"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="101.82,-1014.17 105.24,-1003.75 101.29,-1009.2 100.77,-1004.23 100.77,-1004.23 100.77,-1004.23 101.29,-1009.2 96.29,-1004.7 101.82,-1014.17 101.82,-1014.17"/>
+<ellipse fill="none" stroke="#8a91b4" cx="102.24" cy="-1018.15" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="794.96,-1335.77 804.92,-1336.66 804.74,-1338.65 794.78,-1337.76 794.96,-1335.77"/>
+<polyline fill="none" stroke="#8a91b4" points="800.03,-1335.22 799.59,-1340.2 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="794.52,-1340.75 804.48,-1341.64 804.3,-1343.63 794.34,-1342.74 794.52,-1340.75"/>
+<polyline fill="none" stroke="#8a91b4" points="799.59,-1340.2 799.14,-1345.18 "/>
+</g>
+<!-- crm_followups&#45;&gt;users -->
+<g id="edge12" class="edge">
+<title>crm_followups&#45;&gt;users</title>
+<path fill="none" stroke="#8a91b4" d="M177.74,-755.86C211.46,-634.53 170.68,-366.57 244,-303 321.68,-235.65 653.88,-297.96 764.79,-321.13"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="175.21,-763.5 167.8,-771.58 173.64,-768.25 172.07,-772.99 172.07,-772.99 172.07,-772.99 173.64,-768.25 176.34,-774.41 175.21,-763.5 175.21,-763.5"/>
+<ellipse fill="none" stroke="#8a91b4" cx="176.47" cy="-759.7" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="774.87,-318.15 772.81,-327.93 770.85,-327.52 772.91,-317.74 774.87,-318.15"/>
+<polyline fill="none" stroke="#8a91b4" points="774.82,-323.25 769.92,-322.22 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="769.98,-317.12 767.91,-326.9 765.96,-326.49 768.02,-316.7 769.98,-317.12"/>
+<polyline fill="none" stroke="#8a91b4" points="769.92,-322.22 765.03,-321.18 "/>
 </g>
 <!-- crm_message_drafts -->
 <g id="node6" class="node">
@@ -519,22 +519,16 @@
 <polygon fill="#8a91b4" stroke="#8a91b4" points="251.85,-531.27 242.73,-535.38 241.91,-533.55 251.03,-529.45 251.85,-531.27"/>
 <polyline fill="none" stroke="#8a91b4" points="247.7,-534.24 245.65,-529.68 "/>
 </g>
-<!-- agent_runs -->
-<g id="node12" class="node">
-<title>agent_runs</title>
-<path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M362.5,-189C362.5,-189 331.5,-189 331.5,-189 325.5,-189 319.5,-183 319.5,-177 319.5,-177 319.5,-165 319.5,-165 319.5,-159 325.5,-153 331.5,-153 331.5,-153 362.5,-153 362.5,-153 368.5,-153 374.5,-159 374.5,-165 374.5,-165 374.5,-177 374.5,-177 374.5,-183 368.5,-189 362.5,-189"/>
-<text text-anchor="middle" x="347" y="-168.2" font-family="Figtree" font-size="11.00" fill="#5b6280">agent_runs</text>
-</g>
-<!-- crm_message_drafts&#45;&gt;agent_runs -->
-<g id="edge17" class="edge">
-<title>crm_message_drafts&#45;&gt;agent_runs</title>
-<path fill="none" stroke="#8a91b4" d="M197.37,-171C237.2,-171 279.81,-171 309.15,-171"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="189.14,-171 179.14,-166.5 184.14,-171 179.14,-171 179.14,-171 179.14,-171 184.14,-171 179.14,-175.5 189.14,-171 189.14,-171"/>
-<ellipse fill="none" stroke="#8a91b4" cx="193.14" cy="-171" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="318.33,-166 318.33,-176 316.33,-176 316.33,-166 318.33,-166"/>
-<polyline fill="none" stroke="#8a91b4" points="319.33,-171 314.33,-171 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="313.33,-166 313.33,-176 311.33,-176 311.33,-166 313.33,-166"/>
-<polyline fill="none" stroke="#8a91b4" points="314.33,-171 309.33,-171 "/>
+<!-- crm_message_drafts&#45;&gt;institutions -->
+<g id="edge13" class="edge">
+<title>crm_message_drafts&#45;&gt;institutions</title>
+<path fill="none" stroke="#8a91b4" d="M151.38,-359.66C162.16,-399.07 172.12,-440.62 179,-480 197.56,-586.19 165.26,-1374.37 244,-1448 320.91,-1519.92 610.99,-1395.47 709,-1357 727.43,-1349.77 747.64,-1341.07 764.4,-1333.63"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="149.23,-351.96 150.88,-341.12 147.89,-347.14 146.55,-342.32 146.55,-342.32 146.55,-342.32 147.89,-347.14 142.21,-343.53 149.23,-351.96 149.23,-351.96"/>
+<ellipse fill="none" stroke="#8a91b4" cx="150.3" cy="-355.81" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="770.89,-1325.26 774.97,-1334.4 773.14,-1335.21 769.06,-1326.08 770.89,-1325.26"/>
+<polyline fill="none" stroke="#8a91b4" points="773.84,-1329.42 769.28,-1331.46 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="766.32,-1327.3 770.4,-1336.43 768.57,-1337.25 764.5,-1328.12 766.32,-1327.3"/>
+<polyline fill="none" stroke="#8a91b4" points="769.28,-1331.46 764.71,-1333.5 "/>
 </g>
 <!-- crm_message_drafts&#45;&gt;users -->
 <g id="edge15" class="edge">
@@ -558,16 +552,22 @@
 <polygon fill="#8a91b4" stroke="#8a91b4" points="788,-303.15 779.56,-308.5 778.48,-306.82 786.93,-301.46 788,-303.15"/>
 <polyline fill="none" stroke="#8a91b4" points="784.31,-306.67 781.64,-302.45 "/>
 </g>
-<!-- crm_message_drafts&#45;&gt;institutions -->
-<g id="edge13" class="edge">
-<title>crm_message_drafts&#45;&gt;institutions</title>
-<path fill="none" stroke="#8a91b4" d="M150.5,-359.67C161.6,-400.63 171.91,-443.98 179,-485 197.26,-590.68 165.66,-1374.77 244,-1448 320.92,-1519.9 610.99,-1395.47 709,-1357 727.43,-1349.77 747.64,-1341.07 764.4,-1333.63"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="148.36,-351.92 150.04,-341.08 147.03,-347.1 145.7,-342.28 145.7,-342.28 145.7,-342.28 147.03,-347.1 141.36,-343.47 148.36,-351.92 148.36,-351.92"/>
-<ellipse fill="none" stroke="#8a91b4" cx="149.42" cy="-355.77" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="770.89,-1325.26 774.97,-1334.4 773.14,-1335.21 769.06,-1326.08 770.89,-1325.26"/>
-<polyline fill="none" stroke="#8a91b4" points="773.84,-1329.42 769.28,-1331.46 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="766.32,-1327.3 770.4,-1336.43 768.57,-1337.25 764.5,-1328.12 766.32,-1327.3"/>
-<polyline fill="none" stroke="#8a91b4" points="769.28,-1331.46 764.71,-1333.5 "/>
+<!-- agent_runs -->
+<g id="node15" class="node">
+<title>agent_runs</title>
+<path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M362.5,-189C362.5,-189 331.5,-189 331.5,-189 325.5,-189 319.5,-183 319.5,-177 319.5,-177 319.5,-165 319.5,-165 319.5,-159 325.5,-153 331.5,-153 331.5,-153 362.5,-153 362.5,-153 368.5,-153 374.5,-159 374.5,-165 374.5,-165 374.5,-177 374.5,-177 374.5,-183 368.5,-189 362.5,-189"/>
+<text text-anchor="middle" x="347" y="-168.2" font-family="Figtree" font-size="11.00" fill="#5b6280">agent_runs</text>
+</g>
+<!-- crm_message_drafts&#45;&gt;agent_runs -->
+<g id="edge17" class="edge">
+<title>crm_message_drafts&#45;&gt;agent_runs</title>
+<path fill="none" stroke="#8a91b4" d="M197.37,-171C237.2,-171 279.81,-171 309.15,-171"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="189.14,-171 179.14,-166.5 184.14,-171 179.14,-171 179.14,-171 179.14,-171 184.14,-171 179.14,-175.5 189.14,-171 189.14,-171"/>
+<ellipse fill="none" stroke="#8a91b4" cx="193.14" cy="-171" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="318.33,-166 318.33,-176 316.33,-176 316.33,-166 318.33,-166"/>
+<polyline fill="none" stroke="#8a91b4" points="319.33,-171 314.33,-171 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="313.33,-166 313.33,-176 311.33,-176 311.33,-166 313.33,-166"/>
+<polyline fill="none" stroke="#8a91b4" points="314.33,-171 309.33,-171 "/>
 </g>
 <!-- crm_consent_records -->
 <g id="node7" class="node">
@@ -682,17 +682,6 @@
 <polygon fill="#8a91b4" stroke="#8a91b4" points="524.39,-1137.75 521.32,-1147.27 519.41,-1146.65 522.49,-1137.14 524.39,-1137.75"/>
 <polyline fill="none" stroke="#8a91b4" points="523.8,-1142.82 519.05,-1141.28 "/>
 </g>
-<!-- crm_privacy_cases&#45;&gt;users -->
-<g id="edge20" class="edge">
-<title>crm_privacy_cases&#45;&gt;users</title>
-<path fill="none" stroke="#8a91b4" d="M440.97,-980.78C444.21,-975.57 447.24,-970.3 450,-965 501.71,-865.88 435.78,-800.88 515,-722 578.18,-659.1 645.78,-733.86 709,-671 754.09,-626.17 786.37,-430.54 797.11,-357.04"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="436.27,-987.87 426.99,-993.71 433.5,-992.03 430.74,-996.2 430.74,-996.2 430.74,-996.2 433.5,-992.03 434.49,-998.69 436.27,-987.87 436.27,-987.87"/>
-<ellipse fill="none" stroke="#8a91b4" cx="438.48" cy="-984.53" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="793.45,-347.4 803.35,-348.82 803.06,-350.8 793.16,-349.38 793.45,-347.4"/>
-<polyline fill="none" stroke="#8a91b4" points="798.54,-347.12 797.83,-352.07 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="792.74,-352.35 802.63,-353.77 802.35,-355.75 792.45,-354.33 792.74,-352.35"/>
-<polyline fill="none" stroke="#8a91b4" points="797.83,-352.07 797.12,-357.02 "/>
-</g>
 <!-- crm_privacy_cases&#45;&gt;institutions -->
 <g id="edge18" class="edge">
 <title>crm_privacy_cases&#45;&gt;institutions</title>
@@ -703,6 +692,17 @@
 <polyline fill="none" stroke="#8a91b4" points="773.71,-1321.51 768.75,-1322.15 "/>
 <polygon fill="#8a91b4" stroke="#8a91b4" points="767.11,-1317.33 768.41,-1327.24 766.43,-1327.5 765.13,-1317.58 767.11,-1317.33"/>
 <polyline fill="none" stroke="#8a91b4" points="768.75,-1322.15 763.79,-1322.8 "/>
+</g>
+<!-- crm_privacy_cases&#45;&gt;users -->
+<g id="edge20" class="edge">
+<title>crm_privacy_cases&#45;&gt;users</title>
+<path fill="none" stroke="#8a91b4" d="M440.97,-980.78C444.21,-975.57 447.24,-970.3 450,-965 501.71,-865.88 435.78,-800.88 515,-722 578.18,-659.1 645.78,-733.86 709,-671 754.09,-626.17 786.37,-430.54 797.11,-357.04"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="436.27,-987.87 426.99,-993.71 433.5,-992.03 430.74,-996.2 430.74,-996.2 430.74,-996.2 433.5,-992.03 434.49,-998.69 436.27,-987.87 436.27,-987.87"/>
+<ellipse fill="none" stroke="#8a91b4" cx="438.48" cy="-984.53" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="793.45,-347.4 803.35,-348.82 803.06,-350.8 793.16,-349.38 793.45,-347.4"/>
+<polyline fill="none" stroke="#8a91b4" points="798.54,-347.12 797.83,-352.07 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="792.74,-352.35 802.63,-353.77 802.35,-355.75 792.45,-354.33 792.74,-352.35"/>
+<polyline fill="none" stroke="#8a91b4" points="797.83,-352.07 797.12,-357.02 "/>
 </g>
 <!-- platform_crm_accounts -->
 <g id="node9" class="node">
@@ -738,17 +738,6 @@
 <text text-anchor="start" x="537" y="-424.2" font-family="Figtree" font-size="11.00">updated_at</text>
 <text text-anchor="start" x="636" y="-424.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
 </g>
-<!-- platform_crm_accounts&#45;&gt;users -->
-<g id="edge27" class="edge">
-<title>platform_crm_accounts&#45;&gt;users</title>
-<path fill="none" stroke="#8a91b4" d="M720.79,-405.37C740.78,-386.34 759.91,-368.12 774.48,-354.25"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="714.79,-411.08 704.45,-414.72 711.17,-414.53 707.55,-417.98 707.55,-417.98 707.55,-417.98 711.17,-414.53 710.65,-421.23 714.79,-411.08 714.79,-411.08"/>
-<ellipse fill="none" stroke="#8a91b4" cx="717.69" cy="-408.32" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="777.9,-344.09 784.8,-351.33 783.35,-352.71 776.46,-345.47 777.9,-344.09"/>
-<polyline fill="none" stroke="#8a91b4" points="782.08,-347.02 778.46,-350.47 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="774.28,-347.53 781.18,-354.78 779.73,-356.16 772.83,-348.91 774.28,-347.53"/>
-<polyline fill="none" stroke="#8a91b4" points="778.46,-350.47 774.83,-353.91 "/>
-</g>
 <!-- platform_crm_accounts&#45;&gt;institutions -->
 <g id="edge26" class="edge">
 <title>platform_crm_accounts&#45;&gt;institutions</title>
@@ -760,6 +749,17 @@
 <polyline fill="none" stroke="#8a91b4" points="800.14,-1298.7 799.89,-1293.71 "/>
 <polygon fill="#8a91b4" stroke="#8a91b4" points="804.83,-1292.46 794.84,-1292.96 794.74,-1290.96 804.73,-1290.46 804.83,-1292.46"/>
 <polyline fill="none" stroke="#8a91b4" points="799.89,-1293.71 799.64,-1288.71 "/>
+</g>
+<!-- platform_crm_accounts&#45;&gt;users -->
+<g id="edge27" class="edge">
+<title>platform_crm_accounts&#45;&gt;users</title>
+<path fill="none" stroke="#8a91b4" d="M720.79,-405.37C740.78,-386.34 759.91,-368.12 774.48,-354.25"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="714.79,-411.08 704.45,-414.72 711.17,-414.53 707.55,-417.98 707.55,-417.98 707.55,-417.98 711.17,-414.53 710.65,-421.23 714.79,-411.08 714.79,-411.08"/>
+<ellipse fill="none" stroke="#8a91b4" cx="717.69" cy="-408.32" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="777.9,-344.09 784.8,-351.33 783.35,-352.71 776.46,-345.47 777.9,-344.09"/>
+<polyline fill="none" stroke="#8a91b4" points="782.08,-347.02 778.46,-350.47 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="774.28,-347.53 781.18,-354.78 779.73,-356.16 772.83,-348.91 774.28,-347.53"/>
+<polyline fill="none" stroke="#8a91b4" points="778.46,-350.47 774.83,-353.91 "/>
 </g>
 <!-- platform_crm_contacts -->
 <g id="node10" class="node">

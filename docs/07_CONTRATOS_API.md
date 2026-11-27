@@ -157,3 +157,14 @@ Detalle de las decisiones en [ADR 0010](adr/0010-mapa-rango-mascotas-parejas.md)
 | GET | `/memory-games/:gameId` | — | Estado de la partida propia (`404` si es de otra persona) |
 | POST | `/memory-games/:gameId/reveal` | `{ cardId }` | `{ id, position, kind: "question" \| "answer", text }` |
 | POST | `/memory-games/:gameId/match` | `{ cardIds: [a, b] }` | `{ match, cards, attempts, matchedPairs, pairCount, finished, elapsedSeconds }`; `409 GAME_FINISHED` o `ALREADY_MATCHED` |
+
+## Modo de prueba (2026-11-26)
+
+Detalle en [ADR 0011](adr/0011-modo-de-prueba.md). Todo depende de `DEMO_MODE=on` en el backend.
+
+| Método | Ruta | Cuerpo | Respuesta |
+|---|---|---|---|
+| GET | `/auth/demo` | — | `{ enabled, accounts: [{ role, label, email }] }`; con el modo apagado `{ enabled: false, accounts: [] }` |
+| POST | `/auth/demo` | `{ role: "student" \| "teacher" \| "institution_admin" \| "auditor" \| "platform_admin" }` | Igual que `/auth/login`: cookie de sesión, `{ user, csrfToken, pendingConsents }`. Con el modo apagado responde `404`; rol inválido, `422`; mismo límite de intentos que el inicio de sesión |
+
+Con el modo apagado, `/auth/login` rechaza las cuentas con `users.is_demo` y sus sesiones abiertas dejan de valer (`401`).

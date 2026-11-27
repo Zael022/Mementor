@@ -7,7 +7,7 @@
 - IA: falta de configuración produce `AI_NOT_CONFIGURED` sin respuesta falsa; con un proveedor configurado, fuentes reales y acceso autorizado; no filtrar material ajeno; resistir instrucciones maliciosas de documentos.
 - Frontend: rutas `Componentes/Pages/Rutas/App/main/index.html`, accesibilidad, carga, vacíos, error, responsive.
 
-**Prohibido:** seeds en desarrollo, cuentas demo, métricas prefabricadas, JSON Server, datos académicos hardcodeados. Las pruebas automatizadas pueden crear y borrar datos transitorios en una base MySQL separada, jamás en la BD real.
+**Prohibido:** seeds de contenido en desarrollo, cuentas demo fuera del modo de prueba (`DEMO_MODE`, ADR 0011), métricas prefabricadas, JSON Server, datos académicos hardcodeados. Las pruebas automatizadas pueden crear y borrar datos transitorios en una base MySQL separada, jamás en la BD real.
 
 ## Lista de aceptación
 - [ ] `frontend/index.html` inicia `src/main.jsx`, que renderiza `App.jsx` y `Rutas/Rutas.jsx`.

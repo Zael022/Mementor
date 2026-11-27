@@ -18,4 +18,4 @@ Frontend: `Componentes`, `Pages`, `Rutas`, `App.jsx`, `main.jsx`, `index.html` (
 Prompt maestro, visión de producto, roles, flujos, arquitectura, entidades, API, motor IA, UX, seguridad, roadmap, pruebas, prompts de continuación, guía de la estructura y plantilla mínima ejecutable.
 
 ## Regla importante
-No hay currículo de ejemplo, cuentas demostrativas, seeds, mocks de alumnos ni métricas falsas. El repositorio inicia con la base de datos vacía. Las pruebas automatizadas, cuando Claude las agregue, usan un entorno aislado y no precargan el MySQL de desarrollo.
+No hay currículo de ejemplo, seeds de contenido, mocks de alumnos ni métricas falsas. Las únicas cuentas de prueba son las del modo de prueba opcional (`DEMO_MODE=on`, ADR 0011). El repositorio inicia con la base de datos vacía. Las pruebas automatizadas, cuando Claude las agregue, usan un entorno aislado y no precargan el MySQL de desarrollo.

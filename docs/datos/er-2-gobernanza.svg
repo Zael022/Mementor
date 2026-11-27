@@ -39,7 +39,7 @@
 <text text-anchor="start" x="152" y="-891.2" font-family="Figtree" font-size="11.00" fill="#5b6280">datetime</text>
 </g>
 <!-- users -->
-<g id="node10" class="node">
+<g id="node11" class="node">
 <title>users</title>
 <path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M345,-797C345,-797 315,-797 315,-797 309,-797 303,-791 303,-785 303,-785 303,-773 303,-773 303,-767 309,-761 315,-761 315,-761 345,-761 345,-761 351,-761 357,-767 357,-773 357,-773 357,-785 357,-785 357,-791 351,-797 345,-797"/>
 <text text-anchor="middle" x="330" y="-776.2" font-family="Figtree" font-size="11.00" fill="#5b6280">users</text>
@@ -110,7 +110,7 @@
 <polyline fill="none" stroke="#8a91b4" points="309.94,-756.86 306.67,-753.07 "/>
 </g>
 <!-- institutions -->
-<g id="node11" class="node">
+<g id="node12" class="node">
 <title>institutions</title>
 <path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M346,-574C346,-574 314,-574 314,-574 308,-574 302,-568 302,-562 302,-562 302,-550 302,-550 302,-544 308,-538 314,-538 314,-538 346,-538 346,-538 352,-538 358,-544 358,-550 358,-550 358,-562 358,-562 358,-568 352,-574 346,-574"/>
 <text text-anchor="middle" x="330" y="-553.2" font-family="Figtree" font-size="11.00" fill="#5b6280">institutions</text>
@@ -252,6 +252,23 @@
 <text text-anchor="start" x="64" y="-6.2" font-family="Figtree" font-size="11.00">cache_write_tokens</text>
 <text text-anchor="start" x="167" y="-6.2" font-family="Figtree" font-size="11.00" fill="#5b6280">int</text>
 </g>
+<!-- courses -->
+<g id="node10" class="node">
+<title>courses</title>
+<path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M345,-225C345,-225 315,-225 315,-225 309,-225 303,-219 303,-213 303,-213 303,-201 303,-201 303,-195 309,-189 315,-189 315,-189 345,-189 345,-189 351,-189 357,-195 357,-201 357,-201 357,-213 357,-213 357,-219 351,-225 345,-225"/>
+<text text-anchor="middle" x="330" y="-204.2" font-family="Figtree" font-size="11.00" fill="#5b6280">courses</text>
+</g>
+<!-- agent_runs&#45;&gt;courses -->
+<g id="edge3" class="edge">
+<title>agent_runs&#45;&gt;courses</title>
+<path fill="none" stroke="#8a91b4" d="M248.98,-207C264.7,-207 279.83,-207 292.62,-207"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="240.75,-207 230.75,-202.5 235.75,-207 230.75,-207 230.75,-207 230.75,-207 235.75,-207 230.75,-211.5 240.75,-207 240.75,-207"/>
+<ellipse fill="none" stroke="#8a91b4" cx="244.75" cy="-207" rx="4" ry="4"/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="301.77,-202 301.77,-212 299.77,-212 299.77,-202 301.77,-202"/>
+<polyline fill="none" stroke="#8a91b4" points="302.77,-207 297.77,-207 "/>
+<polygon fill="#8a91b4" stroke="#8a91b4" points="296.77,-202 296.77,-212 294.77,-212 294.77,-202 296.77,-202"/>
+<polyline fill="none" stroke="#8a91b4" points="297.77,-207 292.77,-207 "/>
+</g>
 <!-- agent_runs&#45;&gt;users -->
 <g id="edge2" class="edge">
 <title>agent_runs&#45;&gt;users</title>
@@ -273,23 +290,6 @@
 <polyline fill="none" stroke="#8a91b4" points="318.9,-537.65 316.49,-533.27 "/>
 <polygon fill="#8a91b4" stroke="#8a91b4" points="320.39,-529.98 311.63,-534.8 310.67,-533.05 319.43,-528.23 320.39,-529.98"/>
 <polyline fill="none" stroke="#8a91b4" points="316.49,-533.27 314.08,-528.89 "/>
-</g>
-<!-- courses -->
-<g id="node12" class="node">
-<title>courses</title>
-<path fill="none" stroke="#d7dcf2" stroke-dasharray="5,2" d="M345,-225C345,-225 315,-225 315,-225 309,-225 303,-219 303,-213 303,-213 303,-201 303,-201 303,-195 309,-189 315,-189 315,-189 345,-189 345,-189 351,-189 357,-195 357,-201 357,-201 357,-213 357,-213 357,-219 351,-225 345,-225"/>
-<text text-anchor="middle" x="330" y="-204.2" font-family="Figtree" font-size="11.00" fill="#5b6280">courses</text>
-</g>
-<!-- agent_runs&#45;&gt;courses -->
-<g id="edge3" class="edge">
-<title>agent_runs&#45;&gt;courses</title>
-<path fill="none" stroke="#8a91b4" d="M248.98,-207C264.7,-207 279.83,-207 292.62,-207"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="240.75,-207 230.75,-202.5 235.75,-207 230.75,-207 230.75,-207 230.75,-207 235.75,-207 230.75,-211.5 240.75,-207 240.75,-207"/>
-<ellipse fill="none" stroke="#8a91b4" cx="244.75" cy="-207" rx="4" ry="4"/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="301.77,-202 301.77,-212 299.77,-212 299.77,-202 301.77,-202"/>
-<polyline fill="none" stroke="#8a91b4" points="302.77,-207 297.77,-207 "/>
-<polygon fill="#8a91b4" stroke="#8a91b4" points="296.77,-202 296.77,-212 294.77,-212 294.77,-202 296.77,-202"/>
-<polyline fill="none" stroke="#8a91b4" points="297.77,-207 292.77,-207 "/>
 </g>
 <!-- integration_runs -->
 <g id="node5" class="node">
