@@ -46,47 +46,64 @@
 /* --- Mapa del curso --- */
 .mapa { margin-top: 6px; }
 .mapa-completo { margin: 0 0 12px; font-weight: 700; color: var(--lima-hondo); }
+/* Fondo del mapa: un cielo que va de celeste a claro, con dos capas de estrellas y la retícula de puntos.
+   Todo es fondo: las tarjetas van sobre panel blanco y mantienen su contraste. */
 .mapa-ventana {
   position: relative; scroll-margin-top: 90px; max-height: min(74vh, 780px); overflow-y: auto; overscroll-behavior: contain;
   border: 1.5px solid var(--linea); border-radius: var(--radio-grande);
   background:
+    radial-gradient(circle at 18% 22%, color-mix(in srgb, var(--azul) 45%, transparent) 0 1.6px, transparent 2.2px) 0 0 / 170px 150px,
+    radial-gradient(circle at 72% 64%, color-mix(in srgb, var(--lima-hondo) 45%, transparent) 0 1.3px, transparent 1.9px) 0 0 / 130px 190px,
+    radial-gradient(circle at 46% 8%, color-mix(in srgb, var(--naranja) 40%, transparent) 0 1.1px, transparent 1.7px) 0 0 / 210px 120px,
     radial-gradient(circle at 1px 1px, var(--patron-2) 1.2px, transparent 1.6px) 0 0 / 22px 22px,
-    var(--panel);
+    linear-gradient(180deg, var(--cielo) 0, var(--panel) 360px, var(--fondo) 100%);
+  background-attachment: local;
   scroll-padding-block: 90px;
 }
 .mapa-lienzo { position: relative; isolation: isolate; padding: 18px clamp(12px, 3vw, 28px) 36px; }
 .mapa-camino { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
-/* El camino es una senda: un suelo ancho, una línea punteada al centro y el avance en lima encima. */
-.camino-suelo { fill: none; stroke: var(--panel); stroke-width: 26; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 3px 0 var(--linea)); }
 .camino-base { fill: none; stroke: var(--linea-fuerte); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 0.1 14; opacity: 0.7; }
-.camino-borde { fill: none; stroke: var(--lima-hondo); stroke-width: 15; stroke-linecap: round; stroke-linejoin: round; }
-.camino-avance { fill: none; stroke: var(--lima); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+.camino-borde { fill: none; stroke: var(--lima-hondo); stroke-width: 13; stroke-linecap: round; }
+.camino-avance { fill: none; stroke: var(--lima); stroke-width: 8; stroke-linecap: round; }
 .mapa-modulos, .mapa-paradas { list-style: none; margin: 0; padding: 0; }
 /* Cada módulo es una zona con su propio tono; el fondo va detrás del camino (z-index -1 dentro del lienzo). */
 .mapa-modulo { position: relative; padding: 4px 0 18px; }
 .mapa-modulo + .mapa-modulo { margin-top: 18px; }
 .mapa-modulo::before {
-  content: ''; position: absolute; z-index: -1; inset: 0 -6px; border-radius: 32px;
-  background: var(--tono-zona, var(--cielo)); opacity: 0.55;
-  border: 1.5px dashed color-mix(in srgb, var(--tono-borde, var(--azul)) 35%, transparent);
+  content: ''; position: absolute; z-index: -1; inset: 0 -6px; border-radius: 36px 36px 28px 28px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tono-zona, var(--cielo)) 35%, transparent), var(--tono-zona, var(--cielo)));
+  border: 1.5px solid color-mix(in srgb, var(--tono-borde, var(--azul)) 18%, transparent);
 }
 .mapa-modulo.zona-0 { --tono-zona: var(--cielo); --tono-borde: var(--azul); --tono-adorno: var(--azul); }
 .mapa-modulo.zona-1 { --tono-zona: var(--suave-exito); --tono-borde: var(--lima-hondo); --tono-adorno: var(--lima-hondo); }
 .mapa-modulo.zona-2 { --tono-zona: var(--suave-naranja); --tono-borde: var(--naranja); --tono-adorno: var(--naranja); }
 .mapa-modulo.zona-3 { --tono-zona: var(--suave-neutro); --tono-borde: var(--azul-hondo); --tono-adorno: var(--azul-hondo); }
-.mapa-modulo.terminado::before { border-style: solid; border-color: var(--borde-exito); }
-.mapa-adornos { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; border-radius: 32px; }
+.mapa-modulo.terminado::before { border-color: var(--borde-exito); box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--lima) 40%, transparent); }
+
+/* Adornos de cada zona: colinas abajo, una constelación, destellos que titilan y nubes que flotan. */
+.mapa-adornos { position: absolute; inset: 0 -6px; z-index: -1; pointer-events: none; overflow: hidden; border-radius: 36px 36px 28px 28px; }
+.zona-colinas { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 90px; }
+.zona-colinas .colina-atras { fill: var(--tono-adorno); opacity: 0.12; }
+.zona-colinas .colina-frente { fill: var(--tono-adorno); opacity: 0.2; }
+.zona-constelacion { position: absolute; top: 18px; right: 4%; width: 120px; height: 70px; stroke: var(--tono-adorno); fill: var(--tono-adorno); opacity: 0.35; }
+.zona-constelacion path { fill: none; stroke-width: 1.2; stroke-dasharray: 3 4; }
 .adorno { position: absolute; fill: var(--tono-adorno); stroke: var(--tono-adorno); opacity: 0.35; }
 .adorno.a-1 { top: 7%; left: 3%; }
-.adorno.a-2 { top: 38%; right: 5%; }
-.adorno.a-3 { bottom: 16%; left: 12%; width: 14px; height: 14px; opacity: 0.4; }
-.adorno.a-4 { bottom: 8%; right: 16%; }
-.adorno[viewBox="0 0 64 30"] { stroke: none; fill: var(--panel); opacity: 0.9; filter: drop-shadow(0 2px 0 var(--linea)); }
+.adorno.a-2 { top: 40%; right: 4%; }
+.adorno.a-3 { bottom: 26%; left: 9%; width: 14px; height: 14px; opacity: 0.45; }
+.adorno.a-4 { top: 22%; left: 30%; }
+.adorno.a-5 { top: 60%; left: 2%; width: 12px; height: 12px; }
+.adorno.nube { stroke: none; fill: var(--panel); opacity: 0.95; filter: drop-shadow(0 3px 0 color-mix(in srgb, var(--tono-adorno) 20%, transparent)); }
 @media (prefers-reduced-motion: no-preference) {
-  html:not([data-movimiento="reducido"]) .adorno.a-1, html:not([data-movimiento="reducido"]) .adorno.a-3 { animation: titilar 3.4s ease-in-out infinite; }
+  html:not([data-movimiento="reducido"]) .adorno.destello { animation: titilar 3.4s ease-in-out infinite; }
   html:not([data-movimiento="reducido"]) .adorno.a-3 { animation-delay: 1.3s; }
+  html:not([data-movimiento="reducido"]) .adorno.a-5 { animation-delay: 2.2s; }
+  html:not([data-movimiento="reducido"]) .adorno.nube { animation: derivar 26s ease-in-out infinite alternate; }
+  html:not([data-movimiento="reducido"]) .adorno.planeta { animation: flotar-planeta 7s ease-in-out infinite; }
 }
-@keyframes titilar { 0%, 100% { opacity: 0.2; transform: scale(0.85) rotate(0deg); } 50% { opacity: 0.55; transform: scale(1.1) rotate(20deg); } }
+@keyframes titilar { 0%, 100% { opacity: 0.2; transform: scale(0.85) rotate(0deg); } 50% { opacity: 0.6; transform: scale(1.1) rotate(20deg); } }
+@keyframes derivar { from { transform: translateX(0); } to { transform: translateX(-60px); } }
+@keyframes flotar-planeta { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-6px) rotate(-6deg); } }
 
 /* Resumen sobre el mapa: avance total, barra y leyenda de estados. */
 .mapa-resumen {
@@ -215,8 +232,7 @@
   .mapa-orbi { width: 52px; }
   .mapa-modulo::before { inset: 0 -4px; border-radius: 22px; }
   .mapa-hito { margin-left: 4px; }
-  .camino-suelo { stroke-width: 20; }
-  .adorno.a-2, .adorno.a-4 { display: none; }
+  .adorno.a-2, .adorno.a-4, .zona-constelacion { display: none; }
 }
 
 /* --- Sticker de papel (OrbiSticker) --- */
@@ -355,3 +371,14 @@
 .mascota-toque:active > svg { transform: scale(0.96); }
 .mascota-toque:focus-visible { outline: 3px solid var(--foco); outline-offset: 4px; }
 .burbuja-toque { animation: burbuja 0.25s var(--suave); }
+
+/* --- Orbi mira el mapa: se inclina hacia la parada señalada y la comenta --- */
+.mapa-orbi .mascota-toque > svg { transition: transform 0.35s var(--suave); }
+.mapa-orbi[data-mira="izq"] .mascota-toque > svg { transform: rotate(-12deg) translateX(-3px); }
+.mapa-orbi[data-mira="der"] .mascota-toque > svg { transform: rotate(12deg) translateX(3px); }
+.mapa-orbi[data-arriba] .mascota-toque > svg { transform: translateY(-3px) rotate(-4deg); }
+.burbuja-mapa.comentario { background: var(--panel); color: var(--tinta); border: 1.5px solid var(--linea); font-weight: 600; }
+:root[data-tema="oscuro"] .burbuja-mapa.comentario { background: var(--panel); color: var(--tinta); }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .burbuja-mapa.comentario { background: var(--panel); color: var(--tinta); } }
+/* La parada que Orbi está mirando se ilumina un poco. */
+.parada.mirada .parada-nodo { transform: scale(1.1); box-shadow: 0 6px 0 -1px var(--linea), 0 0 0 6px color-mix(in srgb, var(--azul) 18%, transparent); }
