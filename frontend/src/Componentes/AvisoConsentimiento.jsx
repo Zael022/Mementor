@@ -34,7 +34,7 @@ export default function AvisoConsentimiento() {
     <dialog ref={dialogo} className="dialogo-consentimiento" aria-labelledby="titulo-consentimiento" onCancel={(evento) => evento.preventDefault()}>
       <form onSubmit={aceptar}>
         <h2 id="titulo-consentimiento">Antes de continuar</h2>
-        <p>Para seguir usando MENTOR AI necesitamos que leas y aceptes:</p>
+        <p>Para seguir usando MENTOR IA necesitamos que leas y aceptes:</p>
         <ul>
           {pendientes.map((item) => (
             <li key={item.document}>

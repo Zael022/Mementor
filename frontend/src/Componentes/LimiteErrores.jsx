@@ -28,7 +28,7 @@ export default class LimiteErrores extends Component {
     const carga = esCargaFallida(error);
     return (
       <section className="tarjeta pagina-error" role="alert">
-        <h1>{carga ? 'Hay una versión nueva de MENTOR AI' : 'Esta página no se pudo mostrar'}</h1>
+        <h1>{carga ? 'Hay una versión nueva de MENTOR IA' : 'Esta página no se pudo mostrar'}</h1>
         <p>{carga
           ? 'Recarga para descargar la versión más reciente. Tu sesión se mantiene.'
           : 'Ocurrió un error inesperado. Recarga la página; si se repite, avisa a la administración de tu institución.'}</p>

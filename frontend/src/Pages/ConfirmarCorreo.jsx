@@ -33,7 +33,7 @@ export default function ConfirmarCorreo() {
       ) : (
         <>
           {token
-            ? <p>Confirma que esta dirección es tuya para usarla como correo de acceso a MENTOR AI.</p>
+            ? <p>Confirma que esta dirección es tuya para usarla como correo de acceso a MENTOR IA.</p>
             : <Aviso tipo="error">El enlace no incluye un token. Pide el cambio de nuevo desde tu perfil.</Aviso>}
           <MensajeError error={error} />
           <button type="button" className="boton" onClick={confirmar} disabled={enviando || !token} aria-busy={enviando}>

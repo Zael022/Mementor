@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { prefiereMenosMovimiento } from '../hooks/useMovimiento.js';
 import { gsap, useGSAP } from '../utils/gsap.js';
+import { useMascotaViva } from '../hooks/useMascotaViva.js';
 
 // Pausa, la mascota de bienestar (docs/marca/mascotas/pausa.svg): «aprende a tu ritmo».
 // Cada estado cambia partes del mismo dibujo: brazo derecho, ojos, boca y accesorios.
@@ -61,8 +62,10 @@ function Ojos({ estado }) {
     <g data-parte="parpados">
       <circle cx="474" cy={119 + dy} r="4" fill="#fff" stroke="none" />
       <circle cx="506" cy={119 + dy} r="4" fill="#fff" stroke="none" />
-      <circle cx="475" cy={120 + dy * 1.4} r="2" fill={TINTA} stroke="none" />
-      <circle cx="505" cy={120 + dy * 1.4} r="2" fill={TINTA} stroke="none" />
+      <g data-parte="pupilas">
+        <circle cx="475" cy={120 + dy * 1.4} r="2" fill={TINTA} stroke="none" />
+        <circle cx="505" cy={120 + dy * 1.4} r="2" fill={TINTA} stroke="none" />
+      </g>
     </g>
   );
 }
@@ -108,6 +111,8 @@ export function DibujoPausa({ estado = 'leyendo', rama = true }) {
         <ellipse cx="604" cy="52" rx="16" ry="8" fill={LIMA} transform="rotate(25 604 52)" />
         <ellipse cx="582" cy="76" rx="12" ry="6" fill={LIMA} transform="rotate(40 582 76)" />
       </g>}
+      {/* Todo lo que cuelga se mueve junto: el reposo balancea «colgado» y el toque, «colgado-toque». */}
+      <g data-parte="colgado-toque"><g data-parte="colgado">
       <g data-parte="brazo-rama">
         <path d="M456 128 q-20 -30 -14 -66" fill="none" strokeWidth="24" />
         <path d="M456 128 q-20 -30 -14 -66" fill="none" stroke={GRIS} strokeWidth="16" />
@@ -146,6 +151,7 @@ export function DibujoPausa({ estado = 'leyendo', rama = true }) {
         ? 'M436 58 q4 -8 10 -4 M442 60 q4 -8 10 -4 M532 58 q4 -8 10 -2 M538 60 q4 -8 10 -2'
         : 'M436 58 q4 -8 10 -4 M442 60 q4 -8 10 -4'} fill="none" strokeWidth="3" />}
       {estado === 'dormido' && <Zetas />}
+      </g></g>
     </g>
   );
 }
@@ -168,7 +174,10 @@ export function animarEstadoPausa(raiz, estado) {
 }
 
 // Pausa como SVG en línea. «animacion» es un contador: cada cambio reproduce el estado una vez.
-export default function Pausa({ estado = 'leyendo', animacion = 0, ancho = 120, parpadeo = true, rama = true, className = '', alTerminar }) {
+// Con «viva», mira al puntero y se balancea en reposo; «toque» es un contador para reaccionar al tocarla.
+export default function Pausa({
+  estado = 'leyendo', animacion = 0, ancho = 120, parpadeo = true, rama = true, viva = false, toque = 0, className = '', alTerminar,
+}) {
   const raiz = useRef(null);
   const pose = ESTADOS_PAUSA.includes(estado) ? estado : 'leyendo';
 
@@ -179,6 +188,8 @@ export default function Pausa({ estado = 'leyendo', animacion = 0, ancho = 120, 
     }
     animarEstadoPausa(raiz.current, pose).eventCallback('onComplete', () => alTerminar?.());
   }, { scope: raiz, dependencies: [animacion, pose] });
+
+  useMascotaViva(raiz, { personaje: 'pausa', viva, toque, pose });
 
   // Parpadeo lento de lectura cada varios segundos; nunca dormida ni con «menos movimiento».
   useGSAP(() => {

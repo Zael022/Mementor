@@ -81,10 +81,9 @@ export default function BarraLateral() {
         </>
       )}
 
+      {/* Cerrar sesión y los documentos legales están dentro de Configuración. */}
       <ul className="barra-pie">
         <li><NavLink to="/configuracion"><Icono nombre="ajustes" />Configuración</NavLink></li>
-        <li className="barra-legal"><NavLink to="/privacidad"><Icono nombre="privacidad" />Privacidad</NavLink></li>
-        <li className="barra-legal"><NavLink to="/terminos"><Icono nombre="terminos" />Términos</NavLink></li>
       </ul>
     </nav>
   );

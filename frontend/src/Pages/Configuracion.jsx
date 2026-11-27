@@ -1,6 +1,8 @@
 import { Fragment, useId, useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import PrivacidadDatos from '../Componentes/PrivacidadDatos.jsx';
 import Campo from '../Componentes/Campo.jsx';
+import Icono from '../Componentes/Iconos.jsx';
 import { CambiarContrasena, CambiarCorreo, DatosPersonales, FotoPerfil } from '../Componentes/EditorPerfil.jsx';
 import { MensajeError } from '../Componentes/Estados.jsx';
 import Mascota from '../Componentes/Mascota.jsx';
@@ -82,7 +84,9 @@ function useZonas(actual) {
 
 // Perfil, apariencia, accesibilidad y metas de estudio.
 export default function Configuracion() {
-  const { usuario, preferencias, guardarPreferencias } = useSesion();
+  const { usuario, preferencias, guardarPreferencias, cerrarSesion } = useSesion();
+  const navegar = useNavigate();
+  const [saliendo, setSaliendo] = useState(false);
   const [estadoPreferencias, setEstadoPreferencias] = useState('');
   const ajustes = useEnvio();
   const zonas = useZonas(preferencias.timeZone);
@@ -93,6 +97,12 @@ export default function Configuracion() {
     setEstadoPreferencias('Guardando…');
     const resultado = await ajustes.ejecutar(() => guardarPreferencias(cambios));
     setEstadoPreferencias(resultado ? 'Preferencias guardadas en tu cuenta.' : '');
+  }
+
+  async function salir() {
+    setSaliendo(true);
+    await cerrarSesion();
+    navegar('/login');
   }
 
   return (
@@ -181,6 +191,19 @@ export default function Configuracion() {
           {usuario.institutionName && <li><span>Institución</span><span className="tenue">{usuario.institutionName}</span></li>}
         </ul>
         <p className="tenue pequeno">El rol y la institución los administra tu institución.</p>
+      </section>
+
+      {/* Documentos legales y salida de la cuenta: viven aquí para no recargar la barra superior ni el menú. */}
+      <section className="tarjeta" aria-labelledby="titulo-sesion">
+        <h2 id="titulo-sesion">Documentos y sesión</h2>
+        <ul className="config-legales">
+          <li><Link to="/privacidad"><Icono nombre="privacidad" tamano={18} />Política de privacidad</Link></li>
+          <li><Link to="/terminos"><Icono nombre="terminos" tamano={18} />Términos y condiciones</Link></li>
+        </ul>
+        <p className="tenue pequeno">Al cerrar sesión se borra la sesión de este equipo. Tus preferencias quedan guardadas en tu cuenta.</p>
+        <button type="button" className="boton secundario con-icono" onClick={salir} disabled={saliendo}>
+          <Icono nombre="salir" tamano={18} />{saliendo ? 'Cerrando sesión…' : 'Cerrar sesión'}
+        </button>
       </section>
     </>
   );

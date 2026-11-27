@@ -36,7 +36,7 @@ export function assertMailConfigured() {
 // Envía un correo de texto.
 export async function sendMail({ to, subject, text }) {
   assertMailConfigured();
-  const message = { from: process.env.SMTP_FROM || 'MENTOR AI <no-responder@mentor.test>', to, subject, text };
+  const message = { from: process.env.SMTP_FROM || 'MENTOR IA <no-responder@mentor.test>', to, subject, text };
   await getTransport().sendMail(message);
   if (process.env.NODE_ENV === 'test') sentInTests.push(message);
 }

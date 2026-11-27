@@ -1,13 +1,13 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { prefiereMenosMovimiento } from '../hooks/useMovimiento.js';
 import { leerAvance, olvidarAvance } from '../utils/avanceMapa.js';
 import { muestrear, puntoEn, puntosEntre, trazoPor, trazoRecto } from '../utils/caminoMapa.js';
 import { fechaHora } from '../utils/fechas.js';
 import { gsap } from '../utils/gsapMapa.js';
-import { MENSAJE_MAPA_COMPLETO } from '../utils/mensajesMascota.js';
+import { MENSAJE_MAPA_COMPLETO, mensajeOrbiMapa } from '../utils/mensajesMascota.js';
 import EstadoVacio from './EstadoVacio.jsx';
-import { useMascotasVisibles } from './Mascota.jsx';
+import { useMascotasVisibles, useToqueMascota } from './Mascota.jsx';
 import Orbi from './Orbi.jsx';
 import Pausa from './Pausa.jsx';
 import './Recorrido.css';
@@ -100,11 +100,45 @@ function IconoNodo({ parada, estado }) {
   return <span>{parada.numero}</span>;
 }
 
+// Adornos de cada zona del mapa (decorativos): destellos como el de la marca, planetas y nubes.
+function Destello({ className }) {
+  return <svg className={`adorno ${className}`} viewBox="0 0 24 24" width="22" height="22"><path d="M12 1.5c.9 5.6 4.9 9.6 10.5 10.5-5.6.9-9.6 4.9-10.5 10.5C11.1 16.9 7.1 12.9 1.5 12 7.1 11.1 11.1 7.1 12 1.5z" /></svg>;
+}
+function Planeta({ className }) {
+  return (
+    <svg className={`adorno ${className}`} viewBox="0 0 60 40" width="60" height="40">
+      <circle cx="30" cy="20" r="11" />
+      <ellipse cx="30" cy="21" rx="26" ry="7" fill="none" strokeWidth="3" transform="rotate(-14 30 21)" />
+    </svg>
+  );
+}
+function Nube({ className }) {
+  return <svg className={`adorno ${className}`} viewBox="0 0 64 30" width="64" height="30"><path d="M14 28h38a10 10 0 0 0 0-20 14 14 0 0 0-26-2 11 11 0 0 0-12 22z" /></svg>;
+}
+function AdornosZona({ indice }) {
+  return (
+    <div className="mapa-adornos" aria-hidden="true">
+      <Destello className="a-1" />
+      {indice % 2 ? <Nube className="a-2" /> : <Planeta className="a-2" />}
+      <Destello className="a-3" />
+      {indice % 2 ? <Planeta className="a-4" /> : <Nube className="a-4" />}
+    </div>
+  );
+}
+
+// Inicio y meta del recorrido (decorativos; el avance real lo dice el resumen de arriba).
+function Bandera() {
+  return <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 21V3.5M6 4h11l-2.5 3.8L17 11.6H6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+}
+function Estrella() {
+  return <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="currentColor" /></svg>;
+}
+
 function CuerpoParada({ parada, estado, cursoId, mascotas }) {
   if (parada.tipo === 'vacio') {
     return (
       <div className="parada-tarjeta parada-vacia">
-        {mascotas && <Pausa estado="dormido" ancho={56} parpadeo={false} />}
+        {mascotas && <Pausa estado="dormido" ancho={56} parpadeo={false} viva />}
         <span>Este módulo todavía no tiene lecciones.</span>
       </div>
     );
@@ -165,7 +199,14 @@ export default function RutaLecciones({ modulos, tareas = [], cursoId }) {
   const viajando = useRef(false);
   const [medidas, setMedidas] = useState(null);
   const [saludo, setSaludo] = useState(0);
+  const { toque, tocar } = useToqueMascota('orbi');
+  const [fraseOrbi, setFraseOrbi] = useState('');
+  const esperaFrase = useRef(0);
+  useEffect(() => () => clearTimeout(esperaFrase.current), []);
   const completo = hayParadas && siguiente === -1;
+  const cuentanTodas = lista.filter((parada) => parada.tipo === 'leccion' || parada.tipo === 'tarea');
+  const hechasTodas = cuentanTodas.filter((parada) => parada.hecha).length;
+  const porcentaje = cuentanTodas.length ? Math.round((hechasTodas / cuentanTodas.length) * 100) : 0;
   // Hasta dónde llega el camino lleno: la parada siguiente, o la última si ya se recorrió todo.
   const metaIndice = completo ? ultima : siguiente;
 
@@ -260,6 +301,19 @@ export default function RutaLecciones({ modulos, tareas = [], cursoId }) {
     return () => { linea.kill(); viajando.current = false; };
   }, [geometria, lista, metaIndice, completo, cursoId]);
 
+  // Al tocar a Orbi en el mapa: reacciona, dice a dónde sigue y lleva el foco a esa parada.
+  function tocarOrbi() {
+    tocar();
+    const meta = siguiente >= 0 ? lista[siguiente] : null;
+    setFraseOrbi(mensajeOrbiMapa(meta?.titulo));
+    clearTimeout(esperaFrase.current);
+    esperaFrase.current = setTimeout(() => setFraseOrbi(''), 4000);
+    if (!meta) return;
+    const enlace = lienzo.current?.querySelectorAll('.parada')[siguiente]?.querySelector('a');
+    enlace?.scrollIntoView?.({ block: 'center', behavior: prefiereMenosMovimiento() ? 'auto' : 'smooth' });
+    enlace?.focus({ preventScroll: true });
+  }
+
   if (!hayParadas) {
     return (
       <EstadoVacio mascota="leyendo" titulo="Este curso aún no tiene lecciones publicadas"
@@ -270,26 +324,49 @@ export default function RutaLecciones({ modulos, tareas = [], cursoId }) {
   let lado = 0;
   return (
     <div className="mapa">
+      {/* Resumen del recorrido: el mismo avance que dicen las paradas, en una línea. */}
+      <div className="mapa-resumen">
+        <div className="mapa-resumen-texto">
+          <strong>{completo ? `Recorrido completo: ${hechasTodas} de ${cuentanTodas.length}` : `${hechasTodas} de ${cuentanTodas.length} paradas completadas`}</strong>
+          <span className="tenue">{completo ? 'Puedes repasar cualquier parada cuando quieras.' : 'Las lecciones y tareas cuentan; Parejas es práctica libre.'}</span>
+        </div>
+        <div className="mapa-barra" aria-hidden="true"><span style={{ width: `${porcentaje}%` }} /></div>
+        <span className="mapa-porcentaje" aria-hidden="true">{porcentaje} %</span>
+        <ul className="mapa-leyenda" aria-label="Cómo leer el mapa">
+          <li><span className="muestra completada" aria-hidden="true" />Completada</li>
+          <li><span className="muestra siguiente" aria-hidden="true" />Siguiente</li>
+          <li><span className="muestra pendiente" aria-hidden="true" />Pendiente</li>
+          <li><span className="muestra practica" aria-hidden="true" />Práctica</li>
+        </ul>
+      </div>
       {completo && <p className="mapa-completo" role="status">{MENSAJE_MAPA_COMPLETO}</p>}
       <div className="mapa-ventana" ref={ventana}>
         <div className="mapa-lienzo" ref={lienzo}>
           {geometria && (
             <svg className="mapa-camino" width={medidas.ancho} height={medidas.alto} viewBox={`0 0 ${medidas.ancho} ${medidas.alto}`} aria-hidden="true" focusable="false">
+              <path className="camino-suelo" d={geometria.base} />
               <path className="camino-base" d={geometria.base} />
               {geometria.avance && <path className="camino-borde" d={geometria.avance} />}
               {geometria.avance && <path className="camino-avance" d={geometria.avance} />}
             </svg>
           )}
+          <div className="mapa-hito mapa-inicio" aria-hidden="true"><Bandera />Inicio</div>
           <ol className="mapa-modulos">
-            {secciones.map((seccion) => {
+            {secciones.map((seccion, indiceSeccion) => {
               const cuentan = seccion.paradas.filter((parada) => parada.tipo === 'leccion' || parada.tipo === 'tarea');
               const hechas = cuentan.filter((parada) => parada.hecha).length;
+              const terminado = cuentan.length > 0 && hechas === cuentan.length;
               return (
-                <li key={seccion.clave} className={`mapa-modulo ${seccion.final ? 'final' : ''}`}>
+                <li key={seccion.clave} className={`mapa-modulo zona-${indiceSeccion % 4} ${seccion.final ? 'final' : ''} ${terminado ? 'terminado' : ''}`}>
+                  <AdornosZona indice={indiceSeccion} />
                   <div className="mapa-cartel">
-                    <h3>{seccion.titulo}</h3>
+                    {!seccion.final && <span className="cartel-numero">Módulo {indiceSeccion + 1}</span>}
+                    <h3>{terminado && <span className="cartel-estrella" aria-hidden="true"><Estrella /></span>}{seccion.titulo}</h3>
                     {cuentan.length > 0 && (
-                      <span>{hechas === cuentan.length ? `Completo: ${hechas} de ${cuentan.length}` : `${hechas} de ${cuentan.length} ${cuentan.length === 1 ? 'parada' : 'paradas'}`}</span>
+                      <span className="cartel-avance">
+                        {terminado ? `Completo: ${hechas} de ${cuentan.length}` : `${hechas} de ${cuentan.length} ${cuentan.length === 1 ? 'parada' : 'paradas'}`}
+                        <span className="cartel-barra" aria-hidden="true"><span style={{ width: `${Math.round((hechas / cuentan.length) * 100)}%` }} /></span>
+                      </span>
                     )}
                   </div>
                   <ol className="mapa-paradas">
@@ -310,9 +387,17 @@ export default function RutaLecciones({ modulos, tareas = [], cursoId }) {
               );
             })}
           </ol>
+          <div className={`mapa-hito mapa-meta ${completo ? 'lograda' : ''}`} aria-hidden="true"><Estrella />Meta: Constelación</div>
           {mascotas && geometria?.descanso && (
-            <div className="mapa-orbi" ref={orbi} aria-hidden="true">
-              <div><Orbi estado={completo ? 'celebrando' : 'saludo'} ancho={64} animacion={saludo} parpadeo={false} /></div>
+            <div className="mapa-orbi" ref={orbi}>
+              <div>
+                <button type="button" className="mascota-toque" onClick={tocarOrbi}
+                  aria-label={completo ? 'Orbi: celebrar el recorrido' : 'Orbi: ir a la siguiente parada'}>
+                  <Orbi estado={completo ? 'celebrando' : 'saludo'} ancho={64} animacion={saludo} parpadeo={false} viva toque={toque} />
+                </button>
+              </div>
+              {/* La frase se anuncia y desaparece sola; el mapa sigue igual. */}
+              <p className={`burbuja-mapa ${fraseOrbi ? 'visible' : ''}`} aria-live="polite">{fraseOrbi}</p>
             </div>
           )}
         </div>

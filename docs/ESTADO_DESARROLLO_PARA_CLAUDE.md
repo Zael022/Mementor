@@ -2,6 +2,14 @@
 
 **Última actualización** — 2026-11-26. Modo de prueba con cuentas por rol y acceso rápido (rama `feature/cuentas-de-prueba`); antes, 2026-11-25: Mapa del curso, rango de avance, mascotas Orbi y Pausa, sticker de papel y Parejas (rama `feature/mapa-mascota-parejas`); antes, las 8 capas de la IA (rama `feature/capas-ia`, con `main` integrado: CRM de admisiones y de plataforma); antes, CRM institucional y seguridad OWASP (PR #13); antes, correcciones de la auditoría de salida a producción (rama `fix/auditoria-produccion`); antes, correcciones de la revisión independiente (rama `fix/revision-independiente`); antes, asignación de seguridad web (rama `feature/seguridad-web`); antes, correcciones de la auditoría técnica (rama `fix/auditoria`); antes, logo «M con birrete» en la página; GSAP y microinteracciones; antes, logo oficial y requisitos del Proyecto Final FWD: bcrypt y JWT, gobernanza (Ley 8968) y rol auditor, 8 agentes de IA, APIs externas y n8n, catálogo de roles, configuración de despliegue, nueva identidad visual y documentos entregables.
 
+## Sesión 2026-11-27 · Configuración, logo «MENTOR IA», mapa con más diseño y mascotas interactivas
+Rama `feature/configuracion-mentor-ia` (desde `develop`).
+- **Cerrar sesión, Privacidad y Términos** salen de la barra superior y del menú lateral; viven en Configuración, sección «Documentos y sesión».
+- **Logo «MENTOR IA»** (juego de palabras con «mentoría»): en los cuatro SVG de `public/marca` se intercambiaron las letras de la insignia (mismos trazos, sin redibujar). El nombre visible pasó a «MENTOR IA» en la interfaz, el título de la página y los correos. Los prompts del tutor y la documentación histórica conservan «MENTOR AI».
+- **Mapa del curso:** resumen con barra de avance y leyenda; zonas de color por módulo con adornos (destellos, planetas y nubes); senda ancha con línea punteada; carteles «Módulo N» con mini barra y estrella al completar; hitos de inicio y meta; halo giratorio en la parada siguiente.
+- **Orbi y Pausa interactivos** (`hooks/useMascotaViva.js`): las pupilas siguen al puntero, en reposo Orbi flota y Pausa se balancea, y al tocarlos reaccionan y dicen una frase de `FRASES_TOQUE` (región viva, botón con nombre «Saludar a …»). En el mapa, tocar a Orbi lleva el foco a la parada siguiente. Con «Menos movimiento» no se mueven.
+- Verificación: frontend 91/91 + lint + build; backend 257/257; Playwright 47/47 (la prueba del mapa ahora toca a Orbi); capturas y mockups regenerados.
+
 ## Sesión 2026-11-26 · Modo de prueba: cuentas por rol y acceso rápido
 Rama `feature/cuentas-de-prueba` desde `main` (1234bcd). Daisy pidió quitar la regla que prohibía las cuentas de prueba y tener un botón discreto para entrar rápido. Decisiones en `docs/adr/0011-modo-de-prueba.md`; la regla 4 de `CLAUDE.md`, `AGENTS.md`, los documentos 00, 01, 12 y 15, el README y `despliegue.md` quedaron actualizados.
 

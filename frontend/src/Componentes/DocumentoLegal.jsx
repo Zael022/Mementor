@@ -6,11 +6,11 @@ import Logo from './Logo.jsx';
 // Marco común de los documentos legales: se leen con o sin sesión iniciada.
 export default function DocumentoLegal({ titulo, version, children }) {
   const { usuario } = useSesion();
-  useEffect(() => { document.title = `${titulo} · MENTOR AI`; }, [titulo]);
+  useEffect(() => { document.title = `${titulo} · MENTOR IA`; }, [titulo]);
   return (
     <div className="documento-legal">
       <header>
-        <Logo como={Link} to={usuario ? '/' : '/login'} aria-label="MENTOR AI, volver" />
+        <Logo como={Link} to={usuario ? '/' : '/login'} aria-label="MENTOR IA, volver" />
         <Link to={usuario ? '/' : '/login'} className="volver">{usuario ? '← Volver a la plataforma' : '← Volver a iniciar sesión'}</Link>
       </header>
       <article className="tarjeta">

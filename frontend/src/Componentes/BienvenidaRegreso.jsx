@@ -33,7 +33,7 @@ export default function BienvenidaRegreso({ actividad, curso }) {
 
   return (
     <section className="bienvenida-regreso" aria-labelledby="titulo-regreso">
-      <Mascota personaje="pausa" estado="bienvenida" tamano="mediano" animacion={1} />
+      <Mascota personaje="pausa" estado="bienvenida" tamano="mediano" animacion={1} interactiva />
       <div>
         <h2 id="titulo-regreso">{MENSAJE_REGRESO}</h2>
         <p className="tenue">{MENSAJE_RITMO} Tu avance está guardado.</p>

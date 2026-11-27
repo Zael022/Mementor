@@ -1,6 +1,7 @@
 import { useId, useRef } from 'react';
 import { prefiereMenosMovimiento } from '../hooks/useMovimiento.js';
 import { gsap, useGSAP } from '../utils/gsap.js';
+import { useMascotaViva } from '../hooks/useMascotaViva.js';
 
 // Orbi, la mascota principal (docs/marca/mascotas/orbi.svg). Cada estado cambia partes del mismo dibujo.
 export const ESTADOS_ORBI = ['saludo', 'animo', 'pensando', 'celebrando', 'descanso'];
@@ -74,10 +75,12 @@ function Ojos({ estado }) {
     <g data-parte="parpados">
       <ellipse cx="162" cy="124" rx="11" ry="13" fill="#fff" />
       <ellipse cx="198" cy="124" rx="11" ry="13" fill="#fff" />
-      <circle cx={165 + dx} cy={126 + dy} r={pupila} fill={TINTA} stroke="none" />
-      <circle cx={201 + dx} cy={126 + dy} r={pupila} fill={TINTA} stroke="none" />
-      <circle cx={167 + dx} cy={122 + dy} r="2.3" fill="#fff" stroke="none" />
-      <circle cx={203 + dx} cy={122 + dy} r="2.3" fill="#fff" stroke="none" />
+      <g data-parte="pupilas">
+        <circle cx={165 + dx} cy={126 + dy} r={pupila} fill={TINTA} stroke="none" />
+        <circle cx={201 + dx} cy={126 + dy} r={pupila} fill={TINTA} stroke="none" />
+        <circle cx={167 + dx} cy={122 + dy} r="2.3" fill="#fff" stroke="none" />
+        <circle cx={203 + dx} cy={122 + dy} r="2.3" fill="#fff" stroke="none" />
+      </g>
     </g>
   );
 }
@@ -215,7 +218,8 @@ export function useParpadeo(raiz, estado, activo = true) {
 }
 
 // Orbi como SVG en línea. «animacion» es un contador: cada vez que cambia se reproduce el estado una vez.
-export default function Orbi({ estado = 'saludo', animacion = 0, ancho = 120, parpadeo = true, className = '', alTerminar }) {
+// Con «viva», mira al puntero y flota en reposo; «toque» es otro contador para reaccionar al tocarlo.
+export default function Orbi({ estado = 'saludo', animacion = 0, ancho = 120, parpadeo = true, viva = false, toque = 0, className = '', alTerminar }) {
   const raiz = useRef(null);
   const idBase = `orbi${useIdSeguro()}`;
   const pose = ESTADOS_ORBI.includes(estado) ? estado : 'saludo';
@@ -228,11 +232,12 @@ export default function Orbi({ estado = 'saludo', animacion = 0, ancho = 120, pa
     animarEstadoOrbi(raiz.current, pose).eventCallback('onComplete', () => alTerminar?.());
   }, { scope: raiz, dependencies: [animacion, pose] });
   useParpadeo(raiz, pose, parpadeo && ancho >= 80);
+  useMascotaViva(raiz, { personaje: 'orbi', viva, toque, pose });
 
   return (
     <svg ref={raiz} className={`orbi ${className}`.trim()} viewBox={VISTA_ORBI} width={ancho} height={Math.round((ancho * 184) / 236)}
       aria-hidden="true" focusable="false" overflow="visible" data-estado={pose}>
-      <DibujoOrbi estado={pose} idBase={idBase} />
+      <g data-parte="flotar"><DibujoOrbi estado={pose} idBase={idBase} /></g>
     </svg>
   );
 }
