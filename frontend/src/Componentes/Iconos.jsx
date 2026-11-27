@@ -1,4 +1,4 @@
-// Íconos propios de MENTOR AI: retícula de 24 px, trazo redondeado de 1,75 px y un tono suave de relleno.
+// Íconos propios de MENTOR IA: retícula de 24 px, trazo redondeado de 1,75 px y un tono suave de relleno.
 // «trazo» dibuja la línea; «tono» es la superficie que se rellena con el color actual al 16 %.
 export const ICONOS = {
   inicio: {

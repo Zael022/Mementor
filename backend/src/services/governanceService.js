@@ -73,7 +73,7 @@ const LEARNING_EXPORT = {
 };
 
 // Qué queda fuera de la copia y cómo pedirlo.
-const EXPORT_NOTE = 'Incluye tu perfil, aceptaciones, solicitudes de baja y tus datos de aprendizaje en MENTOR AI. '
+const EXPORT_NOTE = 'Incluye tu perfil, aceptaciones, solicitudes de baja y tus datos de aprendizaje en MENTOR IA. '
   + 'La bitácora de seguridad y los registros técnicos de uso no se incluyen: pídelos a la administración de tu institución.';
 
 // Copia de los datos personales propios (derecho de acceso).
@@ -187,7 +187,7 @@ async function notifyCompletion(request, email, displayName) {
     try {
       await sendMail({
         to: email,
-        subject: 'Tu cuenta de MENTOR AI fue eliminada',
+        subject: 'Tu cuenta de MENTOR IA fue eliminada',
         text: `Hola, ${displayName}:\n\nProcesamos tu solicitud de baja n.º ${request.id}. ${RETAINED_SUMMARY}\n\nSi no la pediste, contacta de inmediato a la administración de tu institución.`,
       });
       notificationStatus = 'sent';

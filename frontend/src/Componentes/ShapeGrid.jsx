@@ -1,7 +1,7 @@
 // Shape Grid de React Bits (https://reactbits.dev/backgrounds/shape-grid), variante JavaScript + CSS.
 // Origen: github.com/DavidHDev/react-bits, src/content/Backgrounds/ShapeGrid (copiado el 2026-11-16).
 // Licencia: MIT + Commons Clause, Copyright (c) 2026 David Haz. Ver THIRD_PARTY_NOTICES.md en la raíz.
-// Cambios de MENTOR AI: prop «interactive» para no escuchar el puntero (capa decorativa)
+// Cambios de MENTOR IA: prop «interactive» para no escuchar el puntero (capa decorativa)
 // y pausa explícita cuando la pestaña se oculta; respeta también «menos movimiento» de la cuenta.
 // El resto del motor se conserva sin cambios.
 import { useEffect, useRef } from 'react';

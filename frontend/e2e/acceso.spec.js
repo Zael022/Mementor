@@ -22,12 +22,12 @@ test.describe('Navegación dentro de la plataforma', () => {
 
   test('una dirección inexistente muestra «no encontrada» con el menú y el título de la pestaña cambia por sección', async ({ page }) => {
     await entrar(page, curso.estudiante);
-    await expect(page).toHaveTitle('Inicio · MENTOR AI');
+    await expect(page).toHaveTitle('Inicio · MENTOR IA');
     await page.goto('/estudiante/no-existe');
     await expect(page.getByRole('heading', { name: 'No encontramos esta página' })).toBeVisible();
     await expect(page.getByRole('navigation', { name: 'Navegación principal' })).toBeVisible();
     await page.getByRole('link', { name: 'Calendario' }).click();
-    await expect(page).toHaveTitle('Calendario · MENTOR AI');
+    await expect(page).toHaveTitle('Calendario · MENTOR IA');
     await expect(page.locator('#contenido')).toBeFocused();
   });
 });
